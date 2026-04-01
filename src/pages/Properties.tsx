@@ -120,18 +120,16 @@ const PropertiesPage = () => {
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Map area */}
-        <div className="hidden flex-1 items-center justify-center bg-muted/30 md:flex">
-          <div className="text-center text-muted-foreground">
-            <MapPin className="mx-auto mb-3 h-16 w-16" />
-            <p className="text-lg font-medium">네이버 지도 연동 예정</p>
-            <p className="mt-1 text-sm">API 키 설정 후 활성화됩니다</p>
-            {selectedAsset && (
-              <div className="mt-4 rounded-lg bg-background p-4 text-left shadow-md">
-                <p className="text-sm font-medium">{selectedAsset.address}</p>
-                <p className="text-xs text-muted-foreground">{selectedAsset.asset_type}</p>
-              </div>
-            )}
-          </div>
+        <div className="hidden flex-1 md:flex">
+          <NaverMap
+            markers={filtered
+              .filter(a => a.latitude && a.longitude)
+              .map(a => ({ lat: a.latitude!, lng: a.longitude!, title: a.address }))}
+            onMarkerClick={(idx) => {
+              const validAssets = filtered.filter(a => a.latitude && a.longitude);
+              setSelectedAsset(validAssets[idx]);
+            }}
+          />
         </div>
 
         {/* Asset list */}
