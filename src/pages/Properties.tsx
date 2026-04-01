@@ -136,10 +136,7 @@ const PropertiesPage = () => {
         <div className="w-full overflow-y-auto border-l p-4 md:w-[400px]">
           {filtered.length === 0 ? (
             <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-              <div>
-                <MapPin className="mx-auto mb-2 h-8 w-8" />
-                <p className="text-sm">등록된 자산이 없습니다</p>
-              </div>
+              <p className="text-sm">등록된 자산이 없습니다</p>
             </div>
           ) : (
             <div className="space-y-3">
