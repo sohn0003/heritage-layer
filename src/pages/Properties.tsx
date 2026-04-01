@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AssetCard from '@/components/AssetCard';
 import AuthModal from '@/components/AuthModal';
+import NaverMap from '@/components/NaverMap';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Asset {
