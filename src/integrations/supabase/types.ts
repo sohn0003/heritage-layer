@@ -14,16 +14,208 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assets: {
+        Row: {
+          address: string
+          admin_memo: string | null
+          asset_type: string
+          building_coverage: number | null
+          created_at: string
+          floor_area_ratio: number | null
+          gov_cooperation: boolean | null
+          grade: string | null
+          id: string
+          idle_years: number | null
+          is_published: boolean | null
+          land_area: number | null
+          latitude: number | null
+          longitude: number | null
+          ownership_type: string | null
+          zoning: string | null
+        }
+        Insert: {
+          address: string
+          admin_memo?: string | null
+          asset_type: string
+          building_coverage?: number | null
+          created_at?: string
+          floor_area_ratio?: number | null
+          gov_cooperation?: boolean | null
+          grade?: string | null
+          id?: string
+          idle_years?: number | null
+          is_published?: boolean | null
+          land_area?: number | null
+          latitude?: number | null
+          longitude?: number | null
+          ownership_type?: string | null
+          zoning?: string | null
+        }
+        Update: {
+          address?: string
+          admin_memo?: string | null
+          asset_type?: string
+          building_coverage?: number | null
+          created_at?: string
+          floor_area_ratio?: number | null
+          gov_cooperation?: boolean | null
+          grade?: string | null
+          id?: string
+          idle_years?: number | null
+          is_published?: boolean | null
+          land_area?: number | null
+          latitude?: number | null
+          longitude?: number | null
+          ownership_type?: string | null
+          zoning?: string | null
+        }
+        Relationships: []
+      }
+      deal_signals: {
+        Row: {
+          asset_id: string
+          created_at: string
+          id: string
+          signal_type: string
+          user_id: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          id?: string
+          signal_type: string
+          user_id: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          id?: string
+          signal_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_signals_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_inquiries: {
+        Row: {
+          contact: string
+          created_at: string
+          id: string
+          message: string
+          name: string
+          organization: string
+        }
+        Insert: {
+          contact: string
+          created_at?: string
+          id?: string
+          message: string
+          name: string
+          organization: string
+        }
+        Update: {
+          contact?: string
+          created_at?: string
+          id?: string
+          message?: string
+          name?: string
+          organization?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          subscription_tier: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          name?: string | null
+          subscription_tier?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          subscription_tier?: string
+        }
+        Relationships: []
+      }
+      saved_assets: {
+        Row: {
+          asset_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_assets_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +342,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
