@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["'Noto Sans KR'", "sans-serif"],
+        serif: ["'Playfair Display'", "'Noto Sans KR'", "serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
