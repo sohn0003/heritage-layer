@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { TrendingUp, FileText, BarChart3, Building2 } from 'lucide-react';
+
+// 알고리즘 모듈 연동
+import { calculateScore, type AssetInput, type ScoringResult } from '@/algorithm/scoring/scoring';
+import { calculateFinancials, compareScenarios, type FinancialInput, type ScenarioComparison } from '@/algorithm/financial/irr-calculator';
+import { analyzeDealSignal, type DealSignalResult } from '@/algorithm/deal-signal/deal-signal';
 
 const AnalysisPage = () => {
   const [searchParams] = useSearchParams();
@@ -26,13 +31,51 @@ const AnalysisPage = () => {
       setLoading(false);
       return;
     }
-    const fetch = async () => {
+    const fetchAsset = async () => {
       const { data } = await supabase.from('assets').select('*').eq('id', assetId).single();
       setAsset(data);
       setLoading(false);
     };
-    fetch();
+    fetchAsset();
   }, [assetId]);
+
+  // 알고리즘 결과 계산 (asset 변경 시 자동 재계산)
+  const scoringResult: ScoringResult | null = useMemo(() => {
+    if (!asset) return null;
+    const input: AssetInput = {
+      address: asset.address,
+      asset_type: asset.asset_type,
+      zoning: asset.zoning,
+      building_coverage: asset.building_coverage,
+      floor_area_ratio: asset.floor_area_ratio,
+      land_area: asset.land_area,
+      idle_years: asset.idle_years,
+      ownership_type: asset.ownership_type,
+      grade: asset.grade,
+      gov_cooperation: asset.gov_cooperation,
+    };
+    return calculateScore(input);
+  }, [asset]);
+
+  const scenarioComparison: ScenarioComparison | null = useMemo(() => {
+    if (!asset) return null;
+    const input: FinancialInput = {
+      landArea: asset.land_area ?? 0,
+      buildingCoverage: asset.building_coverage ?? 0,
+      floorAreaRatio: asset.floor_area_ratio ?? 0,
+      acquisitionCost: 0,  // TODO: 사용자 입력 또는 추정값
+      renovationCost: 0,
+      annualRevenue: 0,
+      annualExpense: 0,
+      holdingPeriodYears: 10,
+    };
+    return compareScenarios(input);
+  }, [asset]);
+
+  const dealSignal: DealSignalResult | null = useMemo(() => {
+    if (!asset) return null;
+    return analyzeDealSignal(asset.asset_type, asset.ownership_type, asset.gov_cooperation);
+  }, [asset]);
 
   const handleDealInterest = async () => {
     if (!user) return;
@@ -61,6 +104,9 @@ const AnalysisPage = () => {
     );
   }
 
+  const formatNumber = (n: number) => n ? n.toLocaleString() : '--';
+  const formatPercent = (n: number) => n ? `${n.toFixed(1)}%` : '--';
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       {/* Header */}
@@ -69,13 +115,16 @@ const AnalysisPage = () => {
           <div className="mb-2 flex items-center gap-3">
             {asset.grade && <GradeBadge grade={asset.grade} className="h-9 w-9 text-sm" />}
             <Badge variant="secondary">{asset.asset_type}</Badge>
+            {scoringResult && (
+              <Badge variant="outline">종합 {scoringResult.totalScore}점</Badge>
+            )}
           </div>
           <h1 className="text-2xl font-bold">{asset.address}</h1>
           <p className="mt-1 text-sm text-muted-foreground">방치 기간: {asset.idle_years ?? '-'}년</p>
         </div>
       </div>
 
-      {/* Free section */}
+      {/* Free section — 기본 자산 정보 */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[
           { label: '재생 등급', value: asset.grade ?? '-' },
@@ -94,9 +143,33 @@ const AnalysisPage = () => {
         ))}
       </div>
 
+      {/* Scoring 세부 점수 (Free) */}
+      {scoringResult && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg">스코어링 세부 점수</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-4">
+              {[
+                { label: '입지', value: scoringResult.breakdown.locationScore },
+                { label: '상태', value: scoringResult.breakdown.conditionScore },
+                { label: '규제', value: scoringResult.breakdown.regulationScore },
+                { label: '정부협력', value: scoringResult.breakdown.govCoopScore },
+              ].map((item) => (
+                <div key={item.label} className="text-center">
+                  <p className="text-xs text-muted-foreground">{item.label}</p>
+                  <p className="mt-1 text-2xl font-bold">{item.value}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Pro Sections */}
       <div className="space-y-6">
-        {/* Section 1 — Scenarios */}
+        {/* Section 1 — 재생 시나리오 (scoring 알고리즘 연동) */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
@@ -106,12 +179,24 @@ const AnalysisPage = () => {
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-3">
-                {['복합문화공간', '코워킹 허브', '로컬 관광시설'].map((title) => (
-                  <Card key={title} className="bg-muted/50">
+                {(scoringResult?.scenarios.length
+                  ? scoringResult.scenarios
+                  : [
+                      { title: '복합문화공간', description: '시나리오 설명이 여기에 표시됩니다', estimatedIrr: null, confidence: 'medium' as const },
+                      { title: '코워킹 허브', description: '시나리오 설명이 여기에 표시됩니다', estimatedIrr: null, confidence: 'medium' as const },
+                      { title: '로컬 관광시설', description: '시나리오 설명이 여기에 표시됩니다', estimatedIrr: null, confidence: 'medium' as const },
+                    ]
+                ).map((scenario) => (
+                  <Card key={scenario.title} className="bg-muted/50">
                     <CardContent className="p-4">
-                      <h4 className="font-medium">{title}</h4>
-                      <p className="mt-1 text-xs text-muted-foreground">시나리오 설명이 여기에 표시됩니다</p>
-                      <p className="mt-2 text-sm font-semibold text-accent">예상 수익률: --%</p>
+                      <h4 className="font-medium">{scenario.title}</h4>
+                      <p className="mt-1 text-xs text-muted-foreground">{scenario.description}</p>
+                      <p className="mt-2 text-sm font-semibold text-accent">
+                        예상 수익률: {scenario.estimatedIrr != null ? `${scenario.estimatedIrr}%` : '--%'}
+                      </p>
+                      <Badge variant="outline" className="mt-1 text-xs">
+                        신뢰도: {scenario.confidence === 'high' ? '높음' : scenario.confidence === 'medium' ? '보통' : '낮음'}
+                      </Badge>
                     </CardContent>
                   </Card>
                 ))}
@@ -120,7 +205,7 @@ const AnalysisPage = () => {
           </Card>
         </ProLockOverlay>
 
-        {/* Section 2 — Financial */}
+        {/* Section 2 — 재무 수익성 (irr-calculator 연동) */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
@@ -137,10 +222,16 @@ const AnalysisPage = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {['IRR', 'DSCR', '투자회수기간', '예상 매출', '영업이익'].map((label) => (
-                    <TableRow key={label}>
-                      <TableCell className="font-medium">{label}</TableCell>
-                      <TableCell className="text-muted-foreground">--</TableCell>
+                  {[
+                    { label: 'IRR', value: formatPercent(scenarioComparison?.base.irr ?? 0) },
+                    { label: 'DSCR', value: scenarioComparison?.base.dscr ? scenarioComparison.base.dscr.toFixed(2) : '--' },
+                    { label: '투자회수기간', value: scenarioComparison?.base.paybackPeriod ? `${scenarioComparison.base.paybackPeriod}년` : '--' },
+                    { label: '예상 매출', value: `${formatNumber(scenarioComparison?.base.estimatedRevenue ?? 0)}원` },
+                    { label: '영업이익', value: `${formatNumber(scenarioComparison?.base.operatingProfit ?? 0)}원` },
+                  ].map((row) => (
+                    <TableRow key={row.label}>
+                      <TableCell className="font-medium">{row.label}</TableCell>
+                      <TableCell className="text-muted-foreground">{row.value}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -149,7 +240,7 @@ const AnalysisPage = () => {
           </Card>
         </ProLockOverlay>
 
-        {/* Section 3 — Comparison */}
+        {/* Section 3 — 시나리오 비교표 (compareScenarios 연동) */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
@@ -168,12 +259,37 @@ const AnalysisPage = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {['IRR', '예상 매출', 'NPV', '회수기간'].map((label) => (
-                    <TableRow key={label}>
-                      <TableCell className="font-medium">{label}</TableCell>
-                      <TableCell>--</TableCell>
-                      <TableCell>--</TableCell>
-                      <TableCell>--</TableCell>
+                  {[
+                    {
+                      label: 'IRR',
+                      c: formatPercent(scenarioComparison?.conservative.irr ?? 0),
+                      b: formatPercent(scenarioComparison?.base.irr ?? 0),
+                      o: formatPercent(scenarioComparison?.optimistic.irr ?? 0),
+                    },
+                    {
+                      label: '예상 매출',
+                      c: `${formatNumber(scenarioComparison?.conservative.estimatedRevenue ?? 0)}원`,
+                      b: `${formatNumber(scenarioComparison?.base.estimatedRevenue ?? 0)}원`,
+                      o: `${formatNumber(scenarioComparison?.optimistic.estimatedRevenue ?? 0)}원`,
+                    },
+                    {
+                      label: 'NPV',
+                      c: `${formatNumber(scenarioComparison?.conservative.npv ?? 0)}원`,
+                      b: `${formatNumber(scenarioComparison?.base.npv ?? 0)}원`,
+                      o: `${formatNumber(scenarioComparison?.optimistic.npv ?? 0)}원`,
+                    },
+                    {
+                      label: '회수기간',
+                      c: scenarioComparison?.conservative.paybackPeriod ? `${scenarioComparison.conservative.paybackPeriod}년` : '--',
+                      b: scenarioComparison?.base.paybackPeriod ? `${scenarioComparison.base.paybackPeriod}년` : '--',
+                      o: scenarioComparison?.optimistic.paybackPeriod ? `${scenarioComparison.optimistic.paybackPeriod}년` : '--',
+                    },
+                  ].map((row) => (
+                    <TableRow key={row.label}>
+                      <TableCell className="font-medium">{row.label}</TableCell>
+                      <TableCell>{row.c}</TableCell>
+                      <TableCell>{row.b}</TableCell>
+                      <TableCell>{row.o}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -182,7 +298,7 @@ const AnalysisPage = () => {
           </Card>
         </ProLockOverlay>
 
-        {/* Section 4 — Gov Route */}
+        {/* Section 4 — 정부협력 경로 (deal-signal 연동) */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
@@ -191,8 +307,33 @@ const AnalysisPage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <p><strong>수의계약 조건:</strong> 조건 데이터가 여기에 표시됩니다</p>
-              <p><strong>민간제안 절차:</strong> 절차 데이터가 여기에 표시됩니다</p>
+              {dealSignal?.govRoute ? (
+                <>
+                  <p><strong>수의계약 조건:</strong> {dealSignal.govRoute.directContractCondition}</p>
+                  <p><strong>민간제안 절차:</strong> {dealSignal.govRoute.privateProposaProcess}</p>
+                  <p><strong>예상 소요 기간:</strong> {dealSignal.govRoute.estimatedTimeline}</p>
+                  {dealSignal.govRoute.applicablePrograms.length > 0 && (
+                    <div>
+                      <strong>적용 가능 프로그램:</strong>
+                      <ul className="mt-1 list-disc pl-5">
+                        {dealSignal.govRoute.applicablePrograms.map((p) => (
+                          <li key={p}>{p}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p><strong>수의계약 조건:</strong> 알고리즘 구현 후 표시됩니다</p>
+                  <p><strong>민간제안 절차:</strong> 알고리즘 구현 후 표시됩니다</p>
+                </>
+              )}
+              {dealSignal && (
+                <Badge variant={dealSignal.dealReadiness === 'ready' ? 'default' : 'outline'} className="mt-2">
+                  딜 준비 상태: {dealSignal.dealReadiness === 'ready' ? '준비 완료' : dealSignal.dealReadiness === 'conditional' ? '조건부' : '미준비'}
+                </Badge>
+              )}
             </CardContent>
           </Card>
         </ProLockOverlay>
