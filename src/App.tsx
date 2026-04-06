@@ -4,12 +4,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/common/Navbar";
 import Home from "@/pages/Home";
 import Properties from "@/pages/Properties";
 import Analysis from "@/pages/Analysis";
 import About from "@/pages/About";
-import AdminProperties from "@/admin/pages/AdminProperties";
+import AdminProperties from "@/pages/admin/AdminProperties";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();

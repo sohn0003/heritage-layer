@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import AssetCard from '@/components/AssetCard';
-import AuthModal from '@/components/AuthModal';
-import NaverMap from '@/components/NaverMap';
+import AssetCard from '@/components/cards/AssetCard';
+import AuthModal from '@/components/common/AuthModal';
+import NaverMap from '@/components/map/NaverMap';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
