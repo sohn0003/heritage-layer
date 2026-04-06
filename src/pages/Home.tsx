@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import PartnerForm from '@/components/PartnerForm';
+import PartnerForm from '@/components/common/PartnerForm';
 import { ArrowRight, Search, Brain, Handshake, School, Home as HomeIcon, MapPin } from 'lucide-react';
 
 const stats = [

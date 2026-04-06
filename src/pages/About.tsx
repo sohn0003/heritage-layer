@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import PartnerForm from '@/components/PartnerForm';
+import PartnerForm from '@/components/common/PartnerForm';
 import { Database, Lightbulb, Rocket, Check, X } from 'lucide-react';
 
 const methodology = [
