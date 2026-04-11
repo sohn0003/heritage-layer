@@ -76,6 +76,9 @@ const HomePage = () => {
           backgroundPosition: 'center',
         }}
       >
+        {/* Dark overlay */}
+        <div className="absolute inset-0 z-[1]" style={{ background: 'rgba(0, 0, 0, 0.6)' }} />
+
         {/* Text layer (behind silhouettes) */}
         <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 lg:px-20 z-10">
           <span
