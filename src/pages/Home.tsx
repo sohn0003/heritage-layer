@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import heroBg from '@/assets/hero-bg.jpg';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
