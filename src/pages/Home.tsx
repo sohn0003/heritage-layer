@@ -4,13 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import PartnerForm from '@/components/common/PartnerForm';
-import { ArrowRight, Search, Brain, Handshake, School, Home as HomeIcon, MapPin } from 'lucide-react';
-
-const stats = [
-  { icon: School, label: '폐교', value: '4,008개', desc: '전국 폐교 현황' },
-  { icon: HomeIcon, label: '방치 빈집', value: '13만 호', desc: '관리 사각지대' },
-  { icon: MapPin, label: '소멸위험 지역', value: '118개', desc: '인구감소 위기' },
-];
+import { ArrowRight, Search, Brain, Handshake, MapPin } from 'lucide-react';
 
 const steps = [
   { num: '01', icon: Search, title: '전국 유휴자산 탐색', desc: '폐교, 빈집, 유휴 공공시설을 데이터 기반으로 탐색합니다.' },
