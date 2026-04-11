@@ -35,8 +35,8 @@ const Navbar = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted ${
-                  location.pathname === item.href ? 'bg-muted text-foreground' : 'text-muted-foreground'
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 ${
+                  location.pathname === item.href ? 'bg-white/10 text-white' : 'text-white/70'
                 }`}
               >
                 {item.label}
