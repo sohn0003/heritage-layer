@@ -71,7 +71,9 @@ const HomePage = () => {
         className="relative overflow-hidden"
         style={{
           height: '100vh',
-          background: 'linear-gradient(180deg, hsl(220 30% 12%) 0%, hsl(220 25% 18%) 60%, hsl(220 20% 22%) 100%)',
+          backgroundImage: `url(${heroBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
       >
         {/* Text layer (behind silhouettes) */}
