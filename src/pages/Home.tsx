@@ -91,61 +91,8 @@ const HomePage = () => {
           </h1>
         </div>
 
-        {/* Building silhouettes (foreground, parallax) */}
-        <div
-          className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
-          style={{
-            transform: `translateY(${scrollY * 0.4}px)`,
-            willChange: 'transform',
-          }}
-        >
-          <svg
-            viewBox="0 0 100 50"
-            preserveAspectRatio="none"
-            className="w-full"
-            style={{ height: '70vh' }}
-          >
-            {buildings.map((b, i) => (
-              <rect
-                key={i}
-                x={b.x}
-                y={50 - b.h * 0.5}
-                width={b.w}
-                height={b.h * 0.5}
-                fill={`hsl(220 25% ${8 + (i % 3) * 3}%)`}
-                opacity={0.7 + (i % 3) * 0.1}
-              />
-            ))}
-          </svg>
-        </div>
 
-        {/* Secondary silhouette layer (slower parallax, deeper) */}
-        <div
-          className="absolute bottom-0 left-0 right-0 z-[5] pointer-events-none"
-          style={{
-            transform: `translateY(${scrollY * 0.15}px)`,
-            willChange: 'transform',
-          }}
-        >
-          <svg
-            viewBox="0 0 100 50"
-            preserveAspectRatio="none"
-            className="w-full"
-            style={{ height: '60vh' }}
-          >
-            {buildings.map((b, i) => (
-              <rect
-                key={i}
-                x={b.x + 3}
-                y={50 - b.h * 0.35}
-                width={b.w * 0.8}
-                height={b.h * 0.35}
-                fill={`hsl(220 20% ${14 + (i % 4) * 2}%)`}
-                opacity={0.4}
-              />
-            ))}
-          </svg>
-        </div>
+
 
         {/* Glass "접속하기" button */}
         <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-30">
