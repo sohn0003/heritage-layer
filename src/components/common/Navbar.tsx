@@ -89,13 +89,13 @@ const Navbar = () => {
             {isAdmin && (
               <Link to="/admin/properties" className="block rounded-md px-3 py-2 text-sm font-medium text-white/70 hover:bg-white/10" onClick={() => setMobileOpen(false)}>Admin</Link>
             )}
-            <div className="mt-2 border-t pt-2">
+            <div className="mt-2 border-t border-white/20 pt-2">
               {user ? (
-                <Button variant="ghost" className="w-full justify-start" onClick={() => { signOut(); setMobileOpen(false); }}>
+                <Button variant="ghost" className="w-full justify-start text-white/70 hover:bg-white/10" onClick={() => { signOut(); setMobileOpen(false); }}>
                   <LogOut className="mr-2 h-4 w-4" /> 로그아웃
                 </Button>
               ) : (
-                <Button className="w-full" onClick={() => { setAuthOpen(true); setMobileOpen(false); }}>로그인</Button>
+                <Button className="w-full bg-white/10 text-white border border-white/20 hover:bg-white/20" onClick={() => { setAuthOpen(true); setMobileOpen(false); }}>로그인</Button>
               )}
             </div>
           </div>
