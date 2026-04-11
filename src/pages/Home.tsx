@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import heroBg from '@/assets/hero-bg.jpg';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import PartnerForm from '@/components/common/PartnerForm';
@@ -18,40 +18,9 @@ const cooperations = [
   { title: '자산매입', desc: '적정가에 자산을 매입하여 직접 재생합니다.' },
 ];
 
-// Building silhouette data (x%, width, height as vh)
-const buildings = [
-  { x: 0, w: 6, h: 45 },
-  { x: 5, w: 5, h: 60 },
-  { x: 9, w: 7, h: 50 },
-  { x: 15, w: 4, h: 70 },
-  { x: 18, w: 6, h: 55 },
-  { x: 23, w: 5, h: 40 },
-  { x: 28, w: 8, h: 65 },
-  { x: 35, w: 5, h: 50 },
-  { x: 39, w: 7, h: 75 },
-  { x: 45, w: 6, h: 55 },
-  { x: 50, w: 5, h: 45 },
-  { x: 54, w: 8, h: 60 },
-  { x: 61, w: 5, h: 80 },
-  { x: 65, w: 7, h: 50 },
-  { x: 71, w: 6, h: 65 },
-  { x: 76, w: 5, h: 45 },
-  { x: 80, w: 7, h: 70 },
-  { x: 86, w: 5, h: 55 },
-  { x: 90, w: 6, h: 60 },
-  { x: 95, w: 6, h: 50 },
-];
-
 const HomePage = () => {
   const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const scrollToPartners = () => {
     document.getElementById('partners')?.scrollIntoView({ behavior: 'smooth' });
