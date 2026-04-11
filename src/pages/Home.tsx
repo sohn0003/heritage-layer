@@ -82,7 +82,7 @@ const HomePage = () => {
             Heritage Layer
           </span>
           <h1
-            className="text-4xl lg:text-7xl leading-[1.1] tracking-tight font-sans text-left font-medium my-0 rounded-none shadow sm:text-3xl"
+            className="text-4xl lg:text-7xl leading-[2.2] tracking-tight font-sans text-left font-medium my-0 rounded-none shadow sm:text-3xl"
             style={{ color: 'hsl(0 0% 95%)' }}
           >
             국내 최초 No.1<br />
