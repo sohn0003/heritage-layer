@@ -34,7 +34,17 @@ const NaverMap = ({ markers = [], onMarkerClick, className }: NaverMapProps) => 
     });
 
     return () => {
-      mapInstance.current?.destroy();
+      // Clear markers first to avoid naver maps internal cleanup crash
+      markerInstances.current.forEach(m => m.setMap(null));
+      markerInstances.current = [];
+      if (mapInstance.current) {
+        try {
+          mapInstance.current.destroy();
+        } catch (e) {
+          // Naver maps internal cleanup error - safe to ignore
+        }
+        mapInstance.current = null;
+      }
     };
   }, []);
 
