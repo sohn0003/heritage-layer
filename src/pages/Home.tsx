@@ -82,12 +82,12 @@ const HomePage = () => {
             Heritage Layer
           </span>
           <h1
-            className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight"
+            className="text-4xl lg:text-7xl leading-[1.1] tracking-tight font-sans text-left font-medium my-0 rounded-none shadow sm:text-3xl"
             style={{ color: 'hsl(0 0% 95%)' }}
           >
-            방치된 4,008개<br />
-            폐교가 기회가<br />
-            된다
+            국내 최초 No.1<br />
+            유휴부지를 활용한<br />
+            부동산 재생 솔루션
           </h1>
         </div>
 
