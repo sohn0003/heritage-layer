@@ -100,11 +100,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    font-family: 'Noto Sans KR', sans-serif;
+    @apply bg-background text-foreground;
+    font-family: 'Pretendard Variable', Pretendard, sans-serif;
   }
 
   h1, h2, h3 {
-    font-family: 'Playfair Display', 'Noto Sans KR', serif;
+    font-family: 'Pretendard Variable', Pretendard, sans-serif;
   }
 }

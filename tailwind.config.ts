@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["'Noto Sans KR'", "sans-serif"],
-        serif: ["'Playfair Display'", "'Noto Sans KR'", "serif"],
+        sans: ["'Pretendard Variable'", "Pretendard", "sans-serif"],
+        serif: ["'Pretendard Variable'", "Pretendard", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
