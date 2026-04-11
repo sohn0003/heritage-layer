@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import PartnerForm from '@/components/common/PartnerForm';
@@ -22,8 +23,40 @@ const cooperations = [
   { title: '자산매입', desc: '적정가에 자산을 매입하여 직접 재생합니다.' },
 ];
 
+// Building silhouette data (x%, width, height as vh)
+const buildings = [
+  { x: 0, w: 6, h: 45 },
+  { x: 5, w: 5, h: 60 },
+  { x: 9, w: 7, h: 50 },
+  { x: 15, w: 4, h: 70 },
+  { x: 18, w: 6, h: 55 },
+  { x: 23, w: 5, h: 40 },
+  { x: 28, w: 8, h: 65 },
+  { x: 35, w: 5, h: 50 },
+  { x: 39, w: 7, h: 75 },
+  { x: 45, w: 6, h: 55 },
+  { x: 50, w: 5, h: 45 },
+  { x: 54, w: 8, h: 60 },
+  { x: 61, w: 5, h: 80 },
+  { x: 65, w: 7, h: 50 },
+  { x: 71, w: 6, h: 65 },
+  { x: 76, w: 5, h: 45 },
+  { x: 80, w: 7, h: 70 },
+  { x: 86, w: 5, h: 55 },
+  { x: 90, w: 6, h: 60 },
+  { x: 95, w: 6, h: 50 },
+];
+
 const HomePage = () => {
   const navigate = useNavigate();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const scrollToPartners = () => {
     document.getElementById('partners')?.scrollIntoView({ behavior: 'smooth' });
@@ -31,27 +64,120 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero */}
-      <section className="relative overflow-hidden px-4 py-24 sm:py-32" style={{ background: 'var(--hero-gradient)' }}>
-        <div className="mx-auto max-w-4xl text-center">
-          <h1 className="mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            전국 유휴자산,<br />재생의 기회로
+      {/* Hero with Parallax */}
+      <section
+        ref={heroRef}
+        className="relative overflow-hidden"
+        style={{
+          height: '100vh',
+          background: 'linear-gradient(180deg, hsl(220 30% 12%) 0%, hsl(220 25% 18%) 60%, hsl(220 20% 22%) 100%)',
+        }}
+      >
+        {/* Text layer (behind silhouettes) */}
+        <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 lg:px-20 z-10">
+          <span
+            className="mb-4 text-xs font-semibold tracking-[0.3em] uppercase"
+            style={{ color: 'hsl(220 20% 55%)' }}
+          >
+            Heritage Layer
+          </span>
+          <h1
+            className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight"
+            style={{ color: 'hsl(0 0% 95%)' }}
+          >
+            방치된 4,008개<br />
+            폐교가 기회가<br />
+            된다
           </h1>
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-white/70">
-            4,008개 폐교, 13만 빈집 — Heritage Layer가 재생 가능성을 분석합니다
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => navigate('/properties')}>
-              자산 탐색하기 <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" onClick={scrollToPartners}>
-              협력 제안하기
-            </Button>
-          </div>
         </div>
-        {/* Decorative elements */}
-        <div className="absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5 blur-3xl" />
+
+        {/* Building silhouettes (foreground, parallax) */}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
+          style={{
+            transform: `translateY(${scrollY * 0.4}px)`,
+            willChange: 'transform',
+          }}
+        >
+          <svg
+            viewBox="0 0 100 50"
+            preserveAspectRatio="none"
+            className="w-full"
+            style={{ height: '70vh' }}
+          >
+            {buildings.map((b, i) => (
+              <rect
+                key={i}
+                x={b.x}
+                y={50 - b.h * 0.5}
+                width={b.w}
+                height={b.h * 0.5}
+                fill={`hsl(220 25% ${8 + (i % 3) * 3}%)`}
+                opacity={0.7 + (i % 3) * 0.1}
+              />
+            ))}
+          </svg>
+        </div>
+
+        {/* Secondary silhouette layer (slower parallax, deeper) */}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-[5] pointer-events-none"
+          style={{
+            transform: `translateY(${scrollY * 0.15}px)`,
+            willChange: 'transform',
+          }}
+        >
+          <svg
+            viewBox="0 0 100 50"
+            preserveAspectRatio="none"
+            className="w-full"
+            style={{ height: '60vh' }}
+          >
+            {buildings.map((b, i) => (
+              <rect
+                key={i}
+                x={b.x + 3}
+                y={50 - b.h * 0.35}
+                width={b.w * 0.8}
+                height={b.h * 0.35}
+                fill={`hsl(220 20% ${14 + (i % 4) * 2}%)`}
+                opacity={0.4}
+              />
+            ))}
+          </svg>
+        </div>
+
+        {/* Glass "접속하기" button */}
+        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-30">
+          <button
+            onClick={() => navigate('/properties')}
+            className="group flex items-center gap-2 px-10 py-4 rounded-full border transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              borderColor: 'rgba(255, 255, 255, 0.15)',
+              color: 'hsl(0 0% 90%)',
+            }}
+          >
+            <span className="text-sm font-medium tracking-wide">접속하기</span>
+            <span
+              className="inline-block w-2 h-2 rounded-full"
+              style={{ background: 'hsl(var(--accent))' }}
+            />
+          </button>
+        </div>
+
+        {/* SCROLL indicator */}
+        <div
+          className="absolute bottom-8 right-8 z-30 text-xs tracking-widest"
+          style={{
+            color: 'rgba(255,255,255,0.3)',
+            writingMode: 'vertical-rl',
+          }}
+        >
+          SCROLL
+        </div>
       </section>
 
       {/* Stats */}
@@ -112,7 +238,6 @@ const HomePage = () => {
           <p className="mb-10 text-center text-muted-foreground">
             귀 기관의 유휴자산, Heritage Layer가 예산 없이 재생합니다
           </p>
-
           <div className="mb-12 grid gap-6 sm:grid-cols-3">
             {cooperations.map((c) => (
               <Card key={c.title} className="text-center">
@@ -123,7 +248,6 @@ const HomePage = () => {
               </Card>
             ))}
           </div>
-
           <PartnerForm />
         </div>
       </section>
