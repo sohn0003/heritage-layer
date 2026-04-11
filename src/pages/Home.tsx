@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import heroBg from '@/assets/hero-bg.jpg';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -70,9 +71,14 @@ const HomePage = () => {
         className="relative overflow-hidden"
         style={{
           height: '100vh',
-          background: 'linear-gradient(180deg, hsl(220 30% 12%) 0%, hsl(220 25% 18%) 60%, hsl(220 20% 22%) 100%)',
+          backgroundImage: `url(${heroBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
       >
+        {/* Dark overlay */}
+        <div className="absolute inset-0 z-[1]" style={{ background: 'rgba(0, 0, 0, 0.6)' }} />
+
         {/* Text layer (behind silhouettes) */}
         <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 lg:px-20 z-10">
           <span
