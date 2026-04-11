@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,15 +16,33 @@ const Navbar = () => {
   const { user, signOut, isAdmin } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 80);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const textColor = scrolled ? 'text-foreground' : 'text-white';
+  const textMuted = scrolled ? 'text-muted-foreground' : 'text-white/70';
+  const hoverBg = scrolled ? 'hover:bg-muted' : 'hover:bg-white/10';
+  const activeBg = scrolled ? 'bg-muted text-foreground' : 'bg-white/10 text-white';
+  const borderColor = scrolled ? 'border-border' : 'border-white/20';
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/20 bg-transparent">
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${borderColor} ${
+          scrolled ? 'bg-background/90 backdrop-blur-md' : 'bg-transparent'
+        }`}
+      >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Heritage Layer" className="h-8 w-8 rounded-md object-contain" />
-            <span className="text-lg tracking-tight font-serif font-medium text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <span className={`text-lg tracking-tight font-medium transition-colors duration-300 ${textColor}`}>
               Heritage Layer
             </span>
           </Link>
@@ -35,8 +53,8 @@ const Navbar = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 ${
-                  location.pathname === item.href ? 'bg-white/10 text-white' : 'text-white/70'
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${hoverBg} ${
+                  location.pathname === item.href ? activeBg : textMuted
                 }`}
               >
                 {item.label}
@@ -45,8 +63,8 @@ const Navbar = () => {
             {isAdmin && (
               <Link
                 to="/admin/properties"
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 ${
-                  location.pathname === '/admin/properties' ? 'bg-white/10 text-white' : 'text-white/70'
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${hoverBg} ${
+                  location.pathname === '/admin/properties' ? activeBg : textMuted
                 }`}
               >
                 Admin
@@ -57,45 +75,56 @@ const Navbar = () => {
           <div className="hidden items-center gap-2 md:flex">
             {user ? (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-white/70">{user.email}</span>
-                <Button variant="ghost" size="icon" onClick={signOut} className="text-white/70 hover:text-white hover:bg-white/10">
+                <span className={`text-sm transition-colors duration-300 ${textMuted}`}>{user.email}</span>
+                <Button variant="ghost" size="icon" onClick={signOut} className={`transition-colors duration-300 ${textMuted} ${hoverBg}`}>
                   <LogOut className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
-              <Button onClick={() => setAuthOpen(true)} className="bg-white/10 text-white border border-white/20 hover:bg-white/20">로그인</Button>
+              <Button
+                onClick={() => setAuthOpen(true)}
+                className={`transition-colors duration-300 ${
+                  scrolled
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                }`}
+              >
+                로그인
+              </Button>
             )}
           </div>
 
           {/* Mobile toggle */}
-          <button className="md:hidden text-white" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button className={`md:hidden transition-colors duration-300 ${textColor}`} onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="border-t border-white/20 bg-black/60 backdrop-blur-md px-4 pb-4 pt-2 md:hidden">
+          <div className={`border-t px-4 pb-4 pt-2 md:hidden transition-colors duration-300 ${borderColor} ${
+            scrolled ? 'bg-background/95 backdrop-blur-md' : 'bg-black/60 backdrop-blur-md'
+          }`}>
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
-                className="block rounded-md px-3 py-2 text-sm font-medium text-white/70 hover:bg-white/10"
+                className={`block rounded-md px-3 py-2 text-sm font-medium ${textMuted} ${hoverBg}`}
                 onClick={() => setMobileOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
             {isAdmin && (
-              <Link to="/admin/properties" className="block rounded-md px-3 py-2 text-sm font-medium text-white/70 hover:bg-white/10" onClick={() => setMobileOpen(false)}>Admin</Link>
+              <Link to="/admin/properties" className={`block rounded-md px-3 py-2 text-sm font-medium ${textMuted} ${hoverBg}`} onClick={() => setMobileOpen(false)}>Admin</Link>
             )}
-            <div className="mt-2 border-t border-white/20 pt-2">
+            <div className={`mt-2 border-t pt-2 ${borderColor}`}>
               {user ? (
-                <Button variant="ghost" className="w-full justify-start text-white/70 hover:bg-white/10" onClick={() => { signOut(); setMobileOpen(false); }}>
+                <Button variant="ghost" className={`w-full justify-start ${textMuted} ${hoverBg}`} onClick={() => { signOut(); setMobileOpen(false); }}>
                   <LogOut className="mr-2 h-4 w-4" /> 로그아웃
                 </Button>
               ) : (
-                <Button className="w-full bg-white/10 text-white border border-white/20 hover:bg-white/20" onClick={() => { setAuthOpen(true); setMobileOpen(false); }}>로그인</Button>
+                <Button className={`w-full ${scrolled ? '' : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'}`} onClick={() => { setAuthOpen(true); setMobileOpen(false); }}>로그인</Button>
               )}
             </div>
           </div>
