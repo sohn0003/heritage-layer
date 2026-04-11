@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
 import { Menu, X, LogOut } from 'lucide-react';
+import logo from '@/assets/logo.png';
 
 const navItems = [
   { label: 'Properties', href: '/properties' },

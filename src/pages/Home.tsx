@@ -186,20 +186,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="px-4 py-20">
-        <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-3">
-          {stats.map((s) => (
-            <Card key={s.label} className="text-center transition-shadow hover:shadow-md">
-              <CardContent className="p-8">
-                <s.icon className="mx-auto mb-4 h-8 w-8 text-accent" />
-                <p className="text-3xl font-bold tracking-tight">{s.value}</p>
-                <p className="mt-1 text-sm font-medium text-muted-foreground">{s.desc}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
 
       {/* Service Steps */}
       <section className="bg-muted/50 px-4 py-20">
