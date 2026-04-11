@@ -45,8 +45,8 @@ const Navbar = () => {
             {isAdmin && (
               <Link
                 to="/admin/properties"
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted ${
-                  location.pathname === '/admin/properties' ? 'bg-muted text-foreground' : 'text-muted-foreground'
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 ${
+                  location.pathname === '/admin/properties' ? 'bg-white/10 text-white' : 'text-white/70'
                 }`}
               >
                 Admin
@@ -57,18 +57,18 @@ const Navbar = () => {
           <div className="hidden items-center gap-2 md:flex">
             {user ? (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">{user.email}</span>
-                <Button variant="ghost" size="icon" onClick={signOut}>
+                <span className="text-sm text-white/70">{user.email}</span>
+                <Button variant="ghost" size="icon" onClick={signOut} className="text-white/70 hover:text-white hover:bg-white/10">
                   <LogOut className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
-              <Button onClick={() => setAuthOpen(true)}>로그인</Button>
+              <Button onClick={() => setAuthOpen(true)} className="bg-white/10 text-white border border-white/20 hover:bg-white/20">로그인</Button>
             )}
           </div>
 
           {/* Mobile toggle */}
-          <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button className="md:hidden text-white" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
