@@ -24,7 +24,7 @@ const Navbar = () => {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Heritage Layer" className="h-8 w-8 rounded-md object-contain" />
-            <span className="text-lg tracking-tight font-serif font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <span className="text-lg tracking-tight font-serif font-medium text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
               Heritage Layer
             </span>
           </Link>
