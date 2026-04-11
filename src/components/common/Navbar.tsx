@@ -20,11 +20,11 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/20 bg-transparent">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Heritage Layer" className="h-8 w-8 rounded-md object-contain" />
-            <span className="text-lg tracking-tight font-serif font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <span className="text-lg tracking-tight font-serif font-medium text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
               Heritage Layer
             </span>
           </Link>
@@ -35,8 +35,8 @@ const Navbar = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted ${
-                  location.pathname === item.href ? 'bg-muted text-foreground' : 'text-muted-foreground'
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 ${
+                  location.pathname === item.href ? 'bg-white/10 text-white' : 'text-white/70'
                 }`}
               >
                 {item.label}
@@ -45,8 +45,8 @@ const Navbar = () => {
             {isAdmin && (
               <Link
                 to="/admin/properties"
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted ${
-                  location.pathname === '/admin/properties' ? 'bg-muted text-foreground' : 'text-muted-foreground'
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 ${
+                  location.pathname === '/admin/properties' ? 'bg-white/10 text-white' : 'text-white/70'
                 }`}
               >
                 Admin
@@ -57,45 +57,45 @@ const Navbar = () => {
           <div className="hidden items-center gap-2 md:flex">
             {user ? (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">{user.email}</span>
-                <Button variant="ghost" size="icon" onClick={signOut}>
+                <span className="text-sm text-white/70">{user.email}</span>
+                <Button variant="ghost" size="icon" onClick={signOut} className="text-white/70 hover:text-white hover:bg-white/10">
                   <LogOut className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
-              <Button onClick={() => setAuthOpen(true)}>로그인</Button>
+              <Button onClick={() => setAuthOpen(true)} className="bg-white/10 text-white border border-white/20 hover:bg-white/20">로그인</Button>
             )}
           </div>
 
           {/* Mobile toggle */}
-          <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button className="md:hidden text-white" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="border-t px-4 pb-4 pt-2 md:hidden">
+          <div className="border-t border-white/20 bg-black/60 backdrop-blur-md px-4 pb-4 pt-2 md:hidden">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
-                className="block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
+                className="block rounded-md px-3 py-2 text-sm font-medium text-white/70 hover:bg-white/10"
                 onClick={() => setMobileOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
             {isAdmin && (
-              <Link to="/admin/properties" className="block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted" onClick={() => setMobileOpen(false)}>Admin</Link>
+              <Link to="/admin/properties" className="block rounded-md px-3 py-2 text-sm font-medium text-white/70 hover:bg-white/10" onClick={() => setMobileOpen(false)}>Admin</Link>
             )}
-            <div className="mt-2 border-t pt-2">
+            <div className="mt-2 border-t border-white/20 pt-2">
               {user ? (
-                <Button variant="ghost" className="w-full justify-start" onClick={() => { signOut(); setMobileOpen(false); }}>
+                <Button variant="ghost" className="w-full justify-start text-white/70 hover:bg-white/10" onClick={() => { signOut(); setMobileOpen(false); }}>
                   <LogOut className="mr-2 h-4 w-4" /> 로그아웃
                 </Button>
               ) : (
-                <Button className="w-full" onClick={() => { setAuthOpen(true); setMobileOpen(false); }}>로그인</Button>
+                <Button className="w-full bg-white/10 text-white border border-white/20 hover:bg-white/20" onClick={() => { setAuthOpen(true); setMobileOpen(false); }}>로그인</Button>
               )}
             </div>
           </div>
