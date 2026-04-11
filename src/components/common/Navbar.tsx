@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
 import { Menu, X, LogOut } from 'lucide-react';
+import logo from '@/assets/logo.png';
 
 const navItems = [
   { label: 'Properties', href: '/properties' },
@@ -22,9 +23,7 @@ const Navbar = () => {
       <nav className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">HL</span>
-            </div>
+            <img src={logo} alt="Heritage Layer" className="h-8 w-8 rounded-md object-contain" />
             <span className="text-lg tracking-tight font-serif font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
               Heritage Layer
             </span>
