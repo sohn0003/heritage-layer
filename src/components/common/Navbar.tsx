@@ -18,6 +18,7 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const isHome = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 80);
@@ -26,17 +27,19 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const textColor = scrolled ? 'text-foreground' : 'text-white';
-  const textMuted = scrolled ? 'text-muted-foreground' : 'text-white/70';
-  const hoverBg = scrolled ? 'hover:bg-muted' : 'hover:bg-white/10';
-  const activeBg = scrolled ? 'bg-muted text-foreground' : 'bg-white/10 text-white';
-  const borderColor = scrolled ? 'border-border' : 'border-white/20';
+  const isDark = isHome && !scrolled;
+
+  const textColor = isDark ? 'text-white' : 'text-foreground';
+  const textMuted = isDark ? 'text-white/70' : 'text-muted-foreground';
+  const hoverBg = isDark ? 'hover:bg-white/10' : 'hover:bg-muted';
+  const activeBg = isDark ? 'bg-white/10 text-white' : 'bg-muted text-foreground';
+  const borderColor = isDark ? 'border-white/20' : 'border-border';
 
   return (
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${borderColor} ${
-          scrolled ? 'bg-background/40 backdrop-blur-md' : 'bg-transparent'
+          isDark ? 'bg-transparent' : 'bg-background/40 backdrop-blur-md'
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
