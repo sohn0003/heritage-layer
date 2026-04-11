@@ -25,7 +25,7 @@ const Navbar = () => {
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
               <span className="text-sm font-bold text-primary-foreground">HL</span>
             </div>
-            <span className="text-lg font-semibold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <span className="text-lg tracking-tight font-serif font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
               Heritage Layer
             </span>
           </Link>
