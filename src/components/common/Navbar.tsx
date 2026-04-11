@@ -75,19 +75,19 @@ const Navbar = () => {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="border-t px-4 pb-4 pt-2 md:hidden">
+          <div className="border-t border-white/20 bg-black/60 backdrop-blur-md px-4 pb-4 pt-2 md:hidden">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
-                className="block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
+                className="block rounded-md px-3 py-2 text-sm font-medium text-white/70 hover:bg-white/10"
                 onClick={() => setMobileOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
             {isAdmin && (
-              <Link to="/admin/properties" className="block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted" onClick={() => setMobileOpen(false)}>Admin</Link>
+              <Link to="/admin/properties" className="block rounded-md px-3 py-2 text-sm font-medium text-white/70 hover:bg-white/10" onClick={() => setMobileOpen(false)}>Admin</Link>
             )}
             <div className="mt-2 border-t pt-2">
               {user ? (
