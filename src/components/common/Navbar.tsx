@@ -87,9 +87,9 @@ const Navbar = () => {
               <Button
                 onClick={() => setAuthOpen(true)}
                 className={`transition-colors duration-300 ${
-                  scrolled
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                    : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                  isDark
+                    ? 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
                 }`}
               >
                 로그인
@@ -106,7 +106,7 @@ const Navbar = () => {
         {/* Mobile menu */}
         {mobileOpen && (
           <div className={`border-t px-4 pb-4 pt-2 md:hidden transition-colors duration-300 ${borderColor} ${
-            scrolled ? 'bg-background/95 backdrop-blur-md' : 'bg-black/60 backdrop-blur-md'
+            isDark ? 'bg-black/60 backdrop-blur-md' : 'bg-background/95 backdrop-blur-md'
           }`}>
             {navItems.map((item) => (
               <Link
@@ -127,7 +127,7 @@ const Navbar = () => {
                   <LogOut className="mr-2 h-4 w-4" /> 로그아웃
                 </Button>
               ) : (
-                <Button className={`w-full ${scrolled ? '' : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'}`} onClick={() => { setAuthOpen(true); setMobileOpen(false); }}>로그인</Button>
+                <Button className={`w-full ${isDark ? 'bg-white/10 text-white border border-white/20 hover:bg-white/20' : ''}`} onClick={() => { setAuthOpen(true); setMobileOpen(false); }}>로그인</Button>
               )}
             </div>
           </div>
