@@ -7,9 +7,10 @@ import { Menu, X, LogOut } from 'lucide-react';
 import logo from '@/assets/logo.svg';
 
 const navItems = [
-  { label: 'Properties', href: '/properties' },
-  { label: 'Analysis', href: '/analysis' },
   { label: 'About', href: '/about' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Properties', href: '/properties' },
+  { label: 'Mypage', href: '/mypage' },
 ];
 
 const Navbar = () => {
