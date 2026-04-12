@@ -8,7 +8,6 @@ import logo from '@/assets/logo.svg';
 
 const navItems = [
   { label: 'About', href: '/about' },
-  { label: 'Pricing', href: '/pricing' },
   { label: 'Properties', href: '/properties' },
   { label: 'Mypage', href: '/mypage' },
 ];
@@ -77,6 +76,14 @@ const Navbar = () => {
           </div>
 
           <div className="hidden items-center gap-2 md:flex">
+            <Link
+              to="/pricing"
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${hoverBg} ${
+                location.pathname === '/pricing' ? activeBg : textMuted
+              }`}
+            >
+              Pricing
+            </Link>
             {user ? (
               <div className="flex items-center gap-2">
                 <span className={`text-sm transition-colors duration-300 ${textMuted}`}>{user.email}</span>
