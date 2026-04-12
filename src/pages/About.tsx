@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import PartnerForm from '@/components/common/PartnerForm';
 import { Database, Lightbulb, Rocket, Check, X } from 'lucide-react';
+import aboutHeroBg from '@/assets/about-hero-bg.png';
 
 const methodology = [
   { icon: Database, step: '01', title: '데이터 분석', desc: '전국 유휴자산 데이터를 수집·정제하여 재생 가능성을 정량 평가합니다.' },
@@ -26,13 +27,21 @@ const AboutPage = () => {
   return (
     <div className="min-h-screen">
       {/* Intro */}
-      <section className="px-4 py-20 text-center">
-        <div className="mx-auto max-w-3xl">
+      <section
+        className="relative px-4 py-20 text-center"
+        style={{
+          backgroundImage: `url(${aboutHeroBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0" style={{ background: 'rgba(0, 0, 0, 0.55)' }} />
+        <div className="relative mx-auto max-w-3xl z-10">
           <Badge variant="secondary" className="mb-4">THE LAYER</Badge>
-          <h1 className="mb-6 text-3xl font-bold sm:text-4xl">
+          <h1 className="mb-6 text-3xl font-bold sm:text-4xl" style={{ color: 'hsl(0 0% 95%)' }}>
             우리는 유휴자산을 가장 잘 아는<br />재생 사업자입니다
           </h1>
-          <p className="text-muted-foreground leading-relaxed">
+          <p className="leading-relaxed" style={{ color: 'hsl(0 0% 80%)' }}>
             Heritage Layer는 전국의 유휴 부동산 자산을 데이터 기반으로 분석하고,
             최적의 재생 방향을 도출하여 실제 딜로 연결하는 플랫폼입니다.
             폐교, 빈집, 유휴 공공시설을 새로운 가치의 공간으로 전환합니다.
