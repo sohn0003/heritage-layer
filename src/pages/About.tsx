@@ -28,11 +28,12 @@ const AboutPage = () => {
     <div className="min-h-screen">
       {/* Intro */}
       <section
-        className="relative px-4 py-20 text-center"
+        className="relative flex items-center justify-center px-4 text-center"
         style={{
           backgroundImage: `url(${aboutHeroBg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          minHeight: '80vh',
         }}
       >
         <div className="absolute inset-0" style={{ background: 'rgba(0, 0, 0, 0.55)' }} />
