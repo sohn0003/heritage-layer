@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import PartnerForm from '@/components/common/PartnerForm';
 import { Database, Lightbulb, Rocket, Check, X } from 'lucide-react';
+import aboutHeroBg from '@/assets/about-hero-bg.png';
 
 const methodology = [
   { icon: Database, step: '01', title: '데이터 분석', desc: '전국 유휴자산 데이터를 수집·정제하여 재생 가능성을 정량 평가합니다.' },
