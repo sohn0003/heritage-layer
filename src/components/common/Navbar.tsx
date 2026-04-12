@@ -56,8 +56,8 @@ const Navbar = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${hoverBg} ${
-                  location.pathname === item.href ? activeBg : textMuted
+                className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
+                  location.pathname === item.href ? activeStyle : textMuted
                 }`}
               >
                 {item.label}
@@ -66,8 +66,8 @@ const Navbar = () => {
             {isAdmin && (
               <Link
                 to="/admin/properties"
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${hoverBg} ${
-                  location.pathname === '/admin/properties' ? activeBg : textMuted
+                className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
+                  location.pathname === '/admin/properties' ? activeStyle : textMuted
                 }`}
               >
                 Admin
@@ -78,8 +78,8 @@ const Navbar = () => {
           <div className="hidden items-center gap-2 md:flex">
             <Link
               to="/pricing"
-              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${hoverBg} ${
-                location.pathname === '/pricing' ? activeBg : textMuted
+              className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
+                location.pathname === '/pricing' ? activeStyle : textMuted
               }`}
             >
               Pricing
@@ -87,7 +87,7 @@ const Navbar = () => {
             {user ? (
               <div className="flex items-center gap-2">
                 <span className={`text-sm transition-colors duration-300 ${textMuted}`}>{user.email}</span>
-                <Button variant="ghost" size="icon" onClick={signOut} className={`transition-colors duration-300 ${textMuted} ${hoverBg}`}>
+                <Button variant="ghost" size="icon" onClick={signOut} className={`transition-colors duration-300 ${textMuted}`}>
                   <LogOut className="h-4 w-4" />
                 </Button>
               </div>
@@ -120,18 +120,18 @@ const Navbar = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className={`block rounded-md px-3 py-2 text-sm font-medium ${textMuted} ${hoverBg}`}
+                className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`}
                 onClick={() => setMobileOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
             {isAdmin && (
-              <Link to="/admin/properties" className={`block rounded-md px-3 py-2 text-sm font-medium ${textMuted} ${hoverBg}`} onClick={() => setMobileOpen(false)}>Admin</Link>
+              <Link to="/admin/properties" className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`} onClick={() => setMobileOpen(false)}>Admin</Link>
             )}
             <div className={`mt-2 border-t pt-2 ${borderColor}`}>
               {user ? (
-                <Button variant="ghost" className={`w-full justify-start ${textMuted} ${hoverBg}`} onClick={() => { signOut(); setMobileOpen(false); }}>
+                <Button variant="ghost" className={`w-full justify-start ${textMuted}`} onClick={() => { signOut(); setMobileOpen(false); }}>
                   <LogOut className="mr-2 h-4 w-4" /> 로그아웃
                 </Button>
               ) : (
