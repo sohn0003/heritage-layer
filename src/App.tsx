@@ -9,6 +9,8 @@ import Home from "@/pages/Home";
 import Properties from "@/pages/Properties";
 import Analysis from "@/pages/Analysis";
 import About from "@/pages/About";
+import Mypage from "@/pages/Mypage";
+import Pricing from "@/pages/Pricing";
 import AdminProperties from "@/pages/admin/AdminProperties";
 import NotFound from "@/pages/NotFound";
 
@@ -27,6 +29,8 @@ const App = () => (
             <Route path="/properties" element={<Properties />} />
             <Route path="/analysis" element={<Analysis />} />
             <Route path="/about" element={<About />} />
+            <Route path="/mypage" element={<Mypage />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/admin/properties" element={<AdminProperties />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
