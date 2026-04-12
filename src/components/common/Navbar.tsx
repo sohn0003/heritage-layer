@@ -18,7 +18,7 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const isHome = location.pathname === '/';
+  const isHeroPage = location.pathname === '/' || location.pathname === '/about';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 80);
@@ -27,7 +27,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isDark = isHome && !scrolled;
+  const isDark = isHeroPage && !scrolled;
 
   const textColor = isDark ? 'text-white' : 'text-foreground';
   const textMuted = isDark ? 'text-white/70' : 'text-muted-foreground';
