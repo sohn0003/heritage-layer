@@ -31,8 +31,8 @@ const Navbar = () => {
 
   const textColor = isDark ? 'text-white' : 'text-foreground';
   const textMuted = isDark ? 'text-white/70' : 'text-muted-foreground';
-  const hoverStyle = 'hover:text-[1rem] hover:font-semibold transition-all duration-200';
-  const activeStyle = isDark ? 'text-white font-semibold' : 'text-foreground font-semibold';
+  const hoverStyle = 'relative after:content-[""] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left ' + (isDark ? 'after:bg-white' : 'after:bg-foreground');
+  const activeStyle = (isDark ? 'text-white' : 'text-foreground') + ' after:scale-x-100 after:origin-bottom-left';
   const borderColor = isDark ? 'border-white/20' : 'border-border';
 
   return (
