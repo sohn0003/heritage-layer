@@ -12,9 +12,87 @@ import { toast } from '@/hooks/use-toast';
 import { TrendingUp, FileText, BarChart3, Building2 } from 'lucide-react';
 
 // 알고리즘 모듈 연동
-import { calculateScore, type AssetInput, type ScoringResult } from '@/algorithm/scoring/scoring';
-import { calculateFinancials, compareScenarios, type FinancialInput, type ScenarioComparison } from '@/algorithm/financial/irr-calculator';
+import {
+  calculateScore,
+  type AssetInput,
+  type ScoreResult,
+  type ZoningType,
+} from '@/algorithm/scoring/scoring';
+import {
+  compareScenarios,
+  type FinancialInput,
+  type ScenarioComparison,
+} from '@/algorithm/financial/irr-calculator';
 import { analyzeDealSignal, type DealSignalResult } from '@/algorithm/deal-signal/deal-signal';
+
+// ─────────────────────────────────────────────
+// DB assets row → scoring AssetInput 매핑
+// DB에 없는 필드는 합리적인 기본값으로 채움
+// ─────────────────────────────────────────────
+const ZONING_MAP: Record<string, ZoningType> = {
+  '일반상업': 'commercial_general',
+  '근린상업': 'commercial_neighborhood',
+  '중심상업': 'commercial_central',
+  '준주거': 'semi_residential',
+  '2종일반주거': 'residential_2nd',
+  '3종일반주거': 'residential_3rd',
+  '자연녹지': 'green_natural',
+  '생산녹지': 'green_production',
+  '1종일반주거': 'residential_1st',
+  '준공업': 'semi_industrial',
+  '보전녹지': 'green_conservation',
+  '농림': 'agricultural',
+  '자연환경보전': 'nature_conservation',
+};
+
+function mapZoning(zoning: string | null): ZoningType {
+  if (!zoning) return 'residential_2nd';
+  return ZONING_MAP[zoning] ?? (Object.values(ZONING_MAP).includes(zoning as ZoningType)
+    ? (zoning as ZoningType)
+    : 'residential_2nd');
+}
+
+function buildScoringInput(asset: any): AssetInput {
+  const landArea = asset.land_area ?? 0;
+  const currentBC = asset.building_coverage ?? 0;
+  const currentFAR = asset.floor_area_ratio ?? 0;
+  // 법정 한도가 DB에 없으므로 용도지역 기반의 기본값 사용
+  const zoning = mapZoning(asset.zoning);
+  const legalMaxBC = zoning.startsWith('commercial') ? 80 : zoning.startsWith('residential') ? 60 : 40;
+  const legalMaxFAR = zoning.startsWith('commercial') ? 800 : zoning.startsWith('residential') ? 250 : 100;
+  const currentFloorArea = (currentFAR / 100) * landArea;
+
+  return {
+    zoning,
+    currentBuildingCoverage: currentBC,
+    legalMaxBuildingCoverage: legalMaxBC,
+    currentFloorAreaRatio: currentFAR,
+    legalMaxFloorAreaRatio: legalMaxFAR,
+    currentFloorArea,
+    landArea,
+    isPublicAsset: asset.ownership_type === 'public',
+    isPrivateNegotiationPossible: !!asset.gov_cooperation,
+    isCitizenProposalPossible: !!asset.gov_cooperation,
+    hasNearbyConversionPrecedent: false,
+    isMilitaryOrHeritagZone: false,
+    isUrbanFacilityConflict: false,
+    isWaterFrontEnvironmental: false,
+    isPrivateLand: asset.ownership_type === 'private',
+    zoningUpgradeFloorAreaGain: 'under_20',
+    useChangeExpansion: 'minor',
+    populationTrend: 'stable',
+    commercialDensity: 'low',
+    distanceToCenter: 3,
+    idleYears: asset.idle_years ?? 0,
+    historicalValue: 'ordinary',
+    naturalScenery: 'ordinary_urban',
+    buildingCondition: 'partial_reinforcement',
+    estimatedROI: 7,
+    isUrbanRegenerationArea: !!asset.gov_cooperation,
+    isAbandonedSchoolBudget: asset.asset_type === '폐교',
+    isBalancedDevelopmentBudget: false,
+  };
+}
 
 const AnalysisPage = () => {
   const [searchParams] = useSearchParams();
@@ -32,29 +110,17 @@ const AnalysisPage = () => {
       return;
     }
     const fetchAsset = async () => {
-      const { data } = await supabase.from('assets').select('*').eq('id', assetId).single();
+      const { data } = await supabase.from('assets').select('*').eq('id', assetId).maybeSingle();
       setAsset(data);
       setLoading(false);
     };
     fetchAsset();
   }, [assetId]);
 
-  // 알고리즘 결과 계산 (asset 변경 시 자동 재계산)
-  const scoringResult: ScoringResult | null = useMemo(() => {
+  // ✅ Supabase에서 가져온 자산 데이터를 calculateScore()에 입력
+  const scoringResult: ScoreResult | null = useMemo(() => {
     if (!asset) return null;
-    const input: AssetInput = {
-      address: asset.address,
-      asset_type: asset.asset_type,
-      zoning: asset.zoning,
-      building_coverage: asset.building_coverage,
-      floor_area_ratio: asset.floor_area_ratio,
-      land_area: asset.land_area,
-      idle_years: asset.idle_years,
-      ownership_type: asset.ownership_type,
-      grade: asset.grade,
-      gov_cooperation: asset.gov_cooperation,
-    };
-    return calculateScore(input);
+    return calculateScore(buildScoringInput(asset));
   }, [asset]);
 
   const scenarioComparison: ScenarioComparison | null = useMemo(() => {
@@ -63,7 +129,7 @@ const AnalysisPage = () => {
       landArea: asset.land_area ?? 0,
       buildingCoverage: asset.building_coverage ?? 0,
       floorAreaRatio: asset.floor_area_ratio ?? 0,
-      acquisitionCost: 0,  // TODO: 사용자 입력 또는 추정값
+      acquisitionCost: 0,
       renovationCost: 0,
       annualRevenue: 0,
       annualExpense: 0,
@@ -104,8 +170,8 @@ const AnalysisPage = () => {
     );
   }
 
-  const formatNumber = (n: number) => n ? n.toLocaleString() : '--';
-  const formatPercent = (n: number) => n ? `${n.toFixed(1)}%` : '--';
+  const formatNumber = (n: number) => (n ? n.toLocaleString() : '--');
+  const formatPercent = (n: number) => (n ? `${n.toFixed(1)}%` : '--');
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -113,7 +179,7 @@ const AnalysisPage = () => {
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="mb-2 flex items-center gap-3">
-            {asset.grade && <GradeBadge grade={asset.grade} className="h-9 w-9 text-sm" />}
+            {scoringResult && <GradeBadge grade={scoringResult.grade} className="h-9 w-9 text-sm" />}
             <Badge variant="secondary">{asset.asset_type}</Badge>
             {scoringResult && (
               <Badge variant="outline">종합 {scoringResult.totalScore}점</Badge>
@@ -127,7 +193,7 @@ const AnalysisPage = () => {
       {/* Free section — 기본 자산 정보 */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[
-          { label: '재생 등급', value: asset.grade ?? '-' },
+          { label: '재생 등급', value: scoringResult?.grade ?? asset.grade ?? '-' },
           { label: '용도지역', value: asset.zoning ?? '-' },
           { label: '건폐율', value: asset.building_coverage ? `${asset.building_coverage}%` : '-' },
           { label: '용적률', value: asset.floor_area_ratio ? `${asset.floor_area_ratio}%` : '-' },
@@ -143,19 +209,19 @@ const AnalysisPage = () => {
         ))}
       </div>
 
-      {/* Scoring 세부 점수 (Free) */}
+      {/* COSMO-P 블록별 스코어 (Free) */}
       {scoringResult && (
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-lg">스코어링 세부 점수</CardTitle>
+            <CardTitle className="text-lg">COSMO-P 블록별 점수</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-4">
               {[
-                { label: '입지', value: scoringResult.breakdown.locationScore },
-                { label: '상태', value: scoringResult.breakdown.conditionScore },
-                { label: '규제', value: scoringResult.breakdown.regulationScore },
-                { label: '정부협력', value: scoringResult.breakdown.govCoopScore },
+                { label: 'A. 입지·규제 (25%)', value: scoringResult.blockA },
+                { label: 'B. 수요·환경 (25%)', value: scoringResult.blockB },
+                { label: 'C. 심미적 가치 (20%)', value: scoringResult.blockC },
+                { label: 'D. 사업성 (30%)', value: scoringResult.blockD },
               ].map((item) => (
                 <div key={item.label} className="text-center">
                   <p className="text-xs text-muted-foreground">{item.label}</p>
@@ -167,9 +233,53 @@ const AnalysisPage = () => {
         </Card>
       )}
 
+      {/* 세부 점수 항목 (Free) */}
+      {scoringResult && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg">세부 항목 점수</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>항목</TableHead>
+                  <TableHead className="text-right">점수</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[
+                  { label: 'A1. 용도지역', value: scoringResult.detail.a1_zoning },
+                  { label: 'A2. 개발 여력', value: scoringResult.detail.a2_developmentCapacity.toFixed(1) },
+                  { label: 'A3. 인허가 조정', value: scoringResult.detail.a3_permitAdjustment },
+                  { label: 'A4. 종상향 조정', value: scoringResult.detail.a4_zoningUpgradeAdjustment },
+                  { label: 'B1. 인구·상권', value: scoringResult.detail.b1_populationCommercial },
+                  { label: 'B2. 교통 접근성', value: scoringResult.detail.b2_transportation },
+                  { label: 'B3. 방치 기간', value: scoringResult.detail.b3_idleYearsAdjustment },
+                  { label: 'C1. 역사·건축', value: scoringResult.detail.c1_historicalArchitectural },
+                  { label: 'C2. 자연경관', value: scoringResult.detail.c2_naturalScenery },
+                  { label: 'D1. 건물 상태', value: scoringResult.detail.d1_buildingCondition },
+                  { label: 'D2. 수익성', value: scoringResult.detail.d2_profitability },
+                  { label: 'D3. 정부 지원', value: scoringResult.detail.d3_governmentSupport },
+                  { label: '추가 개발 가능 연면적 (㎡)', value: scoringResult.detail.additionalFloorArea.toLocaleString() },
+                  { label: '종상향 후 최대 연면적 (㎡)', value: scoringResult.detail.maxFloorAreaAfterUpgrade.toLocaleString() },
+                  { label: '건폐율 사용률 (%)', value: scoringResult.detail.buildingCoverageUsageRate },
+                  { label: '용적률 사용률 (%)', value: scoringResult.detail.floorAreaRatioUsageRate },
+                ].map((row) => (
+                  <TableRow key={row.label}>
+                    <TableCell className="font-medium">{row.label}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{row.value}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Pro Sections */}
       <div className="space-y-6">
-        {/* Section 1 — 재생 시나리오 (scoring 알고리즘 연동) */}
+        {/* Section 1 — 재생 시나리오 (placeholder) */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
@@ -179,24 +289,16 @@ const AnalysisPage = () => {
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-3">
-                {(scoringResult?.scenarios.length
-                  ? scoringResult.scenarios
-                  : [
-                      { title: '복합문화공간', description: '시나리오 설명이 여기에 표시됩니다', estimatedIrr: null, confidence: 'medium' as const },
-                      { title: '코워킹 허브', description: '시나리오 설명이 여기에 표시됩니다', estimatedIrr: null, confidence: 'medium' as const },
-                      { title: '로컬 관광시설', description: '시나리오 설명이 여기에 표시됩니다', estimatedIrr: null, confidence: 'medium' as const },
-                    ]
-                ).map((scenario) => (
+                {[
+                  { title: '복합문화공간', description: '문화·체험형 복합공간 운영안', confidence: 'medium' as const },
+                  { title: '코워킹 허브', description: '지역 창업·업무 거점화', confidence: 'medium' as const },
+                  { title: '로컬 관광시설', description: '숙박·체험 결합형 운영', confidence: 'medium' as const },
+                ].map((scenario) => (
                   <Card key={scenario.title} className="bg-muted/50">
                     <CardContent className="p-4">
                       <h4 className="font-medium">{scenario.title}</h4>
                       <p className="mt-1 text-xs text-muted-foreground">{scenario.description}</p>
-                      <p className="mt-2 text-sm font-semibold text-accent">
-                        예상 수익률: {scenario.estimatedIrr != null ? `${scenario.estimatedIrr}%` : '--%'}
-                      </p>
-                      <Badge variant="outline" className="mt-1 text-xs">
-                        신뢰도: {scenario.confidence === 'high' ? '높음' : scenario.confidence === 'medium' ? '보통' : '낮음'}
-                      </Badge>
+                      <Badge variant="outline" className="mt-2 text-xs">신뢰도: 보통</Badge>
                     </CardContent>
                   </Card>
                 ))}
@@ -205,7 +307,7 @@ const AnalysisPage = () => {
           </Card>
         </ProLockOverlay>
 
-        {/* Section 2 — 재무 수익성 (irr-calculator 연동) */}
+        {/* Section 2 — 재무 수익성 */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
@@ -240,7 +342,7 @@ const AnalysisPage = () => {
           </Card>
         </ProLockOverlay>
 
-        {/* Section 3 — 시나리오 비교표 (compareScenarios 연동) */}
+        {/* Section 3 — 시나리오 비교표 */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
@@ -298,7 +400,7 @@ const AnalysisPage = () => {
           </Card>
         </ProLockOverlay>
 
-        {/* Section 4 — 정부협력 경로 (deal-signal 연동) */}
+        {/* Section 4 — 정부협력 경로 */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
@@ -345,7 +447,7 @@ const AnalysisPage = () => {
           <Button onClick={handleDealInterest}>딜 관심 표명</Button>
         )}
         {!isPro && (
-          <Button onClick={() => navigate('/about')}>Pro 구독 시작하기</Button>
+          <Button onClick={() => navigate('/pricing')}>Pro 구독 시작하기</Button>
         )}
         <Button variant="outline" onClick={() => navigate('/properties')}>
           목록으로 돌아가기
