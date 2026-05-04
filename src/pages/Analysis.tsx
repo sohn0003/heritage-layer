@@ -123,17 +123,27 @@ const AnalysisPage = () => {
     return calculateScore(buildScoringInput(asset));
   }, [asset]);
 
+  // 분석 가정값 (DB에 없는 값은 합리적 기본값으로 채움)
+  const analysisAssumptions = {
+    buildingCondition: 'partial_reinforcement' as const,
+    assetUseType: 'cultural_complex' as const,
+    landValuePerSqm: 4_500_000, // 성북구 일반주거 평균 공시지가 가정
+    loanRates: { pf: 6, collateral: 4.5 },
+    equityRatio: 30,
+    projectYears: 10,
+  };
+
   const scenarioComparison: IRRResult | null = useMemo(() => {
     if (!asset || !scoringResult) return null;
     const input: IRRInput = {
       scoringResult,
-      buildingCondition: 'partial_reinforcement',
-      assetUseType: 'cultural_complex',
+      buildingCondition: analysisAssumptions.buildingCondition,
+      assetUseType: analysisAssumptions.assetUseType,
       landArea: asset.land_area ?? 0,
-      landValuePerSqm: 0,
-      loanRates: { pf: 6, collateral: 4.5 },
-      equityRatio: 30,
-      projectYears: 10,
+      landValuePerSqm: analysisAssumptions.landValuePerSqm,
+      loanRates: analysisAssumptions.loanRates,
+      equityRatio: analysisAssumptions.equityRatio,
+      projectYears: analysisAssumptions.projectYears,
       isGovernmentSupported: !!asset.gov_cooperation,
     };
     return calculateIRRScenarios(input);
