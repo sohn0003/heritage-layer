@@ -19,9 +19,9 @@ import {
   type ZoningType,
 } from '@/algorithm/scoring/scoring';
 import {
-  compareScenarios,
-  type FinancialInput,
-  type ScenarioComparison,
+  calculateIRRScenarios,
+  type IRRInput,
+  type IRRResult,
 } from '@/algorithm/financial/irr-calculator';
 import { analyzeDealSignal, type DealSignalResult } from '@/algorithm/deal-signal/deal-signal';
 
@@ -123,20 +123,21 @@ const AnalysisPage = () => {
     return calculateScore(buildScoringInput(asset));
   }, [asset]);
 
-  const scenarioComparison: ScenarioComparison | null = useMemo(() => {
-    if (!asset) return null;
-    const input: FinancialInput = {
+  const scenarioComparison: IRRResult | null = useMemo(() => {
+    if (!asset || !scoringResult) return null;
+    const input: IRRInput = {
+      scoringResult,
+      buildingCondition: 'partial_reinforcement',
+      assetUseType: 'cultural_complex',
       landArea: asset.land_area ?? 0,
-      buildingCoverage: asset.building_coverage ?? 0,
-      floorAreaRatio: asset.floor_area_ratio ?? 0,
-      acquisitionCost: 0,
-      renovationCost: 0,
-      annualRevenue: 0,
-      annualExpense: 0,
-      holdingPeriodYears: 10,
+      landValuePerSqm: 0,
+      loanRates: { pf: 6, collateral: 4.5 },
+      equityRatio: 30,
+      projectYears: 10,
+      isGovernmentSupported: !!asset.gov_cooperation,
     };
-    return compareScenarios(input);
-  }, [asset]);
+    return calculateIRRScenarios(input);
+  }, [asset, scoringResult]);
 
   const dealSignal: DealSignalResult | null = useMemo(() => {
     if (!asset) return null;
@@ -327,9 +328,9 @@ const AnalysisPage = () => {
                   {[
                     { label: 'IRR', value: formatPercent(scenarioComparison?.base.irr ?? 0) },
                     { label: 'DSCR', value: scenarioComparison?.base.dscr ? scenarioComparison.base.dscr.toFixed(2) : '--' },
-                    { label: '투자회수기간', value: scenarioComparison?.base.paybackPeriod ? `${scenarioComparison.base.paybackPeriod}년` : '--' },
-                    { label: '예상 매출', value: `${formatNumber(scenarioComparison?.base.estimatedRevenue ?? 0)}원` },
-                    { label: '영업이익', value: `${formatNumber(scenarioComparison?.base.operatingProfit ?? 0)}원` },
+                    { label: '투자회수기간', value: scenarioComparison?.base.paybackYears ? `${scenarioComparison.base.paybackYears}년` : '--' },
+                    { label: '예상 매출', value: `${formatNumber(scenarioComparison?.base.annualRevenue ?? 0)}원` },
+                    { label: '영업이익', value: `${formatNumber(scenarioComparison?.base.annualOperatingProfit ?? 0)}원` },
                   ].map((row) => (
                     <TableRow key={row.label}>
                       <TableCell className="font-medium">{row.label}</TableCell>
@@ -370,21 +371,21 @@ const AnalysisPage = () => {
                     },
                     {
                       label: '예상 매출',
-                      c: `${formatNumber(scenarioComparison?.conservative.estimatedRevenue ?? 0)}원`,
-                      b: `${formatNumber(scenarioComparison?.base.estimatedRevenue ?? 0)}원`,
-                      o: `${formatNumber(scenarioComparison?.optimistic.estimatedRevenue ?? 0)}원`,
+                      c: `${formatNumber(scenarioComparison?.conservative.annualRevenue ?? 0)}원`,
+                      b: `${formatNumber(scenarioComparison?.base.annualRevenue ?? 0)}원`,
+                      o: `${formatNumber(scenarioComparison?.optimistic.annualRevenue ?? 0)}원`,
                     },
                     {
-                      label: 'NPV',
-                      c: `${formatNumber(scenarioComparison?.conservative.npv ?? 0)}원`,
-                      b: `${formatNumber(scenarioComparison?.base.npv ?? 0)}원`,
-                      o: `${formatNumber(scenarioComparison?.optimistic.npv ?? 0)}원`,
+                      label: 'ROI',
+                      c: formatPercent(scenarioComparison?.conservative.roi ?? 0),
+                      b: formatPercent(scenarioComparison?.base.roi ?? 0),
+                      o: formatPercent(scenarioComparison?.optimistic.roi ?? 0),
                     },
                     {
                       label: '회수기간',
-                      c: scenarioComparison?.conservative.paybackPeriod ? `${scenarioComparison.conservative.paybackPeriod}년` : '--',
-                      b: scenarioComparison?.base.paybackPeriod ? `${scenarioComparison.base.paybackPeriod}년` : '--',
-                      o: scenarioComparison?.optimistic.paybackPeriod ? `${scenarioComparison.optimistic.paybackPeriod}년` : '--',
+                      c: scenarioComparison?.conservative.paybackYears ? `${scenarioComparison.conservative.paybackYears}년` : '--',
+                      b: scenarioComparison?.base.paybackYears ? `${scenarioComparison.base.paybackYears}년` : '--',
+                      o: scenarioComparison?.optimistic.paybackYears ? `${scenarioComparison.optimistic.paybackYears}년` : '--',
                     },
                   ].map((row) => (
                     <TableRow key={row.label}>
