@@ -123,20 +123,21 @@ const AnalysisPage = () => {
     return calculateScore(buildScoringInput(asset));
   }, [asset]);
 
-  const scenarioComparison: ScenarioComparison | null = useMemo(() => {
-    if (!asset) return null;
-    const input: FinancialInput = {
+  const scenarioComparison: IRRResult | null = useMemo(() => {
+    if (!asset || !scoringResult) return null;
+    const input: IRRInput = {
+      scoringResult,
+      buildingCondition: 'partial_reinforcement',
+      assetUseType: 'cultural_complex',
       landArea: asset.land_area ?? 0,
-      buildingCoverage: asset.building_coverage ?? 0,
-      floorAreaRatio: asset.floor_area_ratio ?? 0,
-      acquisitionCost: 0,
-      renovationCost: 0,
-      annualRevenue: 0,
-      annualExpense: 0,
-      holdingPeriodYears: 10,
+      landValuePerSqm: 0,
+      loanRates: { pf: 6, collateral: 4.5 },
+      equityRatio: 30,
+      projectYears: 10,
+      isGovernmentSupported: !!asset.gov_cooperation,
     };
-    return compareScenarios(input);
-  }, [asset]);
+    return calculateIRRScenarios(input);
+  }, [asset, scoringResult]);
 
   const dealSignal: DealSignalResult | null = useMemo(() => {
     if (!asset) return null;
