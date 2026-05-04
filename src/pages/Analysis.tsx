@@ -328,9 +328,9 @@ const AnalysisPage = () => {
                   {[
                     { label: 'IRR', value: formatPercent(scenarioComparison?.base.irr ?? 0) },
                     { label: 'DSCR', value: scenarioComparison?.base.dscr ? scenarioComparison.base.dscr.toFixed(2) : '--' },
-                    { label: '투자회수기간', value: scenarioComparison?.base.paybackPeriod ? `${scenarioComparison.base.paybackPeriod}년` : '--' },
-                    { label: '예상 매출', value: `${formatNumber(scenarioComparison?.base.estimatedRevenue ?? 0)}원` },
-                    { label: '영업이익', value: `${formatNumber(scenarioComparison?.base.operatingProfit ?? 0)}원` },
+                    { label: '투자회수기간', value: scenarioComparison?.base.paybackYears ? `${scenarioComparison.base.paybackYears}년` : '--' },
+                    { label: '예상 매출', value: `${formatNumber(scenarioComparison?.base.annualRevenue ?? 0)}원` },
+                    { label: '영업이익', value: `${formatNumber(scenarioComparison?.base.annualOperatingProfit ?? 0)}원` },
                   ].map((row) => (
                     <TableRow key={row.label}>
                       <TableCell className="font-medium">{row.label}</TableCell>
