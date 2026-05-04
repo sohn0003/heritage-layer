@@ -371,21 +371,21 @@ const AnalysisPage = () => {
                     },
                     {
                       label: '예상 매출',
-                      c: `${formatNumber(scenarioComparison?.conservative.estimatedRevenue ?? 0)}원`,
-                      b: `${formatNumber(scenarioComparison?.base.estimatedRevenue ?? 0)}원`,
-                      o: `${formatNumber(scenarioComparison?.optimistic.estimatedRevenue ?? 0)}원`,
+                      c: `${formatNumber(scenarioComparison?.conservative.annualRevenue ?? 0)}원`,
+                      b: `${formatNumber(scenarioComparison?.base.annualRevenue ?? 0)}원`,
+                      o: `${formatNumber(scenarioComparison?.optimistic.annualRevenue ?? 0)}원`,
                     },
                     {
-                      label: 'NPV',
-                      c: `${formatNumber(scenarioComparison?.conservative.npv ?? 0)}원`,
-                      b: `${formatNumber(scenarioComparison?.base.npv ?? 0)}원`,
-                      o: `${formatNumber(scenarioComparison?.optimistic.npv ?? 0)}원`,
+                      label: 'ROI',
+                      c: formatPercent(scenarioComparison?.conservative.roi ?? 0),
+                      b: formatPercent(scenarioComparison?.base.roi ?? 0),
+                      o: formatPercent(scenarioComparison?.optimistic.roi ?? 0),
                     },
                     {
                       label: '회수기간',
-                      c: scenarioComparison?.conservative.paybackPeriod ? `${scenarioComparison.conservative.paybackPeriod}년` : '--',
-                      b: scenarioComparison?.base.paybackPeriod ? `${scenarioComparison.base.paybackPeriod}년` : '--',
-                      o: scenarioComparison?.optimistic.paybackPeriod ? `${scenarioComparison.optimistic.paybackPeriod}년` : '--',
+                      c: scenarioComparison?.conservative.paybackYears ? `${scenarioComparison.conservative.paybackYears}년` : '--',
+                      b: scenarioComparison?.base.paybackYears ? `${scenarioComparison.base.paybackYears}년` : '--',
+                      o: scenarioComparison?.optimistic.paybackYears ? `${scenarioComparison.optimistic.paybackYears}년` : '--',
                     },
                   ].map((row) => (
                     <TableRow key={row.label}>
