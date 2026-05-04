@@ -24,8 +24,8 @@
     --muted: 40 15% 94%;
     --muted-foreground: 220 10% 46%;
 
-    --accent: 38 80% 55%;
-    --accent-foreground: 220 60% 10%;
+    --accent: 199 24% 45%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -46,7 +46,7 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* Heritage Layer custom tokens */
-    --grade-s: 45 90% 50%;
+    --grade-s: 199 24% 45%;
     --grade-a: 210 10% 60%;
     --grade-b: 25 60% 55%;
     --grade-c: 220 5% 55%;
