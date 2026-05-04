@@ -197,9 +197,28 @@ const AnalysisPage = () => {
             )}
           </div>
           <h1 className="text-2xl font-bold">{asset.address}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">방치 기간: {asset.idle_years ?? '-'}년</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            방치 기간: {asset.idle_years ?? '-'}년 · 소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : '-'}
+            {asset.latitude && asset.longitude && (
+              <> · 좌표: {Number(asset.latitude).toFixed(4)}, {Number(asset.longitude).toFixed(4)}</>
+            )}
+          </p>
         </div>
       </div>
+
+      {/* 분석 가정 안내 */}
+      {isPro && (
+        <Card className="mb-6 border-dashed bg-muted/30">
+          <CardContent className="p-4 text-xs text-muted-foreground">
+            <strong className="text-foreground">분석 가정:</strong>{' '}
+            전환 용도 <span className="text-foreground">복합문화시설</span> · 건물 상태{' '}
+            <span className="text-foreground">부분 보강</span> · 공시지가{' '}
+            <span className="text-foreground">{(analysisAssumptions.landValuePerSqm).toLocaleString()}원/㎡</span> ·
+            자기자본 {analysisAssumptions.equityRatio}% · 운영 {analysisAssumptions.projectYears}년 · PF{' '}
+            {analysisAssumptions.loanRates.pf}% / 담보 {analysisAssumptions.loanRates.collateral}%
+          </CardContent>
+        </Card>
+      )}
 
       {/* Free section — 기본 자산 정보 */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
