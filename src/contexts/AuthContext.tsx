@@ -42,15 +42,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .select('subscription_tier')
             .eq('id', session.user.id)
             .single();
-          if (profile) {
-            setSubscriptionTier(profile.subscription_tier as 'free' | 'pro');
-          }
 
           const { data: roles } = await supabase
             .from('user_roles')
             .select('role')
             .eq('user_id', session.user.id);
-          setIsAdmin(roles?.some(r => r.role === 'admin') ?? false);
+          const admin = roles?.some(r => r.role === 'admin') ?? false;
+          setIsAdmin(admin);
+          // Admin은 자동으로 Pro 권한 부여
+          if (admin) {
+            setSubscriptionTier('pro');
+          } else if (profile) {
+            setSubscriptionTier(profile.subscription_tier as 'free' | 'pro');
+          }
         }, 0);
       } else {
         setIsAdmin(false);
