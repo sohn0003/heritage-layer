@@ -19,9 +19,9 @@ import {
   type ZoningType,
 } from '@/algorithm/scoring/scoring';
 import {
-  compareScenarios,
-  type FinancialInput,
-  type ScenarioComparison,
+  calculateIRRScenarios,
+  type IRRInput,
+  type IRRResult,
 } from '@/algorithm/financial/irr-calculator';
 import { analyzeDealSignal, type DealSignalResult } from '@/algorithm/deal-signal/deal-signal';
 
