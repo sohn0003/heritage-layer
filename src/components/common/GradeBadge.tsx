@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 const gradeColors: Record<string, string> = {
-  S: 'bg-amber-400 text-amber-950',
+  S: 'bg-[hsl(199,24%,45%)] text-white',
   A: 'bg-slate-400 text-slate-950',
   B: 'bg-orange-400 text-orange-950',
   C: 'bg-gray-400 text-gray-950',
