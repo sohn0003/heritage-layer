@@ -23,7 +23,13 @@ import {
   type IRRInput,
   type IRRResult,
 } from '@/algorithm/financial/irr-calculator';
-import { analyzeDealSignal, type DealSignalResult } from '@/algorithm/deal-signal/deal-signal';
+import {
+  getAssetSignalStatus,
+  createSignalEvent,
+  type AssetSignalSummary,
+  type SignalEvent,
+  type SignalType,
+} from '@/algorithm/deal-signal/deal-signal';
 
 // ─────────────────────────────────────────────
 // DB assets row → scoring AssetInput 매핑
