@@ -155,10 +155,46 @@ const AnalysisPage = () => {
     return calculateIRRScenarios(input);
   }, [asset, scoringResult]);
 
-  const dealSignal: DealSignalResult | null = useMemo(() => {
-    if (!asset) return null;
-    return analyzeDealSignal(asset.asset_type, asset.ownership_type, asset.gov_cooperation);
-  }, [asset]);
+  const [signalEvents, setSignalEvents] = useState<SignalEvent[]>([]);
+
+  // 현재 자산에 대한 사용자 신호 이벤트 조회
+  const fetchSignals = async () => {
+    if (!assetId || !user) {
+      setSignalEvents([]);
+      return;
+    }
+    const { data } = await supabase
+      .from('deal_signals')
+      .select('*')
+      .eq('asset_id', assetId);
+    if (data) {
+      setSignalEvents(
+        data.map((row: any) =>
+          createSignalEvent(row.user_id, row.asset_id, row.signal_type as SignalType, undefined),
+        ).map((ev, i) => ({ ...ev, timestamp: new Date(data[i].created_at) })),
+      );
+    }
+  };
+
+  // 자산 열람 시 'viewed' 신호 자동 기록
+  useEffect(() => {
+    if (!assetId || !user) return;
+    (async () => {
+      await supabase.from('deal_signals').insert({
+        user_id: user.id,
+        asset_id: assetId,
+        signal_type: 'viewed',
+      });
+      fetchSignals();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetId, user?.id]);
+
+  // 신호 집계 결과
+  const signalSummary: AssetSignalSummary | null = useMemo(() => {
+    if (!asset || !scoringResult) return null;
+    return getAssetSignalStatus(asset.id, signalEvents, scoringResult.grade);
+  }, [asset, scoringResult, signalEvents]);
 
   const handleDealInterest = async () => {
     if (!user) return;
@@ -171,6 +207,27 @@ const AnalysisPage = () => {
       toast({ title: '오류', description: error.message, variant: 'destructive' });
     } else {
       toast({ title: '딜 관심이 등록되었습니다' });
+      fetchSignals();
+    }
+  };
+
+  const handleSaveAsset = async () => {
+    if (!user || !assetId) return;
+    const { error: saveError } = await supabase
+      .from('saved_assets')
+      .insert({ user_id: user.id, asset_id: assetId })
+      .select()
+      .maybeSingle();
+    await supabase.from('deal_signals').insert({
+      user_id: user.id,
+      asset_id: assetId,
+      signal_type: 'saved',
+    });
+    if (saveError && !saveError.message.includes('duplicate')) {
+      toast({ title: '저장 오류', description: saveError.message, variant: 'destructive' });
+    } else {
+      toast({ title: '자산이 저장되었습니다' });
+      fetchSignals();
     }
   };
 
