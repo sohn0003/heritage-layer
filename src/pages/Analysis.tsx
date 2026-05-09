@@ -493,41 +493,77 @@ const AnalysisPage = () => {
           </Card>
         </ProLockOverlay>
 
-        {/* Section 4 — 정부협력 경로 */}
+        {/* Section 4 — 딜 시그널 현황 */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Building2 className="h-5 w-5 text-accent" /> 정부협력 경로
+                <Building2 className="h-5 w-5 text-accent" /> 딜 시그널 현황
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {dealSignal?.govRoute ? (
+              {signalSummary ? (
                 <>
-                  <p><strong>수의계약 조건:</strong> {dealSignal.govRoute.directContractCondition}</p>
-                  <p><strong>민간제안 절차:</strong> {dealSignal.govRoute.privateProposaProcess}</p>
-                  <p><strong>예상 소요 기간:</strong> {dealSignal.govRoute.estimatedTimeline}</p>
-                  {dealSignal.govRoute.applicablePrograms.length > 0 && (
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
-                      <strong>적용 가능 프로그램:</strong>
+                      <p className="text-xs">종합 신호 점수</p>
+                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs">관심 유저 수</p>
+                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.uniqueUsers}명</p>
+                    </div>
+                    <div>
+                      <p className="text-xs">저장 / 열람 / 반복열람</p>
+                      <p className="mt-1 text-xl font-semibold text-foreground">
+                        {signalSummary.savedCount} / {signalSummary.viewCount} / {signalSummary.repeatedViewCount}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs">딜 관심 표명</p>
+                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 pt-2">
+                    <Badge
+                      variant={
+                        signalSummary.triggerLevel === 'action'
+                          ? 'default'
+                          : signalSummary.triggerLevel === 'alert'
+                          ? 'secondary'
+                          : 'outline'
+                      }
+                    >
+                      트리거: {
+                        signalSummary.triggerLevel === 'action' ? '즉시 액션'
+                        : signalSummary.triggerLevel === 'alert' ? '내부 알림'
+                        : signalSummary.triggerLevel === 'watch' ? '관심 수집'
+                        : '대기'
+                      }
+                    </Badge>
+                    <Badge variant="outline">우선순위 {signalSummary.priorityScore}/100</Badge>
+                    {signalSummary.clusterDetected && (
+                      <Badge variant="default">클러스터 감지</Badge>
+                    )}
+                  </div>
+                  {signalSummary.recommendedActions.length > 0 && (
+                    <div>
+                      <strong className="text-foreground">권장 액션:</strong>
                       <ul className="mt-1 list-disc pl-5">
-                        {dealSignal.govRoute.applicablePrograms.map((p) => (
-                          <li key={p}>{p}</li>
+                        {signalSummary.recommendedActions.map((a) => (
+                          <li key={a}>
+                            {a === 'send_proposal' && '딜 제안서 발송'}
+                            {a === 'internal_alert' && '내부 딜팀 알림'}
+                            {a === 'owner_contact' && '자산 소유자 접촉'}
+                            {a === 'cluster_report' && '클러스터 리포트 생성'}
+                          </li>
                         ))}
                       </ul>
                     </div>
                   )}
                 </>
               ) : (
-                <>
-                  <p><strong>수의계약 조건:</strong> 알고리즘 구현 후 표시됩니다</p>
-                  <p><strong>민간제안 절차:</strong> 알고리즘 구현 후 표시됩니다</p>
-                </>
-              )}
-              {dealSignal && (
-                <Badge variant={dealSignal.dealReadiness === 'ready' ? 'default' : 'outline'} className="mt-2">
-                  딜 준비 상태: {dealSignal.dealReadiness === 'ready' ? '준비 완료' : dealSignal.dealReadiness === 'conditional' ? '조건부' : '미준비'}
-                </Badge>
+                <p>신호 데이터를 불러오는 중...</p>
               )}
             </CardContent>
           </Card>
@@ -536,6 +572,9 @@ const AnalysisPage = () => {
 
       {/* Bottom buttons */}
       <div className="mt-8 flex flex-wrap gap-3">
+        {user && (
+          <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
+        )}
         {isPro && user && (
           <Button onClick={handleDealInterest}>딜 관심 표명</Button>
         )}
