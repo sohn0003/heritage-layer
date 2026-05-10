@@ -130,7 +130,6 @@ const AdminPropertiesPage = () => {
       land_area: a.land_area?.toString() || '',
       idle_years: a.idle_years?.toString() || '',
       ownership_type: a.ownership_type || '',
-      grade: a.grade || 'C',
       gov_cooperation: a.gov_cooperation || false,
       latitude: a.latitude?.toString() || '',
       longitude: a.longitude?.toString() || '',
