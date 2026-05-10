@@ -208,14 +208,18 @@ const AdminPropertiesPage = () => {
       is_balanced_dev_budget: form.is_balanced_dev_budget,
     };
 
+    // 자동 등급/점수 산출
+    const scoring = calculateScoringFields(payload);
+    const finalPayload = { ...payload, ...scoring };
+
     if (editId) {
-      const { error } = await supabase.from('assets').update(payload).eq('id', editId);
+      const { error } = await supabase.from('assets').update(finalPayload).eq('id', editId);
       if (error) toast({ title: '수정 실패', description: error.message, variant: 'destructive' });
-      else toast({ title: '매물이 수정되었습니다' });
+      else toast({ title: `매물이 수정되었습니다 · 등급 ${scoring.grade} (${scoring.scoring_total}점)` });
     } else {
-      const { error } = await supabase.from('assets').insert(payload);
+      const { error } = await supabase.from('assets').insert(finalPayload);
       if (error) toast({ title: '등록 실패', description: error.message, variant: 'destructive' });
-      else toast({ title: '매물이 등록되었습니다' });
+      else toast({ title: `매물이 등록되었습니다 · 등급 ${scoring.grade} (${scoring.scoring_total}점)` });
     }
     setSaving(false);
     setDialogOpen(false);
