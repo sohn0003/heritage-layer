@@ -130,14 +130,17 @@ const AnalysisPage = () => {
     return calculateScore(buildScoringInput(asset));
   }, [asset]);
 
+  // 알고리즘 기본값 (loan_rates, system_config 테이블에서 로드)
+  const algoConfig = useAlgorithmConfig();
+
   // 분석 가정값 (DB에 없는 값은 합리적 기본값으로 채움)
   const analysisAssumptions = {
     buildingCondition: 'partial_reinforcement' as const,
     assetUseType: 'cultural_complex' as const,
     landValuePerSqm: 4_500_000, // 성북구 일반주거 평균 공시지가 가정
-    loanRates: { pf: 6, collateral: 4.5 },
-    equityRatio: 30,
-    projectYears: 10,
+    loanRates: algoConfig.loanRates,
+    equityRatio: algoConfig.equityRatio,
+    projectYears: algoConfig.projectYears,
   };
 
   const scenarioComparison: IRRResult | null = useMemo(() => {
@@ -154,7 +157,7 @@ const AnalysisPage = () => {
       isGovernmentSupported: !!asset.gov_cooperation,
     };
     return calculateIRRScenarios(input);
-  }, [asset, scoringResult]);
+  }, [asset, scoringResult, algoConfig.loanRates.pf, algoConfig.loanRates.collateral, algoConfig.equityRatio, algoConfig.projectYears]);
 
   const [signalEvents, setSignalEvents] = useState<SignalEvent[]>([]);
 
