@@ -9,6 +9,7 @@ import ProLockOverlay from '@/components/common/ProLockOverlay';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
 import { TrendingUp, FileText, BarChart3, Building2 } from 'lucide-react';
 
 // 알고리즘 모듈 연동
