@@ -176,7 +176,7 @@ const AdminPropertiesPage = () => {
       land_area: num(form.land_area),
       idle_years: num(form.idle_years),
       ownership_type: str(form.ownership_type),
-      grade: form.grade,
+      
       gov_cooperation: form.gov_cooperation,
       latitude: num(form.latitude),
       longitude: num(form.longitude),
