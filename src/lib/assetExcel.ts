@@ -111,13 +111,16 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
       result.errors.push(`행 ${i + 2}: 주소/자산 유형 누락`);
       continue;
     }
+    // 자동 등급/점수 산출
+    const scoring = calculateScoringFields(payload);
+    const finalPayload = { ...payload, ...scoring };
     try {
       if (id) {
-        const { error } = await (supabase.from('assets').update as any)(payload).eq('id', id);
+        const { error } = await (supabase.from('assets').update as any)(finalPayload).eq('id', id);
         if (error) throw error;
         result.updated++;
       } else {
-        const { error } = await (supabase.from('assets').insert as any)(payload);
+        const { error } = await (supabase.from('assets').insert as any)(finalPayload);
         if (error) throw error;
         result.inserted++;
       }
