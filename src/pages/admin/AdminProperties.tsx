@@ -104,6 +104,8 @@ const AdminPropertiesPage = () => {
   const [form, setForm] = useState<AssetForm>(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!authLoading && !isAdmin) navigate('/');
