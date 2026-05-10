@@ -328,21 +328,13 @@ const AdminPropertiesPage = () => {
               <Label>주소 *</Label>
               <Input value={form.address} onChange={(e) => setF({ address: e.target.value })} required />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>자산 유형 *</Label>
-                <Select value={form.asset_type} onValueChange={(v) => setF({ asset_type: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{assetTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>등급</Label>
-                <Select value={form.grade} onValueChange={(v) => setF({ grade: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{grades.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label>자산 유형 *</Label>
+              <Select value={form.asset_type} onValueChange={(v) => setF({ asset_type: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{assetTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">등급은 알고리즘이 자동 산출합니다.</p>
             </div>
 
             <Accordion type="multiple" defaultValue={['basic']} className="w-full">
