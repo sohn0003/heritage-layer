@@ -16,11 +16,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Download, Upload } from 'lucide-react';
 import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
+import { calculateScoringFields } from '@/lib/assetScoring';
 import { useRef } from 'react';
 import GradeBadge from '@/components/common/GradeBadge';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
-const grades = ['S', 'A', 'B', 'C', 'D'];
 const populationTrends = [
   { v: 'increasing', l: '증가' },
   { v: 'stable', l: '유지' },
