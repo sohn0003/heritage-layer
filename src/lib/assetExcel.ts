@@ -117,7 +117,7 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
         if (error) throw error;
         result.updated++;
       } else {
-        const { error } = await supabase.from('assets').insert(payload as any);
+        const { error } = await (supabase.from('assets').insert as any)(payload);
         if (error) throw error;
         result.inserted++;
       }
