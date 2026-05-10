@@ -1,0 +1,1 @@
+UPDATE public.system_config SET value = '0.4' WHERE key = 'residual_value_ratio';
