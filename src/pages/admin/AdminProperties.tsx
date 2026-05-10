@@ -79,7 +79,7 @@ interface AssetForm {
 
 const emptyForm: AssetForm = {
   address: '', asset_type: '폐교', zoning: '', building_coverage: '', floor_area_ratio: '',
-  land_area: '', idle_years: '', ownership_type: '', grade: 'C', gov_cooperation: false,
+  land_area: '', idle_years: '', ownership_type: '', gov_cooperation: false,
   latitude: '', longitude: '', admin_memo: '', is_published: false,
   current_building_coverage: '', legal_max_building_coverage: '',
   current_floor_area_ratio: '', legal_max_floor_area_ratio: '',
