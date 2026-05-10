@@ -1,16 +1,16 @@
 import * as XLSX from 'xlsx';
 import { supabase } from '@/integrations/supabase/client';
+import { calculateScoringFields } from '@/lib/assetScoring';
 
 // 컬럼 정의: DB 키 ↔ 한글 헤더 ↔ 타입
 type ColType = 'string' | 'number' | 'boolean';
 interface ColDef { key: string; label: string; type: ColType; }
 
-// 편집 가능한 컬럼만 (자동 계산/시스템 필드 제외)
+// 편집 가능한 컬럼만 (등급/점수 등 자동 계산 필드 제외)
 export const ASSET_COLUMNS: ColDef[] = [
   { key: 'id', label: 'ID (수정 시 필수)', type: 'string' },
   { key: 'address', label: '주소', type: 'string' },
   { key: 'asset_type', label: '자산 유형', type: 'string' },
-  { key: 'grade', label: '등급', type: 'string' },
   { key: 'is_published', label: '공개 여부', type: 'boolean' },
   { key: 'gov_cooperation', label: '정부 협력', type: 'boolean' },
   { key: 'zoning', label: '용도지역', type: 'string' },
