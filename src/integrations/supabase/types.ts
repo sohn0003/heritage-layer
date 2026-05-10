@@ -187,6 +187,30 @@ export type Database = {
           },
         ]
       }
+      loan_rates: {
+        Row: {
+          created_at: string
+          effective_date: string
+          id: string
+          rate_type: string
+          rate_value: number
+        }
+        Insert: {
+          created_at?: string
+          effective_date?: string
+          id?: string
+          rate_type: string
+          rate_value: number
+        }
+        Update: {
+          created_at?: string
+          effective_date?: string
+          id?: string
+          rate_type?: string
+          rate_value?: number
+        }
+        Relationships: []
+      }
       partner_inquiries: {
         Row: {
           contact: string
