@@ -14,7 +14,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Download, Upload } from 'lucide-react';
+import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
+import { useRef } from 'react';
 import GradeBadge from '@/components/common/GradeBadge';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
@@ -102,6 +104,8 @@ const AdminPropertiesPage = () => {
   const [form, setForm] = useState<AssetForm>(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!authLoading && !isAdmin) navigate('/');
@@ -235,9 +239,44 @@ const AdminPropertiesPage = () => {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">매물 관리</h1>
-        <Button onClick={openCreate}>
-          <Plus className="mr-2 h-4 w-4" /> 신규 등록
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={async () => {
+            try { await exportAssetsToExcel(); toast({ title: '엑셀 다운로드 완료' }); }
+            catch (e: any) { toast({ title: '다운로드 실패', description: e.message, variant: 'destructive' }); }
+          }}>
+            <Download className="mr-2 h-4 w-4" /> 엑셀 다운로드
+          </Button>
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing}>
+            <Upload className="mr-2 h-4 w-4" /> {importing ? '업로드 중...' : '엑셀 업로드'}
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            className="hidden"
+            onChange={async (e) => {
+              const f = e.target.files?.[0];
+              if (!f) return;
+              setImporting(true);
+              try {
+                const r = await importAssetsFromExcel(f);
+                toast({
+                  title: '엑셀 업로드 완료',
+                  description: `신규 ${r.inserted}건 / 수정 ${r.updated}건 / 실패 ${r.failed}건${r.errors.length ? '\n' + r.errors.slice(0, 3).join('\n') : ''}`,
+                });
+                fetchAssets();
+              } catch (err: any) {
+                toast({ title: '업로드 실패', description: err.message, variant: 'destructive' });
+              } finally {
+                setImporting(false);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+              }
+            }}
+          />
+          <Button onClick={openCreate}>
+            <Plus className="mr-2 h-4 w-4" /> 신규 등록
+          </Button>
+        </div>
       </div>
 
       <Card>
