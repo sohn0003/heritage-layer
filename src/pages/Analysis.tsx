@@ -155,9 +155,10 @@ const AnalysisPage = () => {
       equityRatio: analysisAssumptions.equityRatio,
       projectYears: analysisAssumptions.projectYears,
       isGovernmentSupported: !!asset.gov_cooperation,
+      residualValueRatio: algoConfig.residualValueRatio,
     };
     return calculateIRRScenarios(input);
-  }, [asset, scoringResult, algoConfig.loanRates.pf, algoConfig.loanRates.collateral, algoConfig.equityRatio, algoConfig.projectYears]);
+  }, [asset, scoringResult, algoConfig.loanRates.pf, algoConfig.loanRates.collateral, algoConfig.equityRatio, algoConfig.projectYears, algoConfig.residualValueRatio]);
 
   const [signalEvents, setSignalEvents] = useState<SignalEvent[]>([]);
 

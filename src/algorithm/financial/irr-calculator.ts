@@ -46,6 +46,9 @@ export interface IRRInput {
 
   // 정부 지원 여부
   isGovernmentSupported: boolean; // 보조금·기금 지원 여부
+
+  // system_config 연동값
+  residualValueRatio: number;     // 잔존가치 비율 (0~1) — 예: 0.4 = 40%
 }
 
 // 시나리오별 단일 결과
@@ -332,14 +335,15 @@ function computeScenario(
   const netInvestmentAfterSubsidy = totalInvestment - governmentSubsidy;
 
   // ── IRR 계산 ──
+  // residualValueRatio: system_config에서 읽어온 잔존가치 비율 (예: 0.4 = 40%)
   const cashFlows: number[] = [
     -(netInvestmentAfterSubsidy), // 0년차: 초기 투자
     ...Array(input.projectYears).fill(annualNetProfit), // 운영 기간
-    // 마지막 해에 잔존가치 (총 투자비의 40%) 추가
-    // (마지막 연도 순이익에 합산)
   ];
-  // 잔존가치 마지막 연도에 추가
-  cashFlows[cashFlows.length - 1] += Math.round(totalInvestment * 0.4);
+  // 잔존가치: 마지막 연도 순이익에 합산
+  cashFlows[cashFlows.length - 1] += Math.round(
+    totalInvestment * input.residualValueRatio
+  );
 
   const irr = calculateIRR(cashFlows);
 

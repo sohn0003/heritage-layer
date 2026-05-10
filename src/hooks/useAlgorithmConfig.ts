@@ -5,7 +5,7 @@ export interface AlgorithmConfig {
   loanRates: { pf: number; collateral: number };
   equityRatio: number;       // %
   projectYears: number;      // 년
-  residualValueRatio: number; // % (참고용 — 현재 irr-calculator 내부 상수와 동일하게 유지)
+  residualValueRatio: number; // 0~1 (예: 0.4 = 40%)
   loaded: boolean;
 }
 
@@ -13,7 +13,7 @@ const DEFAULTS: AlgorithmConfig = {
   loanRates: { pf: 5.5, collateral: 4.8 },
   equityRatio: 30,
   projectYears: 10,
-  residualValueRatio: 40,
+  residualValueRatio: 0.4,
   loaded: false,
 };
 
