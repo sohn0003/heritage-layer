@@ -42,7 +42,7 @@ interface AssetForm {
   land_area: string;
   idle_years: string;
   ownership_type: string;
-  grade: string;
+  
   gov_cooperation: boolean;
   latitude: string;
   longitude: string;
