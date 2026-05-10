@@ -16,11 +16,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Download, Upload } from 'lucide-react';
 import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
+import { calculateScoringFields } from '@/lib/assetScoring';
 import { useRef } from 'react';
 import GradeBadge from '@/components/common/GradeBadge';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
-const grades = ['S', 'A', 'B', 'C', 'D'];
 const populationTrends = [
   { v: 'increasing', l: '증가' },
   { v: 'stable', l: '유지' },
@@ -42,7 +42,7 @@ interface AssetForm {
   land_area: string;
   idle_years: string;
   ownership_type: string;
-  grade: string;
+  
   gov_cooperation: boolean;
   latitude: string;
   longitude: string;
@@ -79,7 +79,7 @@ interface AssetForm {
 
 const emptyForm: AssetForm = {
   address: '', asset_type: '폐교', zoning: '', building_coverage: '', floor_area_ratio: '',
-  land_area: '', idle_years: '', ownership_type: '', grade: 'C', gov_cooperation: false,
+  land_area: '', idle_years: '', ownership_type: '', gov_cooperation: false,
   latitude: '', longitude: '', admin_memo: '', is_published: false,
   current_building_coverage: '', legal_max_building_coverage: '',
   current_floor_area_ratio: '', legal_max_floor_area_ratio: '',
@@ -130,7 +130,6 @@ const AdminPropertiesPage = () => {
       land_area: a.land_area?.toString() || '',
       idle_years: a.idle_years?.toString() || '',
       ownership_type: a.ownership_type || '',
-      grade: a.grade || 'C',
       gov_cooperation: a.gov_cooperation || false,
       latitude: a.latitude?.toString() || '',
       longitude: a.longitude?.toString() || '',
@@ -177,7 +176,7 @@ const AdminPropertiesPage = () => {
       land_area: num(form.land_area),
       idle_years: num(form.idle_years),
       ownership_type: str(form.ownership_type),
-      grade: form.grade,
+      
       gov_cooperation: form.gov_cooperation,
       latitude: num(form.latitude),
       longitude: num(form.longitude),
@@ -209,14 +208,18 @@ const AdminPropertiesPage = () => {
       is_balanced_dev_budget: form.is_balanced_dev_budget,
     };
 
+    // 자동 등급/점수 산출
+    const scoring = calculateScoringFields(payload);
+    const finalPayload = { ...payload, ...scoring };
+
     if (editId) {
-      const { error } = await supabase.from('assets').update(payload).eq('id', editId);
+      const { error } = await supabase.from('assets').update(finalPayload).eq('id', editId);
       if (error) toast({ title: '수정 실패', description: error.message, variant: 'destructive' });
-      else toast({ title: '매물이 수정되었습니다' });
+      else toast({ title: `매물이 수정되었습니다 · 등급 ${scoring.grade} (${scoring.scoring_total}점)` });
     } else {
-      const { error } = await supabase.from('assets').insert(payload);
+      const { error } = await supabase.from('assets').insert(finalPayload);
       if (error) toast({ title: '등록 실패', description: error.message, variant: 'destructive' });
-      else toast({ title: '매물이 등록되었습니다' });
+      else toast({ title: `매물이 등록되었습니다 · 등급 ${scoring.grade} (${scoring.scoring_total}점)` });
     }
     setSaving(false);
     setDialogOpen(false);
@@ -329,21 +332,13 @@ const AdminPropertiesPage = () => {
               <Label>주소 *</Label>
               <Input value={form.address} onChange={(e) => setF({ address: e.target.value })} required />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>자산 유형 *</Label>
-                <Select value={form.asset_type} onValueChange={(v) => setF({ asset_type: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{assetTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>등급</Label>
-                <Select value={form.grade} onValueChange={(v) => setF({ grade: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{grades.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label>자산 유형 *</Label>
+              <Select value={form.asset_type} onValueChange={(v) => setF({ asset_type: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{assetTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">등급은 알고리즘이 자동 산출합니다.</p>
             </div>
 
             <Accordion type="multiple" defaultValue={['basic']} className="w-full">
