@@ -4,27 +4,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import GradeBadge from '@/components/common/GradeBadge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Slider } from '@/components/ui/slider';
+import { Progress } from '@/components/ui/progress';
+import { Label } from '@/components/ui/label';
 import ProLockOverlay from '@/components/common/ProLockOverlay';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
-import { TrendingUp, FileText, BarChart3, Building2, School, Home, Factory, Building } from 'lucide-react';
+import {
+  TrendingUp, FileText, BarChart3, Building2, School, Home, Factory, Building,
+  CheckCircle2, AlertTriangle, Sparkles, ShieldAlert,
+} from 'lucide-react';
 import GradeMeter from '@/components/common/GradeMeter';
 import RatioBar from '@/components/common/RatioBar';
 
 // 알고리즘 모듈 연동
+import { type ScoreResult } from '@/algorithm/scoring/scoring';
 import {
-  calculateScore,
-  type AssetInput,
-  type ScoreResult,
-  type ZoningType,
-} from '@/algorithm/scoring/scoring';
-import {
-  calculateIRRScenarios,
-  type IRRInput,
-  type IRRResult,
+  analyzeAsset,
+  type AnalyzeAssetResult,
 } from '@/algorithm/financial/irr-calculator';
 import {
   getAssetSignalStatus,
@@ -33,75 +33,17 @@ import {
   type SignalEvent,
   type SignalType,
 } from '@/algorithm/deal-signal/deal-signal';
+import { buildScoringInput } from '@/lib/assetScoring';
 
-// ─────────────────────────────────────────────
-// DB assets row → scoring AssetInput 매핑
-// DB에 없는 필드는 합리적인 기본값으로 채움
-// ─────────────────────────────────────────────
-const ZONING_MAP: Record<string, ZoningType> = {
-  '일반상업': 'commercial_general',
-  '근린상업': 'commercial_neighborhood',
-  '중심상업': 'commercial_central',
-  '준주거': 'semi_residential',
-  '2종일반주거': 'residential_2nd',
-  '3종일반주거': 'residential_3rd',
-  '자연녹지': 'green_natural',
-  '생산녹지': 'green_production',
-  '1종일반주거': 'residential_1st',
-  '준공업': 'semi_industrial',
-  '보전녹지': 'green_conservation',
-  '농림': 'agricultural',
-  '자연환경보전': 'nature_conservation',
+// 원 → 억원 변환 (소수 1자리)
+const toEokwon = (won: number | null | undefined): string => {
+  if (won == null || !Number.isFinite(won)) return '--';
+  return `${(won / 100_000_000).toFixed(1)}억`;
 };
-
-function mapZoning(zoning: string | null): ZoningType {
-  if (!zoning) return 'residential_2nd';
-  return ZONING_MAP[zoning] ?? (Object.values(ZONING_MAP).includes(zoning as ZoningType)
-    ? (zoning as ZoningType)
-    : 'residential_2nd');
-}
-
-function buildScoringInput(asset: any): AssetInput {
-  const landArea = asset.land_area ?? 0;
-  const currentBC = asset.building_coverage ?? 0;
-  const currentFAR = asset.floor_area_ratio ?? 0;
-  // 법정 한도가 DB에 없으므로 용도지역 기반의 기본값 사용
-  const zoning = mapZoning(asset.zoning);
-  const legalMaxBC = zoning.startsWith('commercial') ? 80 : zoning.startsWith('residential') ? 60 : 40;
-  const legalMaxFAR = zoning.startsWith('commercial') ? 800 : zoning.startsWith('residential') ? 250 : 100;
-  const currentFloorArea = (currentFAR / 100) * landArea;
-
-  return {
-    zoning,
-    currentBuildingCoverage: currentBC,
-    legalMaxBuildingCoverage: legalMaxBC,
-    currentFloorAreaRatio: currentFAR,
-    legalMaxFloorAreaRatio: legalMaxFAR,
-    currentFloorArea,
-    landArea,
-    isPublicAsset: asset.ownership_type === 'public',
-    isPrivateNegotiationPossible: !!asset.gov_cooperation,
-    isCitizenProposalPossible: !!asset.gov_cooperation,
-    hasNearbyConversionPrecedent: false,
-    isMilitaryOrHeritagZone: false,
-    isUrbanFacilityConflict: false,
-    isWaterFrontEnvironmental: false,
-    isPrivateLand: asset.ownership_type === 'private',
-    zoningUpgradeFloorAreaGain: 'under_20',
-    useChangeExpansion: 'minor',
-    populationTrend: 'stable',
-    commercialDensity: 'low',
-    distanceToCenter: 3,
-    idleYears: asset.idle_years ?? 0,
-    historicalValue: 'ordinary',
-    naturalScenery: 'ordinary_urban',
-    buildingCondition: 'partial_reinforcement',
-    preliminaryROI: 7,
-    isUrbanRegenerationArea: !!asset.gov_cooperation,
-    isAbandonedSchoolBudget: asset.asset_type === '폐교',
-    isBalancedDevelopmentBudget: false,
-  };
-}
+const formatPercent = (n: number | null | undefined) =>
+  n == null || !Number.isFinite(n) ? '--' : `${n.toFixed(1)}%`;
+const formatNumber = (n: number | null | undefined) =>
+  n == null || !Number.isFinite(n) ? '--' : Math.round(n).toLocaleString();
 
 const AnalysisPage = () => {
   const [searchParams] = useSearchParams();
@@ -112,6 +54,11 @@ const AnalysisPage = () => {
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  // 사용자가 슬라이더로 조절한 자기자본 비율 (undefined = 추천값 사용)
+  const [equitySliderValue, setEquitySliderValue] = useState<number | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState<'1' | '2' | '3'>('1');
+
+  const algoConfig = useAlgorithmConfig();
 
   useEffect(() => {
     if (!assetId) {
@@ -126,43 +73,42 @@ const AnalysisPage = () => {
     fetchAsset();
   }, [assetId]);
 
-  // ✅ Supabase에서 가져온 자산 데이터를 calculateScore()에 입력
-  const scoringResult: ScoreResult | null = useMemo(() => {
+  // 통합 분석: 예비 ROI → 스코어링 → 시나리오 추천 → IRR 한 번에 처리
+  const analysis: AnalyzeAssetResult | null = useMemo(() => {
     if (!asset) return null;
-    return calculateScore(buildScoringInput(asset));
-  }, [asset]);
+    const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
+    void preliminaryROI;
+    try {
+      return analyzeAsset({
+        assetInput: assetInputBase,
+        landValuePerSqm: asset.land_value_per_sqm ?? 4_500_000,
+        loanRates: algoConfig.loanRates,
+        projectYears: algoConfig.projectYears,
+        residualValueRatio: algoConfig.residualValueRatio,
+        overrideEquityRatio: equitySliderValue,
+      });
+    } catch (e) {
+      console.error('analyzeAsset 실패', e);
+      return null;
+    }
+  }, [
+    asset,
+    algoConfig.loanRates.pf,
+    algoConfig.loanRates.collateral,
+    algoConfig.projectYears,
+    algoConfig.residualValueRatio,
+    equitySliderValue,
+  ]);
 
-  // 알고리즘 기본값 (loan_rates, system_config 테이블에서 로드)
-  const algoConfig = useAlgorithmConfig();
+  const scoringResult: ScoreResult | null = analysis?.scoring ?? null;
+  const scenarios = analysis?.recommendation.scenarios;
+  const activeScenario = scenarios?.find((s) => String(s.rank) === activeTab) ?? scenarios?.[0];
 
-  // 분석 가정값 (DB에 없는 값은 합리적 기본값으로 채움)
-  const analysisAssumptions = {
-    buildingCondition: 'partial_reinforcement' as const,
-    useTypeMix: [{ useType: 'cultural_complex' as const, ratio: 100 }] as [import('@/algorithm/financial/irr-calculator').UseTypeMix, ...import('@/algorithm/financial/irr-calculator').UseTypeMix[]],
-    landValuePerSqm: 4_500_000, // 성북구 일반주거 평균 공시지가 가정
-    loanRates: algoConfig.loanRates,
-    equityRatio: algoConfig.equityRatio,
-    projectYears: algoConfig.projectYears,
-  };
+  // 탭 변경 또는 자산 변경 시 슬라이더 초기화 (추천값 사용)
+  useEffect(() => {
+    setEquitySliderValue(undefined);
+  }, [assetId, activeTab]);
 
-  const scenarioComparison: IRRResult | null = useMemo(() => {
-    if (!asset || !scoringResult) return null;
-    const input: IRRInput = {
-      scoringResult,
-      buildingCondition: analysisAssumptions.buildingCondition,
-      useTypeMix: analysisAssumptions.useTypeMix,
-      landArea: asset.land_area ?? 0,
-      landValuePerSqm: analysisAssumptions.landValuePerSqm,
-      legalMaxFloorAreaRatio: asset.legal_max_floor_area_ratio ?? asset.floor_area_ratio ?? 200,
-      zoningUpgradeGain: (asset.zoning_upgrade_gain as any) ?? 'under_20',
-      loanRates: analysisAssumptions.loanRates,
-      equityRatio: analysisAssumptions.equityRatio,
-      projectYears: analysisAssumptions.projectYears,
-      isGovernmentSupported: !!asset.gov_cooperation,
-      residualValueRatio: algoConfig.residualValueRatio,
-    };
-    return calculateIRRScenarios(input);
-  }, [asset, scoringResult, algoConfig.loanRates.pf, algoConfig.loanRates.collateral, algoConfig.equityRatio, algoConfig.projectYears, algoConfig.residualValueRatio]);
 
   const [signalEvents, setSignalEvents] = useState<SignalEvent[]>([]);
 
