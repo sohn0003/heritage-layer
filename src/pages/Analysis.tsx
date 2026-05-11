@@ -698,7 +698,7 @@ const AnalysisPage = () => {
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs">딜 관심 표명</p>
+                      <p className="text-xs">관심 상담 신청</p>
                       <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
                     </div>
                   </div>
