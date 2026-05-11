@@ -63,11 +63,11 @@ const CountUp = ({ end, duration = 2000, suffix = '', decimals = 0 }: { end: num
 
 // ─── Glass primitives ──────────────────────────────
 const glassCardStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.55)',
-  backdropFilter: 'blur(18px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-  border: '1px solid rgba(255, 255, 255, 0.6)',
-  boxShadow: '0 10px 40px -10px rgba(27, 46, 74, 0.18), inset 0 1px 0 rgba(255,255,255,0.6)',
+  background: 'rgba(255, 255, 255, 0.32)',
+  backdropFilter: 'blur(22px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+  border: '1px solid rgba(255, 255, 255, 0.45)',
+  boxShadow: '0 12px 48px -12px rgba(27, 46, 74, 0.22), inset 0 1px 0 rgba(255,255,255,0.5)',
 };
 const glassDarkStyle: React.CSSProperties = {
   background: 'rgba(27, 46, 74, 0.55)',
