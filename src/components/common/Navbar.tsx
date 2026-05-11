@@ -96,7 +96,13 @@ const Navbar = () => {
             </Link>
             {user ? (
               <div className="flex items-center gap-2">
-                <span className={`text-sm transition-colors duration-300 ${textMuted}`}>{user.email}</span>
+                <Link
+                  to="/mypage"
+                  className={`text-sm transition-colors duration-300 ${textMuted} relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left ${isDark ? 'after:bg-white' : 'after:bg-foreground'}`}
+                  title="마이페이지로 이동"
+                >
+                  {user.email}
+                </Link>
                 <Button variant="ghost" size="icon" onClick={signOut} className={`transition-colors duration-300 ${textMuted}`}>
                   <LogOut className="h-4 w-4" />
                 </Button>
