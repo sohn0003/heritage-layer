@@ -209,8 +209,8 @@ const AnalysisPage = () => {
 
   return (
     <div className="pt-16">
-      {/* Sticky 헤더: 등급 게이지 + 자산 핵심 정보 */}
-      <div className="sticky top-16 z-30 border-b bg-background/95 backdrop-blur-md">
+      {/* 자산 핵심 정보 헤더 (스크롤 시 함께 이동) */}
+      <div className="border-b bg-background">
         <div className="mx-auto max-w-5xl px-4 py-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
