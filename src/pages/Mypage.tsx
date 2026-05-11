@@ -129,6 +129,29 @@ const Mypage = () => {
           </CardContent>
         </Card>
 
+        {/* Admin: Deal Interest Inbox */}
+        {isAdmin && (
+          <Card className="border-accent/40">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Inbox className="h-5 w-5 text-accent" />
+                관심 상담 신청 관리
+                <span className="ml-2 rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent">Admin</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  사용자가 신청한 관심 상담 내역을 확인하고 처리하세요.
+                </p>
+                <Button onClick={() => navigate('/admin/signals')} size="sm">
+                  바로가기 <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Saved Assets */}
         <Card>
           <CardHeader>
