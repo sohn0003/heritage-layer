@@ -171,7 +171,7 @@ const AdminPropertiesPage = () => {
       legal_max_floor_area_ratio: a.legal_max_floor_area_ratio?.toString() || '',
       current_floor_area: a.current_floor_area?.toString() || '',
       land_value_per_sqm: a.land_value_per_sqm?.toString() || '',
-      asset_use_type: a.asset_use_type || '',
+      
       population_trend: a.population_trend || '',
       commercial_density: a.commercial_density || '',
       distance_to_center: a.distance_to_center?.toString() || '',
