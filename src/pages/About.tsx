@@ -413,7 +413,7 @@ const AboutPage = () => {
 
           <StepBlock
             num="03" title="실제 사업으로 연결한다"
-            desc="지자체·시행사를 직접 매칭합니다. 분석에서 끝나지 않고, 행정 절차와 협력 구조까지 함께 설계해 사업화를 추진합니다."
+            desc="프로젝트 매니징을 담당하고 개발에 필요한 리소스를 제공합니다."
             icon={Rocket} side="left" accent="hsl(var(--primary))"
           >
             <Step3Graphic />
