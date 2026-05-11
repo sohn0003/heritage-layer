@@ -94,19 +94,33 @@ const InsightBar = ({
   const { ref, inView } = useInView<HTMLDivElement>();
   const pct = Math.min(100, (value / max) * 100);
   return (
-    <div ref={ref}>
+    <div ref={ref} className="group">
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-sm font-medium text-foreground">{label}</span>
-        <span className="text-xl font-bold tabular-nums" style={{ color }}>
+        <span className="text-sm font-medium tracking-tight text-foreground">{label}</span>
+        <span className="text-xl font-semibold tabular-nums" style={{ color }}>
           <CountUp end={value} suffix={suffix} />
         </span>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-foreground/10">
+      <div
+        className="relative h-2 overflow-hidden rounded-full"
+        style={{ background: 'hsl(var(--foreground) / 0.06)' }}
+      >
         <div
-          className="h-full rounded-full transition-[width] duration-[1800ms] ease-out"
+          className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-[1600ms]"
           style={{
             width: inView ? `${pct}%` : '0%',
-            background: `linear-gradient(90deg, ${color}, ${color}cc)`,
+            background: `linear-gradient(90deg, ${color} 0%, ${color}b3 100%)`,
+            boxShadow: `0 0 20px ${color}40`,
+            transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          }}
+        />
+        {/* 글로시 하이라이트 */}
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 rounded-full opacity-60"
+          style={{
+            width: inView ? `${pct}%` : '0%',
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0) 55%)',
+            transition: 'width 1600ms cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         />
       </div>
@@ -117,38 +131,60 @@ const InsightBar = ({
 // ─── 도넛 차트 (소유 구분) ──────────────────────────
 const DonutChart = ({ segments, total }: { segments: { label: string; value: number; color: string }[]; total: number }) => {
   const { ref, inView } = useInView<SVGSVGElement>();
-  const r = 60;
+  const r = 62;
   const c = 2 * Math.PI * r;
   let offset = 0;
   return (
-    <div className="flex items-center gap-6">
-      <svg ref={ref} width="160" height="160" viewBox="0 0 160 160" className="shrink-0 -rotate-90">
-        <circle cx="80" cy="80" r={r} fill="none" stroke="hsl(var(--muted))" strokeWidth="20" />
-        {segments.map((s, i) => {
-          const len = (s.value / total) * c;
-          const dash = inView ? `${len} ${c - len}` : `0 ${c}`;
-          const node = (
-            <circle
-              key={i}
-              cx="80" cy="80" r={r}
-              fill="none"
-              stroke={s.color}
-              strokeWidth="20"
-              strokeDasharray={dash}
-              strokeDashoffset={-offset}
-              style={{ transition: `stroke-dasharray 1500ms ease-out ${i * 200}ms` }}
-            />
-          );
-          offset += len;
-          return node;
-        })}
-      </svg>
-      <div className="space-y-2">
+    <div className="flex items-center gap-7">
+      <div className="relative shrink-0">
+        <svg ref={ref} width="180" height="180" viewBox="0 0 180 180" className="-rotate-90">
+          <defs>
+            {segments.map((s, i) => (
+              <linearGradient key={i} id={`donutGrad-${i}`} x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor={s.color} stopOpacity="1" />
+                <stop offset="100%" stopColor={s.color} stopOpacity="0.7" />
+              </linearGradient>
+            ))}
+          </defs>
+          {/* 트랙 */}
+          <circle cx="90" cy="90" r={r} fill="none" stroke="hsl(var(--foreground) / 0.06)" strokeWidth="14" />
+          {segments.map((s, i) => {
+            const len = (s.value / total) * c;
+            const dash = inView ? `${Math.max(len - 2, 0)} ${c - len + 2}` : `0 ${c}`;
+            const node = (
+              <circle
+                key={i}
+                cx="90" cy="90" r={r}
+                fill="none"
+                stroke={`url(#donutGrad-${i})`}
+                strokeWidth="14"
+                strokeLinecap="round"
+                strokeDasharray={dash}
+                strokeDashoffset={-offset}
+                style={{
+                  transition: `stroke-dasharray 1400ms cubic-bezier(0.22, 1, 0.36, 1) ${i * 180}ms`,
+                  filter: `drop-shadow(0 4px 10px ${s.color}40)`,
+                }}
+              />
+            );
+            offset += len;
+            return node;
+          })}
+        </svg>
+        {/* 중앙 라벨 */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Total</span>
+          <span className="mt-0.5 text-2xl font-bold tabular-nums">{total}%</span>
+        </div>
+      </div>
+      <div className="flex-1 space-y-3">
         {segments.map((s) => (
-          <div key={s.label} className="flex items-center gap-2 text-sm">
-            <span className="h-3 w-3 rounded-sm" style={{ background: s.color }} />
+          <div key={s.label} className="flex items-center gap-3 text-sm">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: s.color, boxShadow: `0 0 8px ${s.color}80` }} />
             <span className="text-muted-foreground">{s.label}</span>
-            <span className="ml-auto font-semibold tabular-nums">{((s.value / total) * 100).toFixed(0)}%</span>
+            <span className="ml-auto font-semibold tabular-nums" style={{ color: s.color }}>
+              {((s.value / total) * 100).toFixed(0)}%
+            </span>
           </div>
         ))}
       </div>
@@ -156,38 +192,97 @@ const DonutChart = ({ segments, total }: { segments: { label: string; value: num
   );
 };
 
-// ─── 라인/에어리어 차트 (방치기간 추이) ──────────────
+// ─── 라인/에어리어 차트 (추이) ──────────────
 const AreaTrendChart = ({ data, color }: { data: number[]; color: string }) => {
   const { ref, inView } = useInView<SVGSVGElement>();
-  const W = 480, H = 180, pad = 24;
-  const max = Math.max(...data);
-  const stepX = (W - pad * 2) / (data.length - 1);
-  const pts = data.map((v, i) => [pad + i * stepX, H - pad - (v / max) * (H - pad * 2)] as [number, number]);
-  const linePath = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]}`).join(' ');
-  const areaPath = `${linePath} L ${W - pad} ${H - pad} L ${pad} ${H - pad} Z`;
+  const W = 480, H = 200, padX = 28, padY = 28;
+  const max = Math.max(...data) * 1.1;
+  const stepX = (W - padX * 2) / (data.length - 1);
+  const pts = data.map((v, i) => [padX + i * stepX, H - padY - (v / max) * (H - padY * 2)] as [number, number]);
+
+  // 부드러운 cubic bezier 곡선
+  const smooth = (p: [number, number][]) => {
+    if (p.length < 2) return '';
+    let d = `M ${p[0][0]} ${p[0][1]}`;
+    for (let i = 0; i < p.length - 1; i++) {
+      const [x1, y1] = p[i];
+      const [x2, y2] = p[i + 1];
+      const mx = (x1 + x2) / 2;
+      d += ` C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+    }
+    return d;
+  };
+  const linePath = smooth(pts);
+  const areaPath = `${linePath} L ${W - padX} ${H - padY} L ${padX} ${H - padY} Z`;
+  const lastPt = pts[pts.length - 1];
+
   return (
-    <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="w-full">
+    <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ overflow: 'visible' }}>
       <defs>
         <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.45" />
+          <stop offset="0%" stopColor={color} stopOpacity="0.35" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={color} stopOpacity="0.7" />
+          <stop offset="100%" stopColor={color} stopOpacity="1" />
+        </linearGradient>
+        <filter id="lineGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
+      {/* 그리드 라인 */}
       {[0.25, 0.5, 0.75].map((g) => (
-        <line key={g} x1={pad} x2={W - pad} y1={pad + (H - pad * 2) * g} y2={pad + (H - pad * 2) * g}
-          stroke="hsl(var(--muted))" strokeDasharray="4 4" />
+        <line key={g} x1={padX} x2={W - padX}
+          y1={padY + (H - padY * 2) * g} y2={padY + (H - padY * 2) * g}
+          stroke="hsl(var(--foreground) / 0.06)" strokeDasharray="3 5" />
       ))}
+      {/* 영역 */}
       <path d={areaPath} fill="url(#areaGrad)"
-        style={{ opacity: inView ? 1 : 0, transition: 'opacity 1200ms ease-out 300ms' }} />
-      <path d={linePath} fill="none" stroke={color} strokeWidth="2.5"
-        strokeDasharray={1200} strokeDashoffset={inView ? 0 : 1200}
-        style={{ transition: 'stroke-dashoffset 1800ms ease-out' }} />
-      {pts.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r={4} fill="white" stroke={color} strokeWidth="2"
-          style={{ opacity: inView ? 1 : 0, transition: `opacity 400ms ease-out ${800 + i * 100}ms` }} />
-      ))}
+        style={{ opacity: inView ? 1 : 0, transition: 'opacity 1400ms ease-out 400ms' }} />
+      {/* 라인 */}
+      <path d={linePath} fill="none" stroke="url(#lineGrad)" strokeWidth="2.5"
+        strokeLinecap="round" strokeLinejoin="round"
+        filter="url(#lineGlow)"
+        strokeDasharray={1500} strokeDashoffset={inView ? 0 : 1500}
+        style={{ transition: 'stroke-dashoffset 1800ms cubic-bezier(0.22, 1, 0.36, 1)' }} />
+      {/* 포인트 */}
+      {pts.map(([x, y], i) => {
+        const isLast = i === pts.length - 1;
+        return (
+          <g key={i} style={{ opacity: inView ? 1 : 0, transition: `opacity 400ms ease-out ${900 + i * 90}ms` }}>
+            {isLast && (
+              <circle cx={x} cy={y} r={10} fill={color} opacity="0.18">
+                <animate attributeName="r" values="6;14;6" dur="2.4s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.3;0;0.3" dur="2.4s" repeatCount="indefinite" />
+              </circle>
+            )}
+            <circle cx={x} cy={y} r={isLast ? 5 : 3.5} fill="white" stroke={color} strokeWidth={isLast ? 2.5 : 1.8} />
+          </g>
+        );
+      })}
+      {/* 최신값 라벨 */}
+      {lastPt && (
+        <g style={{ opacity: inView ? 1 : 0, transition: 'opacity 600ms ease-out 1600ms' }}>
+          <rect x={lastPt[0] - 28} y={lastPt[1] - 28} width="56" height="20" rx="10"
+            fill={color} />
+          <text x={lastPt[0]} y={lastPt[1] - 14} fontSize="11" fontWeight="600"
+            textAnchor="middle" fill="white">
+            {data[data.length - 1]}
+          </text>
+        </g>
+      )}
+      {/* X축 라벨 */}
       {['2019', '2020', '2021', '2022', '2023', '2024'].map((y, i) => (
-        <text key={y} x={pad + i * stepX} y={H - 4} fontSize="10" textAnchor="middle" fill="hsl(var(--muted-foreground))">{y}</text>
+        <text key={y} x={padX + i * stepX} y={H - 6} fontSize="10"
+          textAnchor="middle" fill="hsl(var(--muted-foreground))"
+          letterSpacing="0.05em">
+          {y}
+        </text>
       ))}
     </svg>
   );
