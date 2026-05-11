@@ -64,14 +64,24 @@ const Navbar = () => {
               </Link>
             ))}
             {isAdmin && (
-              <Link
-                to="/admin/properties"
-                className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
-                  location.pathname === '/admin/properties' ? activeStyle : textMuted
-                }`}
-              >
-                Admin
-              </Link>
+              <>
+                <Link
+                  to="/admin/properties"
+                  className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
+                    location.pathname === '/admin/properties' ? activeStyle : textMuted
+                  }`}
+                >
+                  Admin
+                </Link>
+                <Link
+                  to="/admin/signals"
+                  className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
+                    location.pathname === '/admin/signals' ? activeStyle : textMuted
+                  }`}
+                >
+                  딜 관심
+                </Link>
+              </>
             )}
           </div>
 
@@ -127,7 +137,10 @@ const Navbar = () => {
               </Link>
             ))}
             {isAdmin && (
-              <Link to="/admin/properties" className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`} onClick={() => setMobileOpen(false)}>Admin</Link>
+              <>
+                <Link to="/admin/properties" className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`} onClick={() => setMobileOpen(false)}>Admin</Link>
+                <Link to="/admin/signals" className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`} onClick={() => setMobileOpen(false)}>딜 관심</Link>
+              </>
             )}
             <div className={`mt-2 border-t pt-2 ${borderColor}`}>
               {user ? (

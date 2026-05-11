@@ -12,6 +12,7 @@ import About from "@/pages/About";
 import Mypage from "@/pages/Mypage";
 import Pricing from "@/pages/Pricing";
 import AdminProperties from "@/pages/admin/AdminProperties";
+import AdminDealSignals from "@/pages/admin/AdminDealSignals";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/mypage" element={<Mypage />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/admin/properties" element={<AdminProperties />} />
+            <Route path="/admin/signals" element={<AdminDealSignals />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

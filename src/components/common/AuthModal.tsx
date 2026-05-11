@@ -16,6 +16,8 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +29,7 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
         email,
         password,
         options: {
-          data: { full_name: name },
+          data: { full_name: name, phone, address },
           emailRedirectTo: window.location.origin,
         },
       });
@@ -70,10 +72,20 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'signup' && (
-            <div className="space-y-2">
-              <Label htmlFor="name">이름</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="홍길동" required />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="name">이름</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="홍길동" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">연락처</Label>
+                <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="010-0000-0000" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address">주소</Label>
+                <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="서울시 강남구 ..." required />
+              </div>
+            </>
           )}
           <div className="space-y-2">
             <Label htmlFor="email">이메일</Label>
