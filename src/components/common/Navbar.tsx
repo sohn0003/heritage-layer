@@ -35,12 +35,15 @@ const Navbar = () => {
   const activeStyle = (isDark ? 'text-white' : 'text-foreground') + ' after:scale-x-100 after:origin-bottom-left';
   const borderColor = isDark ? 'border-white/20' : 'border-border';
 
+  // 항상 고정 + 불투명: 히어로 페이지(어두운 배경)는 다크 오버레이, 그 외는 라이트 배경
+  const navBg = isHeroPage
+    ? (scrolled ? 'bg-[#0f1a2e]/95 backdrop-blur-lg shadow-md' : 'bg-[#0f1a2e]/70 backdrop-blur-md')
+    : 'bg-background/95 backdrop-blur-lg shadow-sm';
+
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${borderColor} ${
-          isDark ? 'bg-transparent' : 'bg-background/95 backdrop-blur-lg shadow-sm'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${borderColor} ${navBg}`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2">
