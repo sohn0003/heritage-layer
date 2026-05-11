@@ -583,6 +583,10 @@ const AdminPropertiesPage = () => {
               </AccordionItem>
             </Accordion>
 
+            <div className="rounded-md border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
+              💡 전환 용도와 ROI는 알고리즘이 자산 분석 후 1/2/3순위로 자동 추천합니다.
+            </div>
+
             <Button type="submit" className="w-full" disabled={saving}>
               {saving ? '저장 중...' : editId ? '수정하기' : '등록하기'}
             </Button>
