@@ -251,6 +251,9 @@ const AdminPropertiesPage = () => {
       const result = analyzeAsset({
         assetInput: assetInputBase,
         landValuePerSqm: payload.land_value_per_sqm ?? 4_500_000,
+        loanRates: { pf: 5.5, collateral: 4.8 },
+        projectYears: 10,
+        residualValueRatio: 0.4,
       });
       const top = result.recommendation.scenarios[0];
       if (top) {
