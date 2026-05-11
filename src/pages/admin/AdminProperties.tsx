@@ -417,9 +417,8 @@ const AdminPropertiesPage = () => {
                       <Label>공시지가 (원/㎡)</Label>
                       <Input type="number" value={form.land_value_per_sqm} onChange={(e) => setF({ land_value_per_sqm: e.target.value })} />
                     </div>
-                    <div className="space-y-2 sm:col-span-2">
-                      <Label>전환 용도</Label>
-                      <Input value={form.asset_use_type} onChange={(e) => setF({ asset_use_type: e.target.value })} placeholder="예: 복합문화공간, 청년주택" />
+                    <div className="rounded-md border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground sm:col-span-2">
+                      💡 전환 용도는 알고리즘이 자산 분석 후 1/2/3순위로 자동 추천합니다. 관리자는 입력할 필요가 없습니다.
                     </div>
                   </div>
                 </AccordionContent>
