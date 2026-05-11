@@ -9,7 +9,7 @@ import logo from '@/assets/logo.svg';
 const navItems = [
   { label: 'About', href: '/about' },
   { label: 'Properties', href: '/properties' },
-  { label: 'Mypage', href: '/mypage' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 const Navbar = () => {
