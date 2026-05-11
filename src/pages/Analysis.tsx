@@ -10,7 +10,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
-import { TrendingUp, FileText, BarChart3, Building2 } from 'lucide-react';
+import { TrendingUp, FileText, BarChart3, Building2, School, Home, Factory, Building } from 'lucide-react';
+import GradeMeter from '@/components/common/GradeMeter';
+import RatioBar from '@/components/common/RatioBar';
 
 // 알고리즘 모듈 연동
 import {
