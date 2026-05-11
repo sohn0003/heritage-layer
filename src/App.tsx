@@ -12,6 +12,7 @@ import About from "@/pages/About";
 import Mypage from "@/pages/Mypage";
 import Pricing from "@/pages/Pricing";
 import AdminProperties from "@/pages/admin/AdminProperties";
+import AdminDealSignals from "@/pages/admin/AdminDealSignals";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
