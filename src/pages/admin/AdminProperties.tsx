@@ -218,7 +218,7 @@ const AdminPropertiesPage = () => {
       legal_max_floor_area_ratio: num(form.legal_max_floor_area_ratio),
       current_floor_area: num(form.current_floor_area),
       land_value_per_sqm: num(form.land_value_per_sqm),
-      asset_use_type: str(form.asset_use_type),
+      
       population_trend: str(form.population_trend),
       commercial_density: str(form.commercial_density),
       distance_to_center: num(form.distance_to_center),
