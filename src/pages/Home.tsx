@@ -635,9 +635,9 @@ const HomePage = () => {
       </section>
 
       {/* ── METRICS: Heritage Layer 임팩트 ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary to-primary/90 px-4 py-20 text-primary-foreground md:py-28">
-        <Blob className="right-[10%] top-10 h-72 w-72" color="hsl(40 90% 60%)" />
-        <Blob className="left-[5%] bottom-10 h-72 w-72" color="hsl(220 80% 50%)" />
+      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
+        <Blob className="right-[10%] top-10 h-72 w-72" color="hsl(40 90% 75%)" />
+        <Blob className="left-[5%] bottom-10 h-72 w-72" color="hsl(220 60% 80%)" />
         <div className="relative mx-auto max-w-5xl">
           <div className="mb-12 text-center">
             <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Impact</span>
@@ -653,12 +653,12 @@ const HomePage = () => {
               <div
                 key={i}
                 className="rounded-3xl p-6 text-center transition-transform hover:-translate-y-1"
-                style={glassDarkStyle}
+                style={glassCardStyle}
               >
                 <p className="text-5xl font-bold tabular-nums" style={{ color: 'hsl(var(--accent))' }}>
                   <CountUp end={m.v} suffix={m.s} decimals={m.dec ?? 0} />
                 </p>
-                <p className="mt-2 text-sm opacity-80">{m.l}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{m.l}</p>
               </div>
             ))}
           </div>
