@@ -550,8 +550,7 @@ const HomePage = () => {
       </section>
 
       {/* ── INSIGHT: 큰 통계 + 다양한 차트 ── */}
-      <section className="relative overflow-hidden px-4 py-20 md:py-28"
-        style={{ background: 'linear-gradient(180deg, hsl(220 30% 97%), hsl(0 0% 100%))' }}>
+      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
         <Blob className="right-[-15%] top-10 h-[500px] w-[500px]" color="hsl(40 90% 75%)" />
         <Blob className="left-[-15%] bottom-10 h-[500px] w-[500px]" color="hsl(220 60% 80%)" />
 
