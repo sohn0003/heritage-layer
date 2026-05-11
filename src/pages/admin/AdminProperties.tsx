@@ -85,7 +85,7 @@ interface AssetForm {
   legal_max_floor_area_ratio: string;
   current_floor_area: string;
   land_value_per_sqm: string;
-  asset_use_type: string;
+  // asset_use_type 제거됨 — 알고리즘이 자동 추천
   // 입지/가치
   population_trend: string;
   commercial_density: string;
