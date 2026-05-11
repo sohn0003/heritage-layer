@@ -408,128 +408,216 @@ const AnalysisPage = () => {
 
       {/* Pro Sections */}
       <div className="space-y-6">
-        {/* Section 1 — 재생 시나리오 (placeholder) */}
+        {/* 시나리오 추천 — 1/2/3순위 탭 (Pro) */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingUp className="h-5 w-5 text-accent" /> 재생 방향성 시나리오
+                <TrendingUp className="h-5 w-5 text-accent" /> 개발 시나리오 추천
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {[
-                  { title: '복합문화공간', description: '문화·체험형 복합공간 운영안', confidence: 'medium' as const },
-                  { title: '코워킹 허브', description: '지역 창업·업무 거점화', confidence: 'medium' as const },
-                  { title: '로컬 관광시설', description: '숙박·체험 결합형 운영', confidence: 'medium' as const },
-                ].map((scenario) => (
-                  <Card key={scenario.title} className="bg-muted/50">
-                    <CardContent className="p-4">
-                      <h4 className="font-medium">{scenario.title}</h4>
-                      <p className="mt-1 text-xs text-muted-foreground">{scenario.description}</p>
-                      <Badge variant="outline" className="mt-2 text-xs">신뢰도: 보통</Badge>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              {!scenarios ? (
+                <p className="text-sm text-muted-foreground">분석 결과를 불러오는 중...</p>
+              ) : (
+                <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as '1' | '2' | '3')}>
+                  <TabsList className="grid w-full grid-cols-3">
+                    {scenarios.map((s) => (
+                      <TabsTrigger key={s.rank} value={String(s.rank)}>
+                        {s.rank}순위
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+
+                  {scenarios.map((scenario) => {
+                    const feasibility = scenario.irrResult.summary.investmentFeasibility;
+                    const feasibilityClass =
+                      feasibility === '높음' ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                      : feasibility === '중간' ? 'border-amber-300 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                      : 'border-rose-300 bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300';
+                    const sliderEquity = equitySliderValue ?? scenario.recommendedEquityRatio;
+
+                    return (
+                      <TabsContent key={scenario.rank} value={String(scenario.rank)} className="mt-6 space-y-6">
+                        {/* 시나리오 헤더 */}
+                        <div>
+                          <h3 className="text-xl font-bold leading-tight">
+                            {scenario.rank}순위 · {scenario.concept}
+                          </h3>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <Badge variant="secondary">{scenario.developmentDirectionLabel}</Badge>
+                            <Badge variant="outline">{scenario.useTypeSummary}</Badge>
+                          </div>
+                        </div>
+
+                        {/* 적합도 */}
+                        <div>
+                          <div className="mb-1.5 flex items-baseline justify-between">
+                            <Label className="text-xs font-medium text-muted-foreground">시나리오 적합도</Label>
+                            <span className="text-sm font-semibold">{scenario.suitabilityScore}점</span>
+                          </div>
+                          <Progress value={scenario.suitabilityScore} className="h-2" />
+                        </div>
+
+                        {/* 추천 이유 / 리스크 */}
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div>
+                            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-600">
+                              <CheckCircle2 className="h-4 w-4" /> 추천 이유
+                            </div>
+                            <ul className="space-y-1.5 text-sm text-muted-foreground">
+                              {scenario.reasons.map((r, i) => (
+                                <li key={i} className="flex gap-2">
+                                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />
+                                  <span>{r}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-600">
+                              <AlertTriangle className="h-4 w-4" /> 주요 리스크
+                            </div>
+                            <ul className="space-y-1.5 text-sm text-muted-foreground">
+                              {scenario.risks.map((r, i) => (
+                                <li key={i} className="flex gap-2">
+                                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-500" />
+                                  <span>{r}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+
+                        {/* 금융 구조 추천 */}
+                        <Card className="bg-muted/40">
+                          <CardContent className="space-y-2 p-4 text-sm">
+                            <div className="font-semibold text-foreground">금융 구조 추천</div>
+                            <div className="grid gap-2 sm:grid-cols-3">
+                              <div>
+                                <p className="text-xs text-muted-foreground">추천 자기자본 비율</p>
+                                <p className="text-lg font-bold">{scenario.recommendedEquityRatio}%</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground">대출 방식</p>
+                                <p className="text-lg font-bold">{scenario.loanStructureLabel}</p>
+                              </div>
+                              <div className="sm:col-span-3">
+                                <p className="text-xs text-muted-foreground">선정 이유</p>
+                                <p className="text-sm">{scenario.loanReason}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* 자기자본 비율 슬라이더 */}
+                        <div>
+                          <div className="mb-2 flex items-baseline justify-between">
+                            <Label className="text-sm font-semibold">자기자본 비율 시뮬레이션</Label>
+                            <span className="text-sm font-bold text-primary">{sliderEquity}%</span>
+                          </div>
+                          <Slider
+                            value={[sliderEquity]}
+                            min={10}
+                            max={70}
+                            step={5}
+                            onValueChange={(v) => setEquitySliderValue(v[0])}
+                          />
+                          <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+                            <span>10%</span>
+                            <span>40%</span>
+                            <span>70%</span>
+                          </div>
+                          {equitySliderValue !== undefined && equitySliderValue !== scenario.recommendedEquityRatio && (
+                            <button
+                              type="button"
+                              onClick={() => setEquitySliderValue(undefined)}
+                              className="mt-2 text-xs text-primary underline-offset-2 hover:underline"
+                            >
+                              추천값({scenario.recommendedEquityRatio}%)으로 되돌리기
+                            </button>
+                          )}
+                        </div>
+
+                        {/* 재무 지표: 보수적 / 기본 / 낙관적 3컬럼 */}
+                        <div>
+                          <div className="mb-3 flex items-center gap-2">
+                            <BarChart3 className="h-4 w-4 text-accent" />
+                            <h4 className="text-sm font-semibold">재무 시나리오 비교</h4>
+                            <Badge variant="outline" className={`ml-auto ${feasibilityClass}`}>
+                              투자 타당성: {feasibility}
+                            </Badge>
+                          </div>
+                          <div className="overflow-x-auto">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>지표</TableHead>
+                                  <TableHead className="text-right">보수적</TableHead>
+                                  <TableHead className="text-right">기본</TableHead>
+                                  <TableHead className="text-right">낙관적</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {[
+                                  { label: '사용 연면적 (㎡)', fmt: (v: number) => formatNumber(v),
+                                    c: scenario.irrResult.conservative.usableFloorArea,
+                                    b: scenario.irrResult.base.usableFloorArea,
+                                    o: scenario.irrResult.optimistic.usableFloorArea },
+                                  { label: '총 투자비', fmt: (v: number) => toEokwon(v),
+                                    c: scenario.irrResult.conservative.totalInvestment,
+                                    b: scenario.irrResult.base.totalInvestment,
+                                    o: scenario.irrResult.optimistic.totalInvestment },
+                                  { label: '자기자본', fmt: (v: number) => toEokwon(v),
+                                    c: scenario.irrResult.conservative.equityAmount,
+                                    b: scenario.irrResult.base.equityAmount,
+                                    o: scenario.irrResult.optimistic.equityAmount },
+                                  { label: '대출금액', fmt: (v: number) => toEokwon(v),
+                                    c: scenario.irrResult.conservative.loanAmount,
+                                    b: scenario.irrResult.base.loanAmount,
+                                    o: scenario.irrResult.optimistic.loanAmount },
+                                  { label: '연간 매출', fmt: (v: number) => toEokwon(v),
+                                    c: scenario.irrResult.conservative.annualRevenue,
+                                    b: scenario.irrResult.base.annualRevenue,
+                                    o: scenario.irrResult.optimistic.annualRevenue },
+                                  { label: '연간 영업이익', fmt: (v: number) => toEokwon(v),
+                                    c: scenario.irrResult.conservative.annualOperatingProfit,
+                                    b: scenario.irrResult.base.annualOperatingProfit,
+                                    o: scenario.irrResult.optimistic.annualOperatingProfit },
+                                  { label: 'IRR', fmt: (v: number) => formatPercent(v),
+                                    c: scenario.irrResult.conservative.irr,
+                                    b: scenario.irrResult.base.irr,
+                                    o: scenario.irrResult.optimistic.irr,
+                                    highlight: true },
+                                  { label: 'DSCR', fmt: (v: number) => (Number.isFinite(v) ? v.toFixed(2) : '--'),
+                                    c: scenario.irrResult.conservative.dscr,
+                                    b: scenario.irrResult.base.dscr,
+                                    o: scenario.irrResult.optimistic.dscr },
+                                  { label: '투자회수기간 (년)', fmt: (v: number) => (v > 0 ? `${v}년` : '--'),
+                                    c: scenario.irrResult.conservative.paybackYears,
+                                    b: scenario.irrResult.base.paybackYears,
+                                    o: scenario.irrResult.optimistic.paybackYears },
+                                ].map((row) => (
+                                  <TableRow key={row.label}>
+                                    <TableCell className="font-medium">{row.label}</TableCell>
+                                    <TableCell className="text-right tabular-nums text-muted-foreground">{row.fmt(row.c)}</TableCell>
+                                    <TableCell className={`text-right tabular-nums ${row.highlight ? 'font-bold text-primary' : ''}`}>{row.fmt(row.b)}</TableCell>
+                                    <TableCell className="text-right tabular-nums text-muted-foreground">{row.fmt(row.o)}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    );
+                  })}
+                </Tabs>
+              )}
             </CardContent>
           </Card>
         </ProLockOverlay>
 
-        {/* Section 2 — 재무 수익성 */}
-        <ProLockOverlay locked={!isPro}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <BarChart3 className="h-5 w-5 text-accent" /> 재무 수익성 지표
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>지표</TableHead>
-                    <TableHead>값</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[
-                    { label: 'IRR', value: formatPercent(scenarioComparison?.base.irr ?? 0) },
-                    { label: 'DSCR', value: scenarioComparison?.base.dscr ? scenarioComparison.base.dscr.toFixed(2) : '--' },
-                    { label: '투자회수기간', value: scenarioComparison?.base.paybackYears ? `${scenarioComparison.base.paybackYears}년` : '--' },
-                    { label: '예상 매출', value: `${formatNumber(scenarioComparison?.base.annualRevenue ?? 0)}원` },
-                    { label: '영업이익', value: `${formatNumber(scenarioComparison?.base.annualOperatingProfit ?? 0)}원` },
-                  ].map((row) => (
-                    <TableRow key={row.label}>
-                      <TableCell className="font-medium">{row.label}</TableCell>
-                      <TableCell className="text-muted-foreground">{row.value}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </ProLockOverlay>
-
-        {/* Section 3 — 시나리오 비교표 */}
-        <ProLockOverlay locked={!isPro}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <FileText className="h-5 w-5 text-accent" /> 시나리오 비교표
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>항목</TableHead>
-                    <TableHead>보수적</TableHead>
-                    <TableHead>기본</TableHead>
-                    <TableHead>낙관적</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[
-                    {
-                      label: 'IRR',
-                      c: formatPercent(scenarioComparison?.conservative.irr ?? 0),
-                      b: formatPercent(scenarioComparison?.base.irr ?? 0),
-                      o: formatPercent(scenarioComparison?.optimistic.irr ?? 0),
-                    },
-                    {
-                      label: '예상 매출',
-                      c: `${formatNumber(scenarioComparison?.conservative.annualRevenue ?? 0)}원`,
-                      b: `${formatNumber(scenarioComparison?.base.annualRevenue ?? 0)}원`,
-                      o: `${formatNumber(scenarioComparison?.optimistic.annualRevenue ?? 0)}원`,
-                    },
-                    {
-                      label: 'ROI',
-                      c: formatPercent(scenarioComparison?.conservative.roi ?? 0),
-                      b: formatPercent(scenarioComparison?.base.roi ?? 0),
-                      o: formatPercent(scenarioComparison?.optimistic.roi ?? 0),
-                    },
-                    {
-                      label: '회수기간',
-                      c: scenarioComparison?.conservative.paybackYears ? `${scenarioComparison.conservative.paybackYears}년` : '--',
-                      b: scenarioComparison?.base.paybackYears ? `${scenarioComparison.base.paybackYears}년` : '--',
-                      o: scenarioComparison?.optimistic.paybackYears ? `${scenarioComparison.optimistic.paybackYears}년` : '--',
-                    },
-                  ].map((row) => (
-                    <TableRow key={row.label}>
-                      <TableCell className="font-medium">{row.label}</TableCell>
-                      <TableCell>{row.c}</TableCell>
-                      <TableCell>{row.b}</TableCell>
-                      <TableCell>{row.o}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </ProLockOverlay>
-
-        {/* Section 4 — 딜 시그널 현황 */}
         <ProLockOverlay locked={!isPro}>
           <Card>
             <CardHeader>
