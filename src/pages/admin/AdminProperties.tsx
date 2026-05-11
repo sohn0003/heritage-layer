@@ -22,15 +22,45 @@ import GradeBadge from '@/components/common/GradeBadge';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
 const populationTrends = [
-  { v: 'increasing', l: '증가' },
+  { v: 'increasing', l: '인구 증가' },
   { v: 'stable', l: '유지' },
-  { v: 'decreasing', l: '감소' },
-  { v: 'extinction_risk', l: '소멸위험' },
+  { v: 'decreasing', l: '인구 감소' },
+  { v: 'extinction_risk', l: '소멸위험 지역' },
 ];
-const densityOptions = [{ v: 'high', l: '높음' }, { v: 'low', l: '낮음' }];
-const valueGrades = ['상', '중', '하'];
-const conditionOptions = ['양호', '보통', '노후', '심각'];
-const expansionOptions = ['높음', '중간', '낮음', '없음'];
+const densityOptions = [
+  { v: 'high', l: '높음 (반경 500m 내 상업시설 10개 이상)' },
+  { v: 'low', l: '낮음' },
+];
+const conditionOptions = [
+  { v: 'remodel_possible', l: '리모델링 가능 (구조 양호)' },
+  { v: 'partial_reinforcement', l: '일부 보강 후 활용 가능' },
+  { v: 'major_repair', l: '대수선 필요' },
+  { v: 'demolish_rebuild', l: '전면 철거 후 신축 필요' },
+];
+const historicalValueOptions = [
+  { v: 'registered_heritage', l: '등록문화재·근대건축 유산' },
+  { v: 'regional_landmark', l: '지역 역사 상징성 (50년 이상)' },
+  { v: 'architectural_art', l: '건축예술적 특성 보유' },
+  { v: 'ordinary', l: '일반 건물' },
+  { v: 'deteriorated', l: '노후 불량' },
+];
+const naturalSceneryOptions = [
+  { v: 'waterfront_view', l: '산·바다·강·호수 조망 가능' },
+  { v: 'good_nature', l: '우수한 자연경관 인접' },
+  { v: 'ordinary_urban', l: '도심 내 평범한 환경' },
+  { v: 'negative', l: '경관 저해 요소 존재' },
+];
+const zoningUpgradeOptions = [
+  { v: 'over_50', l: '종상향 시 용적률 50% 이상 추가' },
+  { v: 'between_20_50', l: '20~50% 추가' },
+  { v: 'under_20', l: '20% 미만 추가' },
+  { v: 'impossible', l: '종상향 불가' },
+];
+const useChangeOptions = [
+  { v: 'major', l: '허용 용도 대폭 확대 가능' },
+  { v: 'minor', l: '소폭 확대 가능' },
+  { v: 'none', l: '해당 없음' },
+];
 
 interface AssetForm {
   // 기본
