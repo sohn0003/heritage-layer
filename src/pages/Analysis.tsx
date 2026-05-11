@@ -256,28 +256,41 @@ const AnalysisPage = () => {
   const formatNumber = (n: number) => (n ? n.toLocaleString() : '--');
   const formatPercent = (n: number) => (n ? `${n.toFixed(1)}%` : '--');
 
+  const ASSET_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+    '폐교': School, '빈집': Home, '유휴공공시설': Building2, '폐산업시설': Factory, '기타': Building,
+  };
+  const AssetIcon = ASSET_ICONS[asset.asset_type] ?? Building;
+
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      {/* Header */}
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="mb-2 flex items-center gap-3">
-            {scoringResult && <GradeBadge grade={scoringResult.grade} className="h-9 w-9 text-sm" />}
-            <Badge variant="secondary">{asset.asset_type}</Badge>
+    <div className="pt-16">
+      {/* Sticky 헤더: 등급 게이지 + 자산 핵심 정보 */}
+      <div className="sticky top-16 z-30 border-b bg-background/95 backdrop-blur-md">
+        <div className="mx-auto max-w-5xl px-4 py-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-foreground">
+                  <AssetIcon className="h-5 w-5" />
+                </span>
+                <Badge variant="secondary">{asset.asset_type}</Badge>
+                {asset.gov_cooperation && (
+                  <Badge variant="outline" className="border-emerald-300 text-emerald-600">정부협력</Badge>
+                )}
+              </div>
+              <h1 className="text-2xl font-bold leading-tight">{asset.address}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                방치 기간: {asset.idle_years ?? '-'}년 · 소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}
+              </p>
+            </div>
+            {/* 우측 상단 등급 계기판 */}
             {scoringResult && (
-              <Badge variant="outline">종합 {scoringResult.totalScore}점</Badge>
+              <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={170} />
             )}
           </div>
-          <h1 className="text-2xl font-bold">{asset.address}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            방치 기간: {asset.idle_years ?? '-'}년 · 소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : '-'}
-            {asset.latitude && asset.longitude && (
-              <> · 좌표: {Number(asset.latitude).toFixed(4)}, {Number(asset.longitude).toFixed(4)}</>
-            )}
-          </p>
         </div>
       </div>
 
+      <div className="mx-auto max-w-5xl px-4 py-8">
       {/* 분석 가정 안내 */}
       {isPro && (
         <Card className="mb-6 border-dashed bg-muted/30">
@@ -292,15 +305,34 @@ const AnalysisPage = () => {
         </Card>
       )}
 
+      {/* 건폐율 / 용적률 — 법정 한도 대비 시각화 */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-lg">건폐율 / 용적률</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-6 sm:grid-cols-2">
+          <RatioBar
+            label="건폐율"
+            current={asset.current_building_coverage ?? asset.building_coverage}
+            legalMax={asset.legal_max_building_coverage ?? scoringResult?.detail ? Number(scoringResult?.detail.buildingCoverageUsageRate ? (asset.building_coverage ?? 0) / (scoringResult.detail.buildingCoverageUsageRate / 100) : null) || null : null}
+          />
+          <RatioBar
+            label="용적률"
+            current={asset.current_floor_area_ratio ?? asset.floor_area_ratio}
+            legalMax={asset.legal_max_floor_area_ratio ?? null}
+          />
+        </CardContent>
+      </Card>
+
       {/* Free section — 기본 자산 정보 */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[
-          { label: '재생 등급', value: scoringResult?.grade ?? asset.grade ?? '-' },
           { label: '용도지역', value: asset.zoning ?? '-' },
-          { label: '건폐율', value: asset.building_coverage ? `${asset.building_coverage}%` : '-' },
-          { label: '용적률', value: asset.floor_area_ratio ? `${asset.floor_area_ratio}%` : '-' },
           { label: '대지면적', value: asset.land_area ? `${asset.land_area.toLocaleString()}㎡` : '-' },
-          { label: '정부협력', value: asset.gov_cooperation ? '가능' : '불가' },
+          { label: '연면적', value: asset.current_floor_area ? `${asset.current_floor_area.toLocaleString()}㎡` : '-' },
+          { label: '공시지가', value: asset.land_value_per_sqm ? `${asset.land_value_per_sqm.toLocaleString()}원/㎡` : '-' },
+          { label: '인구 추이', value: asset.population_trend ?? '-' },
+          { label: '건물 상태', value: asset.building_condition ?? '-' },
         ].map((item) => (
           <Card key={item.label}>
             <CardContent className="p-4">
