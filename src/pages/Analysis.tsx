@@ -546,33 +546,48 @@ const AnalysisPage = () => {
                           </CardContent>
                         </Card>
 
-                        {/* 자기자본 비율 슬라이더 */}
+                        {/* 자기자본 비율 슬라이더 (탭별 개별) */}
                         <div>
-                          <div className="mb-2 flex items-baseline justify-between">
-                            <Label className="text-sm font-semibold">자기자본 비율 시뮬레이션</Label>
-                            <span className="text-sm font-bold text-primary">{sliderEquity}%</span>
+                          <div className="mb-2 flex items-baseline justify-between gap-2">
+                            <Label className="text-sm font-semibold">내 자기자본 비율</Label>
+                            <div className="flex items-baseline gap-3">
+                              <span className="text-xs text-muted-foreground">추천: {recommendedEquity}%</span>
+                              <span className="text-sm font-bold text-primary tabular-nums">{sliderEquity}%</span>
+                            </div>
                           </div>
                           <Slider
                             value={[sliderEquity]}
                             min={10}
                             max={70}
                             step={5}
-                            onValueChange={(v) => setEquitySliderValue(v[0])}
+                            onValueChange={(v) =>
+                              setEquityByRank((prev) => ({ ...prev, [scenario.rank]: v[0] }))
+                            }
                           />
                           <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
                             <span>10%</span>
                             <span>40%</span>
                             <span>70%</span>
                           </div>
-                          {equitySliderValue !== undefined && equitySliderValue !== scenario.recommendedEquityRatio && (
-                            <button
-                              type="button"
-                              onClick={() => setEquitySliderValue(undefined)}
-                              className="mt-2 text-xs text-primary underline-offset-2 hover:underline"
-                            >
-                              추천값({scenario.recommendedEquityRatio}%)으로 되돌리기
-                            </button>
-                          )}
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            자기자본 비율을 조절하면 수익률이 실시간으로 변경됩니다.
+                          </p>
+                          {equityByRank[scenario.rank] !== undefined &&
+                            equityByRank[scenario.rank] !== recommendedEquity && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setEquityByRank((prev) => {
+                                    const next = { ...prev };
+                                    delete next[scenario.rank];
+                                    return next;
+                                  })
+                                }
+                                className="mt-2 text-xs text-primary underline-offset-2 hover:underline"
+                              >
+                                추천값({recommendedEquity}%)으로 되돌리기
+                              </button>
+                            )}
                         </div>
 
                         {/* 재무 지표: 보수적 / 기본 / 낙관적 3컬럼 */}
