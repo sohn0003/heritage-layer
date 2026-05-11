@@ -54,8 +54,8 @@ const AnalysisPage = () => {
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  // 사용자가 슬라이더로 조절한 자기자본 비율 (undefined = 추천값 사용)
-  const [equitySliderValue, setEquitySliderValue] = useState<number | undefined>(undefined);
+  // 탭(시나리오)별 자기자본 비율 오버라이드 — undefined면 추천값 사용
+  const [equityByRank, setEquityByRank] = useState<Record<number, number | undefined>>({});
   const [activeTab, setActiveTab] = useState<'1' | '2' | '3'>('1');
 
   const algoConfig = useAlgorithmConfig();
@@ -73,7 +73,12 @@ const AnalysisPage = () => {
     fetchAsset();
   }, [assetId]);
 
-  // 통합 분석: 예비 ROI → 스코어링 → 시나리오 추천 → IRR 한 번에 처리
+  // 자산 변경 시 슬라이더 오버라이드 초기화
+  useEffect(() => {
+    setEquityByRank({});
+  }, [assetId]);
+
+  // 기본 분석(오버라이드 없음) — 스코어링/추천 시나리오/추천 자기자본비율의 기준값
   const analysis: AnalyzeAssetResult | null = useMemo(() => {
     if (!asset) return null;
     const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
@@ -85,7 +90,6 @@ const AnalysisPage = () => {
         loanRates: algoConfig.loanRates,
         projectYears: algoConfig.projectYears,
         residualValueRatio: algoConfig.residualValueRatio,
-        overrideEquityRatio: equitySliderValue,
       });
     } catch (e) {
       console.error('analyzeAsset 실패', e);
@@ -97,17 +101,46 @@ const AnalysisPage = () => {
     algoConfig.loanRates.collateral,
     algoConfig.projectYears,
     algoConfig.residualValueRatio,
-    equitySliderValue,
   ]);
 
   const scoringResult: ScoreResult | null = analysis?.scoring ?? null;
-  const scenarios = analysis?.recommendation.scenarios;
-  const activeScenario = scenarios?.find((s) => String(s.rank) === activeTab) ?? scenarios?.[0];
+  const baseScenarios = analysis?.recommendation.scenarios;
 
-  // 탭 변경 또는 자산 변경 시 슬라이더 초기화 (추천값 사용)
-  useEffect(() => {
-    setEquitySliderValue(undefined);
-  }, [assetId, activeTab]);
+  // 시나리오별 슬라이더 값을 적용한 표시용 시나리오 — 오버라이드된 IRR/DSCR/자기자본 등 반영
+  const displayScenarios = useMemo(() => {
+    if (!asset || !baseScenarios) return baseScenarios;
+    const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
+    void preliminaryROI;
+    return baseScenarios.map((base) => {
+      const override = equityByRank[base.rank];
+      if (override === undefined || override === base.recommendedEquityRatio) return base;
+      try {
+        const r = analyzeAsset({
+          assetInput: assetInputBase,
+          landValuePerSqm: asset.land_value_per_sqm ?? 4_500_000,
+          loanRates: algoConfig.loanRates,
+          projectYears: algoConfig.projectYears,
+          residualValueRatio: algoConfig.residualValueRatio,
+          overrideEquityRatio: override,
+        });
+        return r.recommendation.scenarios.find((x) => x.rank === base.rank) ?? base;
+      } catch (e) {
+        console.error('analyzeAsset 오버라이드 실패', e);
+        return base;
+      }
+    });
+  }, [
+    asset,
+    baseScenarios,
+    equityByRank,
+    algoConfig.loanRates.pf,
+    algoConfig.loanRates.collateral,
+    algoConfig.projectYears,
+    algoConfig.residualValueRatio,
+  ]);
+
+  const scenarios = displayScenarios;
+  const activeScenario = scenarios?.find((s) => String(s.rank) === activeTab) ?? scenarios?.[0];
 
 
   const [signalEvents, setSignalEvents] = useState<SignalEvent[]>([]);
@@ -435,7 +468,10 @@ const AnalysisPage = () => {
                       feasibility === '높음' ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                       : feasibility === '중간' ? 'border-amber-300 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
                       : 'border-rose-300 bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300';
-                    const sliderEquity = equitySliderValue ?? scenario.recommendedEquityRatio;
+                    const recommendedEquity =
+                      baseScenarios?.find((b) => b.rank === scenario.rank)?.recommendedEquityRatio
+                      ?? scenario.recommendedEquityRatio;
+                    const sliderEquity = equityByRank[scenario.rank] ?? recommendedEquity;
 
                     return (
                       <TabsContent key={scenario.rank} value={String(scenario.rank)} className="mt-6 space-y-6">
@@ -510,33 +546,48 @@ const AnalysisPage = () => {
                           </CardContent>
                         </Card>
 
-                        {/* 자기자본 비율 슬라이더 */}
+                        {/* 자기자본 비율 슬라이더 (탭별 개별) */}
                         <div>
-                          <div className="mb-2 flex items-baseline justify-between">
-                            <Label className="text-sm font-semibold">자기자본 비율 시뮬레이션</Label>
-                            <span className="text-sm font-bold text-primary">{sliderEquity}%</span>
+                          <div className="mb-2 flex items-baseline justify-between gap-2">
+                            <Label className="text-sm font-semibold">내 자기자본 비율</Label>
+                            <div className="flex items-baseline gap-3">
+                              <span className="text-xs text-muted-foreground">추천: {recommendedEquity}%</span>
+                              <span className="text-sm font-bold text-primary tabular-nums">{sliderEquity}%</span>
+                            </div>
                           </div>
                           <Slider
                             value={[sliderEquity]}
                             min={10}
                             max={70}
                             step={5}
-                            onValueChange={(v) => setEquitySliderValue(v[0])}
+                            onValueChange={(v) =>
+                              setEquityByRank((prev) => ({ ...prev, [scenario.rank]: v[0] }))
+                            }
                           />
                           <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
                             <span>10%</span>
                             <span>40%</span>
                             <span>70%</span>
                           </div>
-                          {equitySliderValue !== undefined && equitySliderValue !== scenario.recommendedEquityRatio && (
-                            <button
-                              type="button"
-                              onClick={() => setEquitySliderValue(undefined)}
-                              className="mt-2 text-xs text-primary underline-offset-2 hover:underline"
-                            >
-                              추천값({scenario.recommendedEquityRatio}%)으로 되돌리기
-                            </button>
-                          )}
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            자기자본 비율을 조절하면 수익률이 실시간으로 변경됩니다.
+                          </p>
+                          {equityByRank[scenario.rank] !== undefined &&
+                            equityByRank[scenario.rank] !== recommendedEquity && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setEquityByRank((prev) => {
+                                    const next = { ...prev };
+                                    delete next[scenario.rank];
+                                    return next;
+                                  })
+                                }
+                                className="mt-2 text-xs text-primary underline-offset-2 hover:underline"
+                              >
+                                추천값({recommendedEquity}%)으로 되돌리기
+                              </button>
+                            )}
                         </div>
 
                         {/* 재무 지표: 보수적 / 기본 / 낙관적 3컬럼 */}
