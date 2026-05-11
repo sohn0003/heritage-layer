@@ -109,6 +109,21 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
           {asset.land_area != null && <span>{asset.land_area.toLocaleString()}㎡</span>}
         </div>
 
+        <div className="mb-3 space-y-1 rounded-md bg-muted/40 p-2 text-xs">
+          <div className="flex gap-1.5">
+            <span className="shrink-0 font-medium text-muted-foreground">추천 용도</span>
+            <span className="font-medium text-foreground">
+              {asset.recommended_use_type?.trim() || <span className="text-muted-foreground">분석 중</span>}
+            </span>
+          </div>
+          <div className="flex gap-1.5">
+            <span className="shrink-0 font-medium text-muted-foreground">개발 방향</span>
+            <span className="font-medium text-foreground">
+              {asset.recommended_dev_direction?.trim() || <span className="text-muted-foreground">분석 중</span>}
+            </span>
+          </div>
+        </div>
+
         <div className="flex gap-2">
           <Button
             size="sm"
