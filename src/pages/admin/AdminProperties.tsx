@@ -535,7 +535,7 @@ const AdminPropertiesPage = () => {
                       <Label>용도변경 확대 가능성</Label>
                       <Select value={form.use_change_expansion} onValueChange={(v) => setF({ use_change_expansion: v })}>
                         <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
-                        <SelectContent>{expansionOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                        <SelectContent>{useChangeOptions.map(o => <SelectItem key={o.v} value={o.v}>{o.l}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                   </div>
