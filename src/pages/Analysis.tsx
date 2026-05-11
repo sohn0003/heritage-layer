@@ -754,7 +754,7 @@ const AnalysisPage = () => {
           <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
         )}
         {isPro && user && (
-          <Button onClick={handleDealInterest}>딜 관심 표명</Button>
+          <Button onClick={handleDealInterest}>관심 상담 신청</Button>
         )}
         {!isPro && (
           <Button onClick={() => navigate('/pricing')}>Pro 구독 시작하기</Button>
