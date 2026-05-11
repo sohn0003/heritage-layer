@@ -468,7 +468,10 @@ const AnalysisPage = () => {
                       feasibility === '높음' ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                       : feasibility === '중간' ? 'border-amber-300 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
                       : 'border-rose-300 bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300';
-                    const sliderEquity = equitySliderValue ?? scenario.recommendedEquityRatio;
+                    const recommendedEquity =
+                      baseScenarios?.find((b) => b.rank === scenario.rank)?.recommendedEquityRatio
+                      ?? scenario.recommendedEquityRatio;
+                    const sliderEquity = equityByRank[scenario.rank] ?? recommendedEquity;
 
                     return (
                       <TabsContent key={scenario.rank} value={String(scenario.rank)} className="mt-6 space-y-6">
