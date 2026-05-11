@@ -54,8 +54,8 @@ const AnalysisPage = () => {
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  // 사용자가 슬라이더로 조절한 자기자본 비율 (undefined = 추천값 사용)
-  const [equitySliderValue, setEquitySliderValue] = useState<number | undefined>(undefined);
+  // 탭(시나리오)별 자기자본 비율 오버라이드 — undefined면 추천값 사용
+  const [equityByRank, setEquityByRank] = useState<Record<number, number | undefined>>({});
   const [activeTab, setActiveTab] = useState<'1' | '2' | '3'>('1');
 
   const algoConfig = useAlgorithmConfig();
@@ -73,7 +73,12 @@ const AnalysisPage = () => {
     fetchAsset();
   }, [assetId]);
 
-  // 통합 분석: 예비 ROI → 스코어링 → 시나리오 추천 → IRR 한 번에 처리
+  // 자산 변경 시 슬라이더 오버라이드 초기화
+  useEffect(() => {
+    setEquityByRank({});
+  }, [assetId]);
+
+  // 기본 분석(오버라이드 없음) — 스코어링/추천 시나리오/추천 자기자본비율의 기준값
   const analysis: AnalyzeAssetResult | null = useMemo(() => {
     if (!asset) return null;
     const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
@@ -85,7 +90,6 @@ const AnalysisPage = () => {
         loanRates: algoConfig.loanRates,
         projectYears: algoConfig.projectYears,
         residualValueRatio: algoConfig.residualValueRatio,
-        overrideEquityRatio: equitySliderValue,
       });
     } catch (e) {
       console.error('analyzeAsset 실패', e);
@@ -97,17 +101,46 @@ const AnalysisPage = () => {
     algoConfig.loanRates.collateral,
     algoConfig.projectYears,
     algoConfig.residualValueRatio,
-    equitySliderValue,
   ]);
 
   const scoringResult: ScoreResult | null = analysis?.scoring ?? null;
-  const scenarios = analysis?.recommendation.scenarios;
-  const activeScenario = scenarios?.find((s) => String(s.rank) === activeTab) ?? scenarios?.[0];
+  const baseScenarios = analysis?.recommendation.scenarios;
 
-  // 탭 변경 또는 자산 변경 시 슬라이더 초기화 (추천값 사용)
-  useEffect(() => {
-    setEquitySliderValue(undefined);
-  }, [assetId, activeTab]);
+  // 시나리오별 슬라이더 값을 적용한 표시용 시나리오 — 오버라이드된 IRR/DSCR/자기자본 등 반영
+  const displayScenarios = useMemo(() => {
+    if (!asset || !baseScenarios) return baseScenarios;
+    const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
+    void preliminaryROI;
+    return baseScenarios.map((base) => {
+      const override = equityByRank[base.rank];
+      if (override === undefined || override === base.recommendedEquityRatio) return base;
+      try {
+        const r = analyzeAsset({
+          assetInput: assetInputBase,
+          landValuePerSqm: asset.land_value_per_sqm ?? 4_500_000,
+          loanRates: algoConfig.loanRates,
+          projectYears: algoConfig.projectYears,
+          residualValueRatio: algoConfig.residualValueRatio,
+          overrideEquityRatio: override,
+        });
+        return r.recommendation.scenarios.find((x) => x.rank === base.rank) ?? base;
+      } catch (e) {
+        console.error('analyzeAsset 오버라이드 실패', e);
+        return base;
+      }
+    });
+  }, [
+    asset,
+    baseScenarios,
+    equityByRank,
+    algoConfig.loanRates.pf,
+    algoConfig.loanRates.collateral,
+    algoConfig.projectYears,
+    algoConfig.residualValueRatio,
+  ]);
+
+  const scenarios = displayScenarios;
+  const activeScenario = scenarios?.find((s) => String(s.rank) === activeTab) ?? scenarios?.[0];
 
 
   const [signalEvents, setSignalEvents] = useState<SignalEvent[]>([]);
