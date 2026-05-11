@@ -134,23 +134,24 @@ export interface IRRResult {
 // 기준표 — 16종 용도
 // ────────────────────────────────────────────────────────────
 
+// 공사비 단가 (원/m²) — 리모델링 기준, 지방·유휴자산 현실 반영
 const CONSTRUCTION_COST_BASE: Record<AssetUseType, number> = {
-  accommodation:            850_000,
-  cultural_complex:         700_000,
-  education:                650_000,
-  senior_welfare:           750_000,
-  retail_fnb:               600_000,
-  shared_residence:         800_000,
-  logistics:                400_000,
-  knowledge_industry:       900_000,
-  wellness:                 950_000,
-  public_complex:           700_000,
-  residential:              900_000,
-  mixed_use_residential:    950_000,
-  office:                   850_000,
-  retail_shopping:          750_000,
-  medical:                1_100_000,
-  religious_cultural:       700_000,
+  accommodation:            650_000,   // 농촌·지방 펜션·호텔 리모델링
+  cultural_complex:         600_000,
+  education:                550_000,
+  senior_welfare:           650_000,
+  retail_fnb:               500_000,
+  shared_residence:         650_000,
+  logistics:                350_000,
+  knowledge_industry:       800_000,
+  wellness:                 750_000,
+  public_complex:           600_000,
+  residential:              750_000,
+  mixed_use_residential:    850_000,
+  office:                   750_000,
+  retail_shopping:          650_000,
+  medical:                  900_000,
+  religious_cultural:       600_000,
 };
 
 const CONDITION_MULTIPLIER: Record<BuildingCondition, number> = {
@@ -166,19 +167,20 @@ const SCENARIO_COST_MULTIPLIER: Record<ScenarioType, number> = {
   optimistic:   0.90,
 };
 
+// 연간 매출 단가 (원/m²) — 지방 현실 기준 (도심은 1.2~1.5배 가능)
 const REVENUE_PER_SQM: Record<AssetUseType, number> = {
-  accommodation:          220_000,
+  accommodation:          220_000,   // 지방 펜션·호텔 객실 매출
   cultural_complex:       120_000,
   education:              150_000,
   senior_welfare:         180_000,
   retail_fnb:             200_000,
-  shared_residence:       130_000,
+  shared_residence:       170_000,   // 공유주거: 상향 (도심 소형 임대)
   logistics:               80_000,
   knowledge_industry:     160_000,
   wellness:               250_000,
   public_complex:         100_000,
-  residential:            110_000,
-  mixed_use_residential:  150_000,
+  residential:            150_000,   // 임대주택: 상향
+  mixed_use_residential:  180_000,   // 주상복합: 상향
   office:                 170_000,
   retail_shopping:        180_000,
   medical:                200_000,
@@ -287,8 +289,25 @@ function calcWeightedOpCostRatio(mix: UseTypeMix[]): number {
 }
 
 function calculateIRR(cashFlows: number[]): number {
+  // 비할인 합계 검증 — 양의 IRR 가능 여부 사전 확인
+  const futureSum = cashFlows.slice(1).reduce((a, b) => a + b, 0);
+  const initialOut = Math.abs(cashFlows[0]);
+
+  if (futureSum <= initialOut * 0.05) {
+    // 양의 IRR 불가 → 이분법으로 음의 IRR 추정
+    let lo = -0.99, hi = 0.0;
+    for (let i = 0; i < 100; i++) {
+      const mid = (lo + hi) / 2;
+      const npv = cashFlows.reduce((s, cf, t) => s + cf / Math.pow(1 + mid, t), 0);
+      if (npv > 0) lo = mid; else hi = mid;
+      if (hi - lo < 1e-6) break;
+    }
+    return Math.round(((lo + hi) / 2) * 1000) / 10;
+  }
+
+  // Newton-Raphson (발산 방지: -99% ~ 500% 범위 제한)
   let rate = 0.1;
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 200; i++) {
     let npv = 0, dnpv = 0;
     for (let t = 0; t < cashFlows.length; t++) {
       const pv = cashFlows[t] / Math.pow(1 + rate, t);
@@ -296,7 +315,7 @@ function calculateIRR(cashFlows: number[]): number {
       dnpv -= (t * cashFlows[t]) / Math.pow(1 + rate, t + 1);
     }
     if (Math.abs(dnpv) < 1e-7) break;
-    const newRate = rate - npv / dnpv;
+    const newRate = Math.max(-0.99, Math.min(5.0, rate - npv / dnpv));
     if (Math.abs(newRate - rate) < 1e-7) { rate = newRate; break; }
     rate = newRate;
   }
@@ -343,8 +362,12 @@ function computeScenario(input: IRRInput, scenario: ScenarioType): ScenarioResul
   const softCost = Math.round(totalConstructionCost * 0.15);
   const totalInvestment = totalConstructionCost + landAcquisitionCost + softCost;
 
-  const equityAmount = Math.round(totalInvestment * (input.equityRatio / 100));
-  const loanAmount = totalInvestment - equityAmount;
+  const governmentSubsidy = estimateSubsidy(totalInvestment, input.isGovernmentSupported, grade);
+  const netInvestmentAfterSubsidy = totalInvestment - governmentSubsidy;
+
+  // 자기자본 = 보조금 차감 후 실투자비 기준
+  const equityAmount = Math.round(netInvestmentAfterSubsidy * (input.equityRatio / 100));
+  const loanAmount = netInvestmentAfterSubsidy - equityAmount;
   const loanType = grade === 'S' || grade === 'A' ? 'PF' : '담보';
   const interestRate = loanType === 'PF' ? input.loanRates.pf : input.loanRates.collateral;
   const annualInterest = Math.round(loanAmount * (interestRate / 100));
@@ -355,18 +378,28 @@ function computeScenario(input: IRRInput, scenario: ScenarioType): ScenarioResul
   const weightedOpCostRatio = calcWeightedOpCostRatio(useTypeMix);
   const annualOperatingCost = Math.round(annualRevenue * (weightedOpCostRatio / 100));
   const annualOperatingProfit = annualRevenue - annualOperatingCost;
-  const annualNetProfit = annualOperatingProfit - annualInterest;
 
-  const governmentSubsidy = estimateSubsidy(totalInvestment, input.isGovernmentSupported, grade);
-  const netInvestmentAfterSubsidy = totalInvestment - governmentSubsidy;
+  // ── Equity IRR: 원리금 균등 상환 기준 연간 부채상환액 산출 ──
+  const annualDebtService = loanAmount > 0
+    ? (() => {
+        const mr = interestRate / 100 / 12;
+        const mo = input.projectYears * 12;
+        const mp = mr > 0
+          ? (loanAmount * mr * Math.pow(1 + mr, mo)) / (Math.pow(1 + mr, mo) - 1)
+          : loanAmount / mo;
+        return Math.round(mp * 12);
+      })()
+    : 0;
+  const annualNetProfit = annualOperatingProfit - annualDebtService;
 
-  const cashFlows = [-(netInvestmentAfterSubsidy), ...Array(input.projectYears).fill(annualNetProfit)];
-  cashFlows[cashFlows.length - 1] += Math.round(totalInvestment * input.residualValueRatio);
+  // 초기 지출 = 자기자본만 / 만기 시 대출 완전 상환 → 잔존가치에서 차감 불필요
+  const cashFlows = [-equityAmount, ...Array(input.projectYears).fill(annualNetProfit)];
+  cashFlows[cashFlows.length - 1] += Math.round(netInvestmentAfterSubsidy * input.residualValueRatio);
 
   const irr = calculateIRR(cashFlows);
   const dscr = calculateDSCR(annualOperatingProfit, loanAmount, interestRate, input.projectYears);
   const paybackYears = annualNetProfit > 0
-    ? Math.round((netInvestmentAfterSubsidy / annualNetProfit) * 10) / 10 : 999;
+    ? Math.round((equityAmount / annualNetProfit) * 10) / 10 : 999;
   const roi = Math.round((annualOperatingProfit / netInvestmentAfterSubsidy) * 100 * 10) / 10;
 
   return {
