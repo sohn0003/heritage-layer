@@ -19,7 +19,6 @@ export type Database = {
           address: string
           admin_memo: string | null
           asset_type: string
-          asset_use_type: string | null
           building_condition: string | null
           building_coverage: number | null
           commercial_density: string | null
@@ -54,6 +53,8 @@ export type Database = {
           natural_scenery: string | null
           ownership_type: string | null
           population_trend: string | null
+          recommended_dev_direction: string | null
+          recommended_use_type: string | null
           scoring_detail: Json | null
           scoring_grade: string | null
           scoring_total: number | null
@@ -65,7 +66,6 @@ export type Database = {
           address: string
           admin_memo?: string | null
           asset_type: string
-          asset_use_type?: string | null
           building_condition?: string | null
           building_coverage?: number | null
           commercial_density?: string | null
@@ -100,6 +100,8 @@ export type Database = {
           natural_scenery?: string | null
           ownership_type?: string | null
           population_trend?: string | null
+          recommended_dev_direction?: string | null
+          recommended_use_type?: string | null
           scoring_detail?: Json | null
           scoring_grade?: string | null
           scoring_total?: number | null
@@ -111,7 +113,6 @@ export type Database = {
           address?: string
           admin_memo?: string | null
           asset_type?: string
-          asset_use_type?: string | null
           building_condition?: string | null
           building_coverage?: number | null
           commercial_density?: string | null
@@ -146,6 +147,8 @@ export type Database = {
           natural_scenery?: string | null
           ownership_type?: string | null
           population_trend?: string | null
+          recommended_dev_direction?: string | null
+          recommended_use_type?: string | null
           scoring_detail?: Json | null
           scoring_grade?: string | null
           scoring_total?: number | null
