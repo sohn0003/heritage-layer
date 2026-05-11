@@ -528,7 +528,7 @@ const AdminPropertiesPage = () => {
                       <Label>종상향 여력</Label>
                       <Select value={form.zoning_upgrade_gain} onValueChange={(v) => setF({ zoning_upgrade_gain: v })}>
                         <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
-                        <SelectContent>{expansionOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                        <SelectContent>{zoningUpgradeOptions.map(o => <SelectItem key={o.v} value={o.v}>{o.l}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
