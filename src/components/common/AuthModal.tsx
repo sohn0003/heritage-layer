@@ -16,6 +16,8 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +29,7 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
         email,
         password,
         options: {
-          data: { full_name: name },
+          data: { full_name: name, phone, address },
           emailRedirectTo: window.location.origin,
         },
       });
