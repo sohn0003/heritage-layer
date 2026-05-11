@@ -541,7 +541,7 @@ const HomePage = () => {
 
           <StepBlock
             num="03" title="직접 딜 연결"
-            desc="지자체·시행사를 직접 연결합니다. 관심 표명 한 번이면 행정 절차 없이 협력 논의가 시작됩니다."
+            desc="프로젝트 매니징을 담당하고 개발에 필요한 리소스를 제공합니다."
             icon={Handshake} side="left" accent="hsl(var(--primary))"
           >
             <Step3Graphic />
