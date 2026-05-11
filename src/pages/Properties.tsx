@@ -318,7 +318,7 @@ const PropertiesPage = () => {
   );
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col">
+    <div className="flex h-screen flex-col pt-16">
       {/* Top search bar */}
       <div className="flex items-center gap-2 border-b bg-background px-4 py-3">
         <div className="relative flex-1 max-w-md">
