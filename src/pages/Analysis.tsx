@@ -136,7 +136,7 @@ const AnalysisPage = () => {
   // 분석 가정값 (DB에 없는 값은 합리적 기본값으로 채움)
   const analysisAssumptions = {
     buildingCondition: 'partial_reinforcement' as const,
-    assetUseType: 'cultural_complex' as const,
+    useTypeMix: [{ useType: 'cultural_complex' as const, ratio: 100 }] as [import('@/algorithm/financial/irr-calculator').UseTypeMix, ...import('@/algorithm/financial/irr-calculator').UseTypeMix[]],
     landValuePerSqm: 4_500_000, // 성북구 일반주거 평균 공시지가 가정
     loanRates: algoConfig.loanRates,
     equityRatio: algoConfig.equityRatio,
@@ -148,9 +148,11 @@ const AnalysisPage = () => {
     const input: IRRInput = {
       scoringResult,
       buildingCondition: analysisAssumptions.buildingCondition,
-      assetUseType: analysisAssumptions.assetUseType,
+      useTypeMix: analysisAssumptions.useTypeMix,
       landArea: asset.land_area ?? 0,
       landValuePerSqm: analysisAssumptions.landValuePerSqm,
+      legalMaxFloorAreaRatio: asset.legal_max_floor_area_ratio ?? asset.floor_area_ratio ?? 200,
+      zoningUpgradeGain: (asset.zoning_upgrade_gain as any) ?? 'under_20',
       loanRates: analysisAssumptions.loanRates,
       equityRatio: analysisAssumptions.equityRatio,
       projectYears: analysisAssumptions.projectYears,
