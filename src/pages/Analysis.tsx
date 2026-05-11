@@ -314,12 +314,12 @@ const AnalysisPage = () => {
           <RatioBar
             label="건폐율"
             current={asset.current_building_coverage ?? asset.building_coverage}
-            legalMax={asset.legal_max_building_coverage ?? scoringResult?.detail ? Number(scoringResult?.detail.buildingCoverageUsageRate ? (asset.building_coverage ?? 0) / (scoringResult.detail.buildingCoverageUsageRate / 100) : null) || null : null}
+            legalMax={asset.legal_max_building_coverage}
           />
           <RatioBar
             label="용적률"
             current={asset.current_floor_area_ratio ?? asset.floor_area_ratio}
-            legalMax={asset.legal_max_floor_area_ratio ?? null}
+            legalMax={asset.legal_max_floor_area_ratio}
           />
         </CardContent>
       </Card>
