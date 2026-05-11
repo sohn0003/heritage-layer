@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Mail, Phone, Building2, FileQuestion, CheckCircle2 } from 'lucide-react';
+import { Mail, Building2, FileQuestion, CheckCircle2 } from 'lucide-react';
 
 const inquiryTypes = [
   { v: 'asset_report', l: '매물 제보' },
@@ -19,13 +19,14 @@ const ContactPage = () => {
   const [type, setType] = useState('asset_report');
   const [name, setName] = useState('');
   const [organization, setOrganization] = useState('');
-  const [contact, setContact] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
 
   const reset = () => {
-    setName(''); setOrganization(''); setContact(''); setMessage('');
+    setName(''); setOrganization(''); setPhone(''); setEmail(''); setMessage('');
     setType('asset_report');
   };
 
@@ -35,7 +36,7 @@ const ContactPage = () => {
     const typeLabel = inquiryTypes.find((t) => t.v === type)?.l ?? type;
     const finalMessage = `[${typeLabel}]\n${message}`;
     const { error } = await supabase.from('partner_inquiries').insert({
-      name, organization: organization || '-', contact, message: finalMessage,
+      name, organization: organization || '-', contact: `${phone} / ${email}`, message: finalMessage,
     });
     setLoading(false);
     if (error) {
@@ -58,23 +59,14 @@ const ContactPage = () => {
         </div>
 
         {/* Contact info chips */}
-        <div className="mb-8 grid gap-3 sm:grid-cols-2">
-          <div className="flex items-center gap-3 rounded-xl border bg-card/60 p-4 backdrop-blur">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15">
-              <Phone className="h-5 w-5 text-accent" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">대표전화</p>
-              <p className="text-sm font-semibold">010-0000-0000</p>
-            </div>
-          </div>
+        <div className="mb-8">
           <div className="flex items-center gap-3 rounded-xl border bg-card/60 p-4 backdrop-blur">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15">
               <Mail className="h-5 w-5 text-accent" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">이메일</p>
-              <p className="text-sm font-semibold">contact@heritagelayer.com</p>
+              <p className="text-sm font-semibold">contact@thelayercorp.com</p>
             </div>
           </div>
         </div>
@@ -109,9 +101,15 @@ const ContactPage = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="contact">연락처 (전화 또는 이메일) *</Label>
-                <Input id="contact" value={contact} onChange={(e) => setContact(e.target.value)} maxLength={100} placeholder="010-0000-0000 또는 email@example.com" required />
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">연락처 *</Label>
+                  <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={50} placeholder="010-0000-0000" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">이메일 *</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={100} placeholder="email@example.com" required />
+                </div>
               </div>
 
               <div className="space-y-2">

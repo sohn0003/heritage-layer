@@ -19,6 +19,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const isHeroPage = location.pathname === '/' || location.pathname === '/about';
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 80);
@@ -39,7 +40,11 @@ const Navbar = () => {
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${borderColor} ${
-          isDark ? 'bg-transparent' : 'bg-background/40 backdrop-blur-md'
+          isAdminPage
+            ? 'bg-background/95 backdrop-blur-lg shadow-sm'
+            : isDark
+            ? 'bg-transparent'
+            : 'bg-background/40 backdrop-blur-md'
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
