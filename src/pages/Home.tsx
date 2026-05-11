@@ -518,30 +518,32 @@ const HomePage = () => {
 
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-20 text-center">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Process</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">Heritage Layer는 이렇게 작동합니다</h2>
-            <p className="mt-4 text-muted-foreground">스크롤하며 3단계 재생 과정을 확인하세요</p>
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Our Service</span>
+            <h2 className="mt-3 text-4xl font-bold md:text-5xl">유휴자산 등록부터 매입까지,<br/>매니징해주는 파트너</h2>
+            <p className="mt-4 text-muted-foreground">
+              Heritage Layer는 단순 분석 도구가 아닙니다. 자산 발굴부터 사업화까지 전 과정을 함께 책임지는 엔드투엔드 서비스를 제공합니다.
+            </p>
           </div>
 
           <StepBlock
-            num="01" title="전국 유휴자산 탐색"
-            desc="폐교, 빈집, 유휴 공공시설을 데이터 기반으로 한곳에서 탐색합니다. 흩어진 공공·민간 자산을 통합 데이터베이스로 시각화합니다."
+            num="01" title="유휴자산 통합 데이터베이스"
+            desc="전국에 흩어진 폐교·빈집·유휴 공공시설을 한곳에 모아 시각화합니다. 직접 발로 뛰지 않아도, 검증된 자산 정보를 즉시 탐색할 수 있습니다."
             icon={Search} side="left" accent="hsl(var(--primary))"
           >
             <Step1Graphic />
           </StepBlock>
 
           <StepBlock
-            num="02" title="AI 재생 가능성 분석"
-            desc="입지, 법규, 시장, 예산 등 6개 차원의 데이터를 결합해 재생 가능성을 점수화하고 1·2·3순위 시나리오를 자동 추천합니다."
+            num="02" title="AI 기반 재생 가능성 진단"
+            desc="입지·법규·시장·예산 등 6개 차원을 결합한 알고리즘이 자산별 재생 가능성을 점수화하고 1·2·3순위 사업 시나리오와 수익성 시뮬레이션을 제공합니다."
             icon={Brain} side="right" accent="hsl(var(--accent))"
           >
             <Step2Graphic />
           </StepBlock>
 
           <StepBlock
-            num="03" title="직접 딜 연결"
-            desc="프로젝트 매니징을 담당하고 개발에 필요한 리소스를 제공합니다."
+            num="03" title="등록부터 매입까지 풀 매니징"
+            desc="자산 등록·인허가 검토·지자체 협력 구조 설계·매입 실행까지 프로젝트 전 과정을 매니징하고, 개발에 필요한 자본·전문가·실행 리소스를 함께 제공합니다."
             icon={Handshake} side="left" accent="hsl(var(--primary))"
           >
             <Step3Graphic />
