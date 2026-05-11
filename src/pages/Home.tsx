@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 // ─── Hooks ────────────────────────────────────────
-const useInView = <T extends HTMLElement>(threshold = 0.2) => {
+const useInView = <T extends Element>(threshold = 0.2) => {
   const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
   useEffect(() => {
