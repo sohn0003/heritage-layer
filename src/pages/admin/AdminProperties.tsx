@@ -241,7 +241,27 @@ const AdminPropertiesPage = () => {
 
     // 자동 등급/점수 산출
     const scoring = calculateScoringFields(payload);
-    const finalPayload = { ...payload, ...scoring };
+
+    // 알고리즘 자동 추천: 용도 / 개발 방향
+    let recommended_use_type: string | null = null;
+    let recommended_dev_direction: string | null = null;
+    try {
+      const { preliminaryROI, ...assetInputBase } = buildScoringInput(payload as any);
+      void preliminaryROI;
+      const result = analyzeAsset({
+        assetInput: assetInputBase,
+        landValuePerSqm: payload.land_value_per_sqm ?? 4_500_000,
+      });
+      const top = result.recommendation.scenarios[0];
+      if (top) {
+        recommended_use_type = top.useTypeSummary ?? null;
+        recommended_dev_direction = top.developmentDirectionLabel ?? null;
+      }
+    } catch (err) {
+      console.error('analyzeAsset 자동 추천 실패', err);
+    }
+
+    const finalPayload = { ...payload, ...scoring, recommended_use_type, recommended_dev_direction };
 
     if (editId) {
       const { error } = await supabase.from('assets').update(finalPayload).eq('id', editId);
