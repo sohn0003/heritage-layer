@@ -39,7 +39,7 @@ const Navbar = () => {
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${borderColor} ${
-          isDark ? 'bg-transparent' : 'bg-background/40 backdrop-blur-md'
+          isDark ? 'bg-transparent' : 'bg-background/95 backdrop-blur-lg shadow-sm'
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -64,24 +64,14 @@ const Navbar = () => {
               </Link>
             ))}
             {isAdmin && (
-              <>
-                <Link
-                  to="/admin/properties"
-                  className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
-                    location.pathname === '/admin/properties' ? activeStyle : textMuted
-                  }`}
-                >
-                  Admin
-                </Link>
-                <Link
-                  to="/admin/signals"
-                  className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
-                    location.pathname === '/admin/signals' ? activeStyle : textMuted
-                  }`}
-                >
-                  딜 관심
-                </Link>
-              </>
+              <Link
+                to="/admin/properties"
+                className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
+                  location.pathname === '/admin/properties' ? activeStyle : textMuted
+                }`}
+              >
+                Admin
+              </Link>
             )}
           </div>
 
@@ -143,10 +133,7 @@ const Navbar = () => {
               </Link>
             ))}
             {isAdmin && (
-              <>
-                <Link to="/admin/properties" className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`} onClick={() => setMobileOpen(false)}>Admin</Link>
-                <Link to="/admin/signals" className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`} onClick={() => setMobileOpen(false)}>딜 관심</Link>
-              </>
+              <Link to="/admin/properties" className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`} onClick={() => setMobileOpen(false)}>Admin</Link>
             )}
             <div className={`mt-2 border-t pt-2 ${borderColor}`}>
               {user ? (
