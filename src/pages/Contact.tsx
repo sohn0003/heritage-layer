@@ -1,0 +1,165 @@
+import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import { Mail, Phone, Building2, FileQuestion, CheckCircle2 } from 'lucide-react';
+
+const inquiryTypes = [
+  { v: 'asset_report', l: '매물 제보' },
+  { v: 'pm_request', l: '유휴자산 개발 PM 의뢰' },
+];
+
+const ContactPage = () => {
+  const [type, setType] = useState('asset_report');
+  const [name, setName] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [contact, setContact] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
+
+  const reset = () => {
+    setName(''); setOrganization(''); setContact(''); setMessage('');
+    setType('asset_report');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const typeLabel = inquiryTypes.find((t) => t.v === type)?.l ?? type;
+    const finalMessage = `[${typeLabel}]\n${message}`;
+    const { error } = await supabase.from('partner_inquiries').insert({
+      name, organization: organization || '-', contact, message: finalMessage,
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: '문의 접수 실패', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setSuccessOpen(true);
+    reset();
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background via-muted/30 to-background pt-20">
+      <div className="mx-auto max-w-3xl px-4 py-12 md:py-16">
+        <div className="mb-10 text-center">
+          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Contact</span>
+          <h1 className="mt-3 text-3xl font-bold md:text-4xl">문의하기</h1>
+          <p className="mt-3 text-muted-foreground">
+            매물 제보 또는 유휴자산 개발 PM 의뢰를 남겨주세요. 담당자가 빠르게 안내드립니다.
+          </p>
+        </div>
+
+        {/* Contact info chips */}
+        <div className="mb-8 grid gap-3 sm:grid-cols-2">
+          <div className="flex items-center gap-3 rounded-xl border bg-card/60 p-4 backdrop-blur">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15">
+              <Phone className="h-5 w-5 text-accent" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">대표전화</p>
+              <p className="text-sm font-semibold">010-0000-0000</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl border bg-card/60 p-4 backdrop-blur">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15">
+              <Mail className="h-5 w-5 text-accent" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">이메일</p>
+              <p className="text-sm font-semibold">contact@heritagelayer.com</p>
+            </div>
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="p-6 md:p-8">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <FileQuestion className="h-4 w-4 text-accent" /> 문의 항목 *
+                </Label>
+                <Select value={type} onValueChange={setType}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {inquiryTypes.map((t) => (
+                      <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="name">이름 *</Label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="org" className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" /> 소속 (선택)
+                  </Label>
+                  <Input id="org" value={organization} onChange={(e) => setOrganization(e.target.value)} maxLength={200} />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contact">연락처 (전화 또는 이메일) *</Label>
+                <Input id="contact" value={contact} onChange={(e) => setContact(e.target.value)} maxLength={100} placeholder="010-0000-0000 또는 email@example.com" required />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="message">문의 내용 *</Label>
+                <Textarea
+                  id="message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={6}
+                  maxLength={2000}
+                  required
+                  placeholder={
+                    type === 'asset_report'
+                      ? '제보하실 자산의 위치, 유형, 특이사항 등을 자유롭게 작성해주세요.'
+                      : '의뢰하실 자산 정보와 검토하고자 하는 개발 방향을 알려주세요.'
+                  }
+                />
+                <p className="text-right text-xs text-muted-foreground">{message.length}/2000</p>
+              </div>
+
+              <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                {loading ? '접수 중...' : '문의하기'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Success dialog */}
+      <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-accent/15">
+              <CheckCircle2 className="h-8 w-8 text-accent" />
+            </div>
+            <DialogTitle className="text-center text-xl">문의가 접수되었습니다</DialogTitle>
+            <DialogDescription className="text-center">
+              성공적으로 문의가 접수되었습니다.<br />
+              담당자가 순차적으로 안내 연락을 드리겠습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button className="w-full" onClick={() => setSuccessOpen(false)}>확인</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default ContactPage;
