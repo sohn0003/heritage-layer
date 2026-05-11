@@ -82,12 +82,7 @@ const Mypage = () => {
 
   const isPro = subscriptionTier === 'pro';
 
-  // Mock saved reports
-  const savedReports = [
-    { id: '1', title: '서울 종로구 유휴부지 분석 레포트', date: '2025-03-15' },
-    { id: '2', title: '경기 파주시 폐교 재생 가능성 보고서', date: '2025-03-10' },
-    { id: '3', title: '부산 영도구 빈집 클러스터 분석', date: '2025-02-28' },
-  ];
+  const savedReports: { id: string; title: string; date: string }[] = [];
 
   return (
     <div className="min-h-screen pt-20 px-4 pb-12">
@@ -200,38 +195,32 @@ const Mypage = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {savedReports.map((report) => (
-                <div
-                  key={report.id}
-                  className="flex items-center justify-between rounded-lg border border-border p-3 transition-colors hover:bg-muted/50 cursor-pointer"
-                  onClick={() => {
-                    if (!isPro) {
-                      navigate('/pricing');
-                    }
-                    // Pro users: open report (future implementation)
-                  }}
-                >
-                  <div>
-                    <p className="text-sm font-medium">{report.title}</p>
-                    <p className="text-xs text-muted-foreground">{report.date}</p>
+            {savedReports.length === 0 ? (
+              <div className="py-8 text-center text-sm text-muted-foreground">
+                <FileText className="mx-auto mb-2 h-8 w-8 opacity-30" />
+                <p>비어있음</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {savedReports.map((report) => (
+                  <div
+                    key={report.id}
+                    className="flex items-center justify-between rounded-lg border border-border p-3 transition-colors hover:bg-muted/50 cursor-pointer"
+                    onClick={() => {
+                      if (!isPro) navigate('/pricing');
+                    }}
+                  >
+                    <div>
+                      <p className="text-sm font-medium">{report.title}</p>
+                      <p className="text-xs text-muted-foreground">{report.date}</p>
+                    </div>
+                    {!isPro && (
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        Pro 전용
+                      </span>
+                    )}
                   </div>
-                  {!isPro && (
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                      Pro 전용
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-            {!isPro && (
-              <div className="mt-4 rounded-lg border border-accent/30 bg-accent/5 p-4 text-center">
-                <p className="text-sm text-muted-foreground mb-2">
-                  레포트 열람은 Pro 구독자 전용 기능입니다.
-                </p>
-                <Button size="sm" onClick={() => navigate('/pricing')}>
-                  Pro 구독 시작하기 <ArrowRight className="ml-1 h-4 w-4" />
-                </Button>
+                ))}
               </div>
             )}
           </CardContent>
