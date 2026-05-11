@@ -367,48 +367,52 @@ const AnalysisPage = () => {
         </Card>
       )}
 
-      {/* 세부 점수 항목 (Free) */}
+      {/* 세부 점수 항목 (Pro 전용 — Free는 모자이크) */}
       {scoringResult && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg">세부 항목 점수</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>항목</TableHead>
-                  <TableHead className="text-right">점수</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {[
-                  { label: 'A1. 용도지역', value: scoringResult.detail.a1_zoning },
-                  { label: 'A2. 개발 여력', value: scoringResult.detail.a2_developmentCapacity.toFixed(1) },
-                  { label: 'A3. 인허가 조정', value: scoringResult.detail.a3_permitAdjustment },
-                  { label: 'A4. 종상향 조정', value: scoringResult.detail.a4_zoningUpgradeAdjustment },
-                  { label: 'B1. 인구·상권', value: scoringResult.detail.b1_populationCommercial },
-                  { label: 'B2. 교통 접근성', value: scoringResult.detail.b2_transportation },
-                  { label: 'B3. 방치 기간', value: scoringResult.detail.b3_idleYearsAdjustment },
-                  { label: 'C1. 역사·건축', value: scoringResult.detail.c1_historicalArchitectural },
-                  { label: 'C2. 자연경관', value: scoringResult.detail.c2_naturalScenery },
-                  { label: 'D1. 건물 상태', value: scoringResult.detail.d1_buildingCondition },
-                  { label: 'D2. 수익성', value: scoringResult.detail.d2_profitability },
-                  { label: 'D3. 정부 지원', value: scoringResult.detail.d3_governmentSupport },
-                  { label: '추가 개발 가능 연면적 (㎡)', value: scoringResult.detail.additionalFloorArea.toLocaleString() },
-                  { label: '종상향 후 최대 연면적 (㎡)', value: scoringResult.detail.maxFloorAreaAfterUpgrade.toLocaleString() },
-                  { label: '건폐율 사용률 (%)', value: scoringResult.detail.buildingCoverageUsageRate },
-                  { label: '용적률 사용률 (%)', value: scoringResult.detail.floorAreaRatioUsageRate },
-                ].map((row) => (
-                  <TableRow key={row.label}>
-                    <TableCell className="font-medium">{row.label}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{row.value}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <div className="mb-8">
+          <ProLockOverlay locked={!isPro}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">세부 항목 점수</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>항목</TableHead>
+                      <TableHead className="text-right">점수</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[
+                      { label: 'A1. 용도지역', value: scoringResult.detail.a1_zoning },
+                      { label: 'A2. 개발 여력', value: scoringResult.detail.a2_developmentCapacity.toFixed(1) },
+                      { label: 'A3. 인허가 조정', value: scoringResult.detail.a3_permitAdjustment },
+                      { label: 'A4. 종상향 조정', value: scoringResult.detail.a4_zoningUpgradeAdjustment },
+                      { label: 'B1. 인구·상권', value: scoringResult.detail.b1_populationCommercial },
+                      { label: 'B2. 교통 접근성', value: scoringResult.detail.b2_transportation },
+                      { label: 'B3. 방치 기간', value: scoringResult.detail.b3_idleYearsAdjustment },
+                      { label: 'C1. 역사·건축', value: scoringResult.detail.c1_historicalArchitectural },
+                      { label: 'C2. 자연경관', value: scoringResult.detail.c2_naturalScenery },
+                      { label: 'D1. 건물 상태', value: scoringResult.detail.d1_buildingCondition },
+                      { label: 'D2. 수익성', value: scoringResult.detail.d2_profitability },
+                      { label: 'D3. 정부 지원', value: scoringResult.detail.d3_governmentSupport },
+                      { label: '추가 개발 가능 연면적 (㎡)', value: scoringResult.detail.additionalFloorArea.toLocaleString() },
+                      { label: '종상향 후 최대 연면적 (㎡)', value: scoringResult.detail.maxFloorAreaAfterUpgrade.toLocaleString() },
+                      { label: '건폐율 사용률 (%)', value: scoringResult.detail.buildingCoverageUsageRate },
+                      { label: '용적률 사용률 (%)', value: scoringResult.detail.floorAreaRatioUsageRate },
+                    ].map((row) => (
+                      <TableRow key={row.label}>
+                        <TableCell className="font-medium">{row.label}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{row.value}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </ProLockOverlay>
+        </div>
       )}
 
       {/* Pro Sections */}
