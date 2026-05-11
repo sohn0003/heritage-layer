@@ -626,6 +626,7 @@ const AnalysisPage = () => {
           목록으로 돌아가기
         </Button>
       </div>
+      </div>
     </div>
   );
 };
