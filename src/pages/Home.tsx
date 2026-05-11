@@ -666,8 +666,7 @@ const HomePage = () => {
       </section>
 
       {/* ── MAP ── */}
-      <section className="relative overflow-hidden px-4 py-20 md:py-28"
-        style={{ background: 'linear-gradient(180deg, hsl(0 0% 100%), hsl(220 30% 97%))' }}>
+      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
         <Blob className="left-1/2 top-10 h-96 w-96 -translate-x-1/2" color="hsl(220 60% 85%)" />
         <div className="relative mx-auto max-w-5xl text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Explore</span>
