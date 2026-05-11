@@ -18,7 +18,7 @@ interface SavedAsset {
 }
 
 const Mypage = () => {
-  const { user, subscriptionTier, loading } = useAuth();
+  const { user, subscriptionTier, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [savedAssets, setSavedAssets] = useState<SavedAsset[]>([]);
   const [profileName, setProfileName] = useState<string>('');
