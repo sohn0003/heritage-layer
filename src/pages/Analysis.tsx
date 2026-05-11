@@ -194,7 +194,10 @@ const AnalysisPage = () => {
     if (error) {
       toast({ title: '오류', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: '딜 관심이 등록되었습니다' });
+      toast({
+        title: '관심 상담이 신청되었습니다',
+        description: '담당자가 순차적으로 안내 연락을 드리겠습니다.',
+      });
       fetchSignals();
     }
   };
