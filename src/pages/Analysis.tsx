@@ -315,6 +315,49 @@ const AnalysisPage = () => {
         </Card>
       )}
 
+      {/* 자산 강점·리스크 요약 (Free) */}
+      {analysis && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg">자산 강점 · 리스크 요약</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-6 sm:grid-cols-2">
+            <div>
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-emerald-600">
+                <Sparkles className="h-4 w-4" /> 핵심 강점
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {analysis.recommendation.assetSummary.keyStrengths.length === 0 ? (
+                  <span className="text-xs text-muted-foreground">두드러진 강점 없음</span>
+                ) : (
+                  analysis.recommendation.assetSummary.keyStrengths.map((s, i) => (
+                    <Badge key={i} variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                      {s}
+                    </Badge>
+                  ))
+                )}
+              </div>
+            </div>
+            <div>
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-amber-600">
+                <ShieldAlert className="h-4 w-4" /> 주요 리스크
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {analysis.recommendation.assetSummary.keyRisks.length === 0 ? (
+                  <span className="text-xs text-muted-foreground">특이 리스크 없음</span>
+                ) : (
+                  analysis.recommendation.assetSummary.keyRisks.map((s, i) => (
+                    <Badge key={i} variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                      {s}
+                    </Badge>
+                  ))
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* 세부 점수 항목 (Pro 전용 — Free는 모자이크) */}
       {scoringResult && (
         <div className="mb-8">
