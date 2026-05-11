@@ -267,11 +267,10 @@ const AboutPage = () => {
 
       {/* ── PROBLEM: 왜 우리 비즈니스가 필요한가 ── */}
       <section
-        className="relative overflow-hidden px-4 py-20 md:py-28"
-        style={{ background: 'linear-gradient(180deg, hsl(0 0% 100%), hsl(20 60% 97%))' }}
+        className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28"
       >
-        <Blob className="left-[-10%] top-10 h-96 w-96" color="hsl(0 80% 80%)" />
-        <Blob className="right-[-10%] bottom-10 h-96 w-96" color="hsl(40 90% 75%)" />
+        <Blob className="left-[-10%] top-10 h-96 w-96" color="hsl(0 70% 80%)" />
+        <Blob className="right-[-10%] bottom-10 h-96 w-96" color="hsl(40 90% 80%)" />
 
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-12 text-center">
@@ -305,43 +304,59 @@ const AboutPage = () => {
             ))}
           </div>
 
-          {/* 두 컬럼: 권역 막대 + 문제점 */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl p-7" style={glassCardStyle}>
-              <h3 className="mb-5 text-lg font-semibold">권역별 폐교 분포 (Top 5)</h3>
-              <div className="space-y-5">
-                <InsightBar label="전남" value={839} max={1000} color="hsl(0 70% 55%)" suffix="개" />
-                <InsightBar label="경북" value={745} max={1000} color="hsl(0 70% 55%)" suffix="개" />
-                <InsightBar label="경남" value={584} max={1000} color="hsl(25 90% 55%)" suffix="개" />
-                <InsightBar label="강원" value={476} max={1000} color="hsl(25 90% 55%)" suffix="개" />
-                <InsightBar label="전북" value={329} max={1000} color="hsl(var(--primary))" suffix="개" />
-              </div>
-            </div>
-
-            <div className="rounded-3xl p-7" style={glassCardStyle}>
-              <h3 className="mb-5 text-lg font-semibold">왜 재생되지 못할까요?</h3>
-              <ul className="space-y-4">
-                {[
-                  { icon: Database, t: '데이터의 분절', d: '교육부·국토부·지자체로 흩어진 자산 정보를 통합 조회할 수 없습니다.' },
-                  { icon: Users, t: '주체의 부재', d: '관리 주체가 명확치 않아 책임 있는 재생 사업이 진행되지 못합니다.' },
-                  { icon: Building2, t: '복잡한 인허가', d: '용도변경, 종상향, 환경영향평가 등 절차가 미로처럼 얽혀 있습니다.' },
-                  { icon: TrendingDown, t: '낮은 수익성 인식', d: '사업성 검토조차 하지 않은 채 폐기 결정이 내려집니다.' },
-                ].map((p) => (
-                  <li key={p.t} className="flex gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/15">
-                      <p.icon className="h-4 w-4 text-accent" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">{p.t}</p>
-                      <p className="text-xs text-muted-foreground">{p.d}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+          {/* 권역 막대 */}
+          <div className="rounded-3xl p-7" style={glassCardStyle}>
+            <h3 className="mb-5 text-lg font-semibold">권역별 폐교 분포 (Top 5)</h3>
+            <div className="space-y-5">
+              <InsightBar label="전남" value={839} max={1000} color="hsl(0 70% 55%)" suffix="개" />
+              <InsightBar label="경북" value={745} max={1000} color="hsl(0 70% 55%)" suffix="개" />
+              <InsightBar label="경남" value={584} max={1000} color="hsl(25 90% 55%)" suffix="개" />
+              <InsightBar label="강원" value={476} max={1000} color="hsl(25 90% 55%)" suffix="개" />
+              <InsightBar label="전북" value={329} max={1000} color="hsl(var(--primary))" suffix="개" />
             </div>
           </div>
 
-          <p className="mx-auto mt-10 max-w-2xl text-center text-base font-medium">
+          {/* 왜 재생되지 못할까요? — 큰 그래픽, 4단 스택 */}
+          <div className="mt-16">
+            <div className="mb-10 text-center">
+              <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Root Cause</span>
+              <h3 className="mt-3 text-3xl font-bold md:text-4xl">왜 재생되지 못할까요?</h3>
+              <p className="mt-3 text-muted-foreground">방치는 우연이 아닙니다. 구조적 원인이 4가지 축에서 작동하고 있습니다.</p>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                { icon: Database, t: '데이터의 분절', d: '교육부·국토부·지자체로 흩어진 자산 정보를 통합 조회할 수 없습니다. 어디에 무엇이 있는지조차 한눈에 파악되지 않습니다.', color: 'hsl(0 70% 55%)' },
+                { icon: Users, t: '주체의 부재', d: '관리 주체가 명확치 않아 책임 있는 재생 사업이 진행되지 못합니다. 누구도 결정권자가 아닌 상태로 수년이 흘러갑니다.', color: 'hsl(25 90% 55%)' },
+                { icon: Building2, t: '복잡한 인허가', d: '용도변경, 종상향, 환경영향평가 등 절차가 미로처럼 얽혀 있습니다. 작은 사업자에게는 진입 장벽 그 자체입니다.', color: 'hsl(var(--accent))' },
+                { icon: TrendingDown, t: '낮은 수익성 인식', d: '사업성 검토조차 하지 않은 채 폐기 결정이 내려집니다. 데이터 기반 분석 없이는 기회조차 발견되지 않습니다.', color: 'hsl(var(--primary))' },
+              ].map((p, i) => (
+                <div
+                  key={p.t}
+                  className={`flex flex-col items-center gap-6 rounded-3xl p-6 md:p-8 md:flex-row ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
+                  style={glassCardStyle}
+                >
+                  <div
+                    className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl md:h-28 md:w-28"
+                    style={{ background: `${p.color.replace(')', ' / 0.15)')}` }}
+                  >
+                    <p.icon className="h-12 w-12 md:h-14 md:w-14" style={{ color: p.color }} />
+                  </div>
+                  <div className={`flex-1 text-center ${i % 2 === 1 ? 'md:text-right' : 'md:text-left'}`}>
+                    <div className="mb-2 flex items-center justify-center gap-3 md:justify-start" style={{ flexDirection: i % 2 === 1 ? 'row-reverse' : 'row' }}>
+                      <span className="text-xs font-bold tabular-nums tracking-widest" style={{ color: p.color }}>
+                        0{i + 1}
+                      </span>
+                      <h4 className="text-2xl font-bold md:text-3xl">{p.t}</h4>
+                    </div>
+                    <p className="text-base leading-relaxed text-muted-foreground md:text-lg">{p.d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="mx-auto mt-12 max-w-2xl text-center text-base font-medium md:text-lg">
             <span className="text-accent">&ldquo;방치&rdquo;가 아니라 &ldquo;기회&rdquo;</span>로 전환할 시간입니다.
           </p>
         </div>

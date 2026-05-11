@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import ProLockOverlay from '@/components/common/ProLockOverlay';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -194,7 +195,10 @@ const AnalysisPage = () => {
     if (error) {
       toast({ title: '오류', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: '딜 관심이 등록되었습니다' });
+      toast({
+        title: '관심 상담이 신청되었습니다',
+        description: '담당자가 순차적으로 안내 연락을 드리겠습니다.',
+      });
       fetchSignals();
     }
   };
@@ -400,39 +404,103 @@ const AnalysisPage = () => {
                 <CardTitle className="text-lg">세부 항목 점수</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>항목</TableHead>
-                      <TableHead className="text-right">점수</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[
-                      { label: 'A1. 용도지역', value: scoringResult.detail.a1_zoning },
-                      { label: 'A2. 개발 여력', value: scoringResult.detail.a2_developmentCapacity.toFixed(1) },
-                      { label: 'A3. 인허가 조정', value: scoringResult.detail.a3_permitAdjustment },
-                      { label: 'A4. 종상향 조정', value: scoringResult.detail.a4_zoningUpgradeAdjustment },
-                      { label: 'B1. 인구·상권', value: scoringResult.detail.b1_populationCommercial },
-                      { label: 'B2. 교통 접근성', value: scoringResult.detail.b2_transportation },
-                      { label: 'B3. 방치 기간', value: scoringResult.detail.b3_idleYearsAdjustment },
-                      { label: 'C1. 역사·건축', value: scoringResult.detail.c1_historicalArchitectural },
-                      { label: 'C2. 자연경관', value: scoringResult.detail.c2_naturalScenery },
-                      { label: 'D1. 건물 상태', value: scoringResult.detail.d1_buildingCondition },
-                      { label: 'D2. 수익성', value: scoringResult.detail.d2_profitability },
-                      { label: 'D3. 정부 지원', value: scoringResult.detail.d3_governmentSupport },
-                      { label: '추가 개발 가능 연면적 (㎡)', value: scoringResult.detail.additionalFloorArea.toLocaleString() },
-                      { label: '종상향 후 최대 연면적 (㎡)', value: scoringResult.detail.maxFloorAreaAfterUpgrade.toLocaleString() },
-                      { label: '건폐율 사용률 (%)', value: scoringResult.detail.buildingCoverageUsageRate },
-                      { label: '용적률 사용률 (%)', value: scoringResult.detail.floorAreaRatioUsageRate },
-                    ].map((row) => (
-                      <TableRow key={row.label}>
-                        <TableCell className="font-medium">{row.label}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{row.value}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <p className="mb-3 text-xs text-muted-foreground">각 항목을 클릭하면 산출 기준과 의미가 표시됩니다.</p>
+                <Accordion type="multiple" className="w-full">
+                  {[
+                    {
+                      label: 'A1. 용도지역',
+                      value: scoringResult.detail.a1_zoning,
+                      desc: '대지의 용도지역(주거·상업·공업·녹지 등)을 평가합니다. 상업지·준주거지처럼 활용 폭이 넓을수록 높은 점수가 부여되며, 보전녹지·자연환경보전지역은 개발 제약으로 점수가 낮아집니다.\n\n이 점수는 향후 가능한 사업 유형(숙박·오피스·복합시설 등)의 범위를 결정하는 1차 필터입니다.',
+                    },
+                    {
+                      label: 'A2. 개발 여력',
+                      value: scoringResult.detail.a2_developmentCapacity.toFixed(1),
+                      desc: '현재 건폐율·용적률과 법정 최대치 사이의 차이를 계산해, 추가로 지을 수 있는 연면적이 얼마나 남아 있는지 평가합니다. 여력이 클수록 증축·재건축으로 사업성을 끌어올릴 여지가 큽니다.\n\n저활용 자산일수록 이 점수가 높게 산출되어 재생 잠재력이 크다는 신호가 됩니다.',
+                    },
+                    {
+                      label: 'A3. 인허가 조정',
+                      value: scoringResult.detail.a3_permitAdjustment,
+                      desc: '환경청 인가, 군사·문화재 구역, 도시계획시설 저촉 등 인허가 리스크 요인을 가감점으로 반영합니다. 규제 충돌이 많을수록 음(-) 조정이 들어갑니다.\n\n반대로 도시재생 활성화 지역·균형발전 예산 대상 등 우호적 제도권에 속한 자산은 양(+) 조정으로 가점이 부여됩니다.',
+                    },
+                    {
+                      label: 'A4. 종상향 조정',
+                      value: scoringResult.detail.a4_zoningUpgradeAdjustment,
+                      desc: '용도지역을 한 단계 상향(종상향)했을 때 추가로 확보 가능한 용적률을 가점으로 반영합니다. 50% 이상 추가 가능한 자산은 큰 폭의 가점, 종상향이 불가한 자산은 가점이 없습니다.\n\n실현되면 사업 규모를 비약적으로 키울 수 있는 잠재 옵션입니다.',
+                    },
+                    {
+                      label: 'B1. 인구·상권',
+                      value: scoringResult.detail.b1_populationCommercial,
+                      desc: '주변 인구 추이(증가/유지/감소/소멸위험)와 상권 밀도를 결합해 수요 기반을 평가합니다. 인구가 늘고 상권이 두꺼울수록 임대·운영 안정성이 높습니다.\n\n소멸위험 지역이라도 관광·웰니스 등 외부 유입형 컨셉으로 보완 가능한지를 함께 고려합니다.',
+                    },
+                    {
+                      label: 'B2. 교통 접근성',
+                      value: scoringResult.detail.b2_transportation,
+                      desc: '도심까지의 거리(km)를 기준으로 접근성을 평가합니다. 도심 인접 자산은 일반 임대·복합시설에 유리하고, 원거리 자산은 체류형·관광형 컨셉에 유리합니다.\n\n거리만이 아니라, 거리 대비 어떤 사업 컨셉이 적합한지를 시나리오 추천에 반영합니다.',
+                    },
+                    {
+                      label: 'B3. 방치 기간',
+                      value: scoringResult.detail.b3_idleYearsAdjustment,
+                      desc: '얼마나 오랫동안 방치되었는지를 가감점으로 반영합니다. 방치 기간이 길수록 건물 노후·민원 누적 등 음(-) 조정이 적용됩니다.\n\n동시에 정책적 처분 우선순위가 높아져 사업 추진 속도 측면에서는 양(+)으로 작용할 수 있습니다.',
+                    },
+                    {
+                      label: 'C1. 역사·건축',
+                      value: scoringResult.detail.c1_historicalArchitectural,
+                      desc: '등록문화재·근대건축 유산, 지역 상징성, 건축예술적 특성 등을 평가합니다. 역사·건축적 가치가 높을수록 브랜딩과 스토리텔링에 유리하고 프리미엄 가격대를 형성할 수 있습니다.\n\n다만 보전 의무로 인해 개발 자유도가 낮아질 수 있어, 시나리오 추천에서 리모델링 비중이 높아지는 경향이 있습니다.',
+                    },
+                    {
+                      label: 'C2. 자연경관',
+                      value: scoringResult.detail.c2_naturalScenery,
+                      desc: '산·바다·강·호수 조망 가능 여부와 인접 자연경관 수준을 평가합니다. 경관 자산은 숙박·웰니스·리조트 컨셉에서 핵심 가치로 작동합니다.\n\n경관 저해 요소(인접 시설·시야 가림)가 있는 경우 음(-) 조정이 적용됩니다.',
+                    },
+                    {
+                      label: 'D1. 건물 상태',
+                      value: scoringResult.detail.d1_buildingCondition,
+                      desc: '리모델링 가능·일부 보강·대수선 필요·전면 철거 등 4단계로 건물 컨디션을 평가합니다. 상태가 좋을수록 초기 투입비가 줄어 IRR이 개선됩니다.\n\n전면 철거가 필요한 자산은 신축 사업으로 전환되어 자본 규모와 일정이 달라집니다.',
+                    },
+                    {
+                      label: 'D2. 수익성',
+                      value: scoringResult.detail.d2_profitability,
+                      desc: '예비 ROI(공시지가·연면적·예상 단가 기반의 1차 추정 수익률)를 점수화한 항목입니다. 본격적인 IRR 분석에 앞서 자산이 사업성 검토 대상인지 빠르게 판별합니다.\n\n실제 IRR은 시나리오·금융구조에 따라 달라지므로 이 점수는 1차 스크리닝 용도로만 사용됩니다.',
+                    },
+                    {
+                      label: 'D3. 정부 지원',
+                      value: scoringResult.detail.d3_governmentSupport,
+                      desc: '도시재생·폐교활용·균형발전 등 정부·지자체 보조금/예산 지원 대상 여부를 평가합니다. 지원 대상이면 자기자본 부담이 줄어들어 사업 실행 가능성이 크게 올라갑니다.\n\n동시에 공공성 요건이 부과될 수 있어, 시나리오 추천에서 운영 컨셉의 일정 비중이 공공·문화 용도로 배분됩니다.',
+                    },
+                    {
+                      label: '추가 개발 가능 연면적 (㎡)',
+                      value: scoringResult.detail.additionalFloorArea.toLocaleString(),
+                      desc: '현재 연면적과 법정 최대 연면적의 차이로, 합법적으로 추가 건축 가능한 면적입니다. 이 값이 클수록 증축형 시나리오의 매출 잠재력이 커집니다.',
+                    },
+                    {
+                      label: '종상향 후 최대 연면적 (㎡)',
+                      value: scoringResult.detail.maxFloorAreaAfterUpgrade.toLocaleString(),
+                      desc: '용도지역 종상향이 실현되었을 때 확보 가능한 최대 연면적입니다. 실현 가능성과 별개로 잠재 사업 규모를 가늠하는 상한선 지표입니다.',
+                    },
+                    {
+                      label: '건폐율 사용률 (%)',
+                      value: scoringResult.detail.buildingCoverageUsageRate,
+                      desc: '현재 건폐율 ÷ 법정 최대 건폐율. 100%에 가까울수록 평면적으로는 더 지을 여지가 없고, 낮을수록 동(棟) 추가나 외부공간 활용 여력이 있다는 뜻입니다.',
+                    },
+                    {
+                      label: '용적률 사용률 (%)',
+                      value: scoringResult.detail.floorAreaRatioUsageRate,
+                      desc: '현재 용적률 ÷ 법정 최대 용적률. 사용률이 낮을수록 같은 대지에 더 많은 연면적을 올릴 수 있어 증축·재건축형 시나리오의 IRR이 유리해집니다.',
+                    },
+                  ].map((row) => (
+                    <AccordionItem key={row.label} value={row.label}>
+                      <AccordionTrigger className="hover:no-underline">
+                        <div className="flex w-full items-center justify-between pr-2">
+                          <span className="text-sm font-medium text-foreground">{row.label}</span>
+                          <span className="text-sm tabular-nums text-muted-foreground">{row.value}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                        {row.desc}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </CardContent>
             </Card>
           </ProLockOverlay>
@@ -695,7 +763,7 @@ const AnalysisPage = () => {
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs">딜 관심 표명</p>
+                      <p className="text-xs">관심 상담 신청</p>
                       <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
                     </div>
                   </div>
@@ -751,7 +819,7 @@ const AnalysisPage = () => {
           <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
         )}
         {isPro && user && (
-          <Button onClick={handleDealInterest}>딜 관심 표명</Button>
+          <Button onClick={handleDealInterest}>관심 상담 신청</Button>
         )}
         {!isPro && (
           <Button onClick={() => navigate('/pricing')}>Pro 구독 시작하기</Button>
