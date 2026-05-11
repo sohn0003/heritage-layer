@@ -101,7 +101,7 @@ const InsightBar = ({
           <CountUp end={value} suffix={suffix} />
         </span>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-muted/60">
+      <div className="h-2.5 overflow-hidden rounded-full bg-foreground/10">
         <div
           className="h-full rounded-full transition-[width] duration-[1800ms] ease-out"
           style={{
