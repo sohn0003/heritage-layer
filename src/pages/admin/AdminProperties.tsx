@@ -113,7 +113,7 @@ const emptyForm: AssetForm = {
   latitude: '', longitude: '', admin_memo: '', is_published: false,
   current_building_coverage: '', legal_max_building_coverage: '',
   current_floor_area_ratio: '', legal_max_floor_area_ratio: '',
-  current_floor_area: '', land_value_per_sqm: '', asset_use_type: '',
+  current_floor_area: '', land_value_per_sqm: '',
   population_trend: '', commercial_density: '', distance_to_center: '',
   historical_value: '', natural_scenery: '', building_condition: '',
   is_private_negotiation: false, is_citizen_proposal: false,
