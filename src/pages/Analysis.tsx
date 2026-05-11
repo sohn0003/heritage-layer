@@ -94,7 +94,7 @@ function buildScoringInput(asset: any): AssetInput {
     historicalValue: 'ordinary',
     naturalScenery: 'ordinary_urban',
     buildingCondition: 'partial_reinforcement',
-    estimatedROI: 7,
+    preliminaryROI: 7,
     isUrbanRegenerationArea: !!asset.gov_cooperation,
     isAbandonedSchoolBudget: asset.asset_type === '폐교',
     isBalancedDevelopmentBudget: false,
