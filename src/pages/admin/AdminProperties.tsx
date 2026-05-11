@@ -480,7 +480,23 @@ const AdminPropertiesPage = () => {
                       <Label>건물 상태</Label>
                       <Select value={form.building_condition} onValueChange={(v) => setF({ building_condition: v })}>
                         <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
-                        <SelectContent>{conditionOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                        <SelectContent>{conditionOptions.map(o => <SelectItem key={o.v} value={o.v}>{o.l}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>역사·건축적 가치</Label>
+                      <Select value={form.historical_value} onValueChange={(v) => setF({ historical_value: v })}>
+                        <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
+                        <SelectContent>{historicalValueOptions.map(o => <SelectItem key={o.v} value={o.v}>{o.l}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>자연경관</Label>
+                      <Select value={form.natural_scenery} onValueChange={(v) => setF({ natural_scenery: v })}>
+                        <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
+                        <SelectContent>{naturalSceneryOptions.map(o => <SelectItem key={o.v} value={o.v}>{o.l}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
                       </Select>
                     </div>
                     <div className="space-y-2">
