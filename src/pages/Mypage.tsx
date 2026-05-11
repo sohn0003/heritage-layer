@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Star, FileText, User, Crown, ArrowRight } from 'lucide-react';
+import { Star, FileText, User, Crown, ArrowRight, Inbox } from 'lucide-react';
 
 interface SavedAsset {
   id: string;
