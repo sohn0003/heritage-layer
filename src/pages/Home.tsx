@@ -63,11 +63,11 @@ const CountUp = ({ end, duration = 2000, suffix = '', decimals = 0 }: { end: num
 
 // ─── Glass primitives ──────────────────────────────
 const glassCardStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.55)',
-  backdropFilter: 'blur(18px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-  border: '1px solid rgba(255, 255, 255, 0.6)',
-  boxShadow: '0 10px 40px -10px rgba(27, 46, 74, 0.18), inset 0 1px 0 rgba(255,255,255,0.6)',
+  background: 'rgba(255, 255, 255, 0.32)',
+  backdropFilter: 'blur(22px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+  border: '1px solid rgba(255, 255, 255, 0.45)',
+  boxShadow: '0 12px 48px -12px rgba(27, 46, 74, 0.22), inset 0 1px 0 rgba(255,255,255,0.5)',
 };
 const glassDarkStyle: React.CSSProperties = {
   background: 'rgba(27, 46, 74, 0.55)',
@@ -101,7 +101,7 @@ const InsightBar = ({
           <CountUp end={value} suffix={suffix} />
         </span>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-muted/60">
+      <div className="h-2.5 overflow-hidden rounded-full bg-foreground/10">
         <div
           className="h-full rounded-full transition-[width] duration-[1800ms] ease-out"
           style={{
@@ -550,8 +550,7 @@ const HomePage = () => {
       </section>
 
       {/* ── INSIGHT: 큰 통계 + 다양한 차트 ── */}
-      <section className="relative overflow-hidden px-4 py-20 md:py-28"
-        style={{ background: 'linear-gradient(180deg, hsl(220 30% 97%), hsl(0 0% 100%))' }}>
+      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
         <Blob className="right-[-15%] top-10 h-[500px] w-[500px]" color="hsl(40 90% 75%)" />
         <Blob className="left-[-15%] bottom-10 h-[500px] w-[500px]" color="hsl(220 60% 80%)" />
 
@@ -667,8 +666,7 @@ const HomePage = () => {
       </section>
 
       {/* ── MAP ── */}
-      <section className="relative overflow-hidden px-4 py-20 md:py-28"
-        style={{ background: 'linear-gradient(180deg, hsl(0 0% 100%), hsl(220 30% 97%))' }}>
+      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
         <Blob className="left-1/2 top-10 h-96 w-96 -translate-x-1/2" color="hsl(220 60% 85%)" />
         <div className="relative mx-auto max-w-5xl text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Explore</span>
