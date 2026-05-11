@@ -42,7 +42,7 @@ export interface AssetInput {
 
   // Block D — 사업성
   buildingCondition: BuildingCondition;    // 건물 상태
-  estimatedROI: number;                    // 추정 ROI (%)
+  preliminaryROI: number;                  // 1차 추정 ROI (%) — irr-calculator가 자동 계산 후 전달
   isUrbanRegenerationArea: boolean;        // 도시재생·지역소멸기금 해당
   isAbandonedSchoolBudget: boolean;        // 폐교활용 교육부 예산 해당
   isBalancedDevelopmentBudget: boolean;    // 균형발전특별회계 해당
@@ -339,7 +339,7 @@ function scoreD3GovernmentSupport(input: AssetInput): number {
 
 function computeBlockD(input: AssetInput): number {
   const d1 = scoreD1BuildingCondition(input.buildingCondition);
-  const d2 = scoreD2Profitability(input.estimatedROI);
+  const d2 = scoreD2Profitability(input.preliminaryROI);
   const d3 = scoreD3GovernmentSupport(input);
   return Math.min(100, Math.max(0, (d1 * 0.35) + (d2 * 0.45) + (d3 * 0.20)));
 }
@@ -419,7 +419,7 @@ export function calculateScore(input: AssetInput): ScoreResult {
       c1_historicalArchitectural: scoreC1Historical(input.historicalValue),
       c2_naturalScenery: scoreC2NaturalScenery(input.naturalScenery),
       d1_buildingCondition: scoreD1BuildingCondition(input.buildingCondition),
-      d2_profitability: scoreD2Profitability(input.estimatedROI),
+      d2_profitability: scoreD2Profitability(input.preliminaryROI),
       d3_governmentSupport: scoreD3GovernmentSupport(input),
       additionalFloorArea: Math.round(calcAdditionalFloorArea(input)),
       maxFloorAreaAfterUpgrade: Math.round(calcMaxFloorAreaAfterUpgrade(input)),
@@ -460,7 +460,7 @@ export function calculateScore(input: AssetInput): ScoreResult {
 //   historicalValue: 'regional_landmark',
 //   naturalScenery: 'good_nature',
 //   buildingCondition: 'remodel_possible',
-//   estimatedROI: 11,
+//   preliminaryROI: 11,   // irr-calculator.estimatePreliminaryROI()가 자동 계산
 //   isUrbanRegenerationArea: true,
 //   isAbandonedSchoolBudget: true,
 //   isBalancedDevelopmentBudget: false,

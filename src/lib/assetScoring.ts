@@ -183,7 +183,7 @@ export const buildScoringInput = (a: AssetLikePayload): AssetInput => {
     historicalValue: mapHistorical(a.historical_value),
     naturalScenery: mapScenery(a.natural_scenery),
     buildingCondition: mapCondition(a.building_condition),
-    estimatedROI: extractROI(a.irr_result),
+    preliminaryROI: extractROI(a.irr_result),
     isUrbanRegenerationArea: b(a.is_urban_regeneration_area),
     isAbandonedSchoolBudget: b(a.is_abandoned_school_budget),
     isBalancedDevelopmentBudget: b(a.is_balanced_dev_budget),
