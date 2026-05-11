@@ -116,7 +116,7 @@ const InsightBar = ({
 
 // ─── 도넛 차트 (소유 구분) ──────────────────────────
 const DonutChart = ({ segments, total }: { segments: { label: string; value: number; color: string }[]; total: number }) => {
-  const { ref, inView } = useInView<SVGSVGElement>();
+  const { ref, inView } = useInView<any>();
   const r = 60;
   const c = 2 * Math.PI * r;
   let offset = 0;
@@ -158,7 +158,7 @@ const DonutChart = ({ segments, total }: { segments: { label: string; value: num
 
 // ─── 라인/에어리어 차트 (방치기간 추이) ──────────────
 const AreaTrendChart = ({ data, color }: { data: number[]; color: string }) => {
-  const { ref, inView } = useInView<SVGSVGElement>();
+  const { ref, inView } = useInView<any>();
   const W = 480, H = 180, pad = 24;
   const max = Math.max(...data);
   const stepX = (W - pad * 2) / (data.length - 1);
