@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
 import AssetCard from '@/components/cards/AssetCard';
 import AuthModal from '@/components/common/AuthModal';
 import NaverMap from '@/components/map/NaverMap';
@@ -8,6 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Asset {
@@ -24,109 +27,344 @@ interface Asset {
   building_coverage: number | null;
   floor_area_ratio: number | null;
   ownership_type: string | null;
+  population_trend: string | null;
+  commercial_density: string | null;
+  historical_value: string | null;
+  natural_scenery: string | null;
+  building_condition: string | null;
+  use_change_expansion: string | null;
+  is_private_negotiation: boolean | null;
+  is_citizen_proposal: boolean | null;
+  is_waterfront_environmental: boolean | null;
+  is_military_heritage_zone: boolean | null;
+  is_urban_facility_conflict: boolean | null;
+  has_conversion_precedent: boolean | null;
+  is_urban_regeneration_area: boolean | null;
+  is_abandoned_school_budget: boolean | null;
+  is_balanced_dev_budget: boolean | null;
 }
 
 const grades = ['S', 'A', 'B', 'C', 'D'];
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
+const ownershipTypes = ['국유', '공유', '사유'];
+const populationTrends = [
+  { v: 'increasing', l: '증가' },
+  { v: 'stable', l: '유지' },
+  { v: 'decreasing', l: '감소' },
+  { v: 'extinction_risk', l: '소멸위험' },
+];
+const densityOptions = [{ v: 'high', l: '높음' }, { v: 'low', l: '낮음' }];
+const valueGrades = ['상', '중', '하'];
+const conditionOptions = ['양호', '보통', '노후', '심각'];
+const expansionOptions = ['높음', '중간', '낮음', '없음'];
+
+const BOOL_FLAGS: { key: keyof Asset; label: string }[] = [
+  { key: 'gov_cooperation', label: '정부협력' },
+  { key: 'is_private_negotiation', label: '사적협상 가능' },
+  { key: 'is_citizen_proposal', label: '시민제안 가능' },
+  { key: 'is_waterfront_environmental', label: '수변/환경 자산' },
+  { key: 'is_military_heritage_zone', label: '군사/문화재 구역' },
+  { key: 'is_urban_facility_conflict', label: '도시계획시설 저촉' },
+  { key: 'has_conversion_precedent', label: '용도전환 선례 있음' },
+  { key: 'is_urban_regeneration_area', label: '도시재생 활성화 지역' },
+  { key: 'is_abandoned_school_budget', label: '폐교 활용 예산 대상' },
+  { key: 'is_balanced_dev_budget', label: '균형발전 예산 대상' },
+];
+
+const initialFilters = {
+  search: '',
+  gradeFilter: [] as string[],
+  typeFilter: 'all',
+  ownership: 'all',
+  zoning: '',
+  idleMin: '',
+  idleMax: '',
+  landMin: '',
+  landMax: '',
+  populationTrend: 'all',
+  commercialDensity: 'all',
+  historicalValue: 'all',
+  naturalScenery: 'all',
+  buildingCondition: 'all',
+  useChangeExpansion: 'all',
+  bools: {} as Record<string, boolean>,
+};
 
 const PropertiesPage = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [filtered, setFiltered] = useState<Asset[]>([]);
   const [authOpen, setAuthOpen] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [, setSelectedAsset] = useState<Asset | null>(null);
+  const [f, setF] = useState(initialFilters);
 
-  // Filters
-  const [gradeFilter, setGradeFilter] = useState<string[]>([]);
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [govOnly, setGovOnly] = useState(false);
-  const [search, setSearch] = useState('');
+  const update = <K extends keyof typeof initialFilters>(k: K, v: (typeof initialFilters)[K]) =>
+    setF((prev) => ({ ...prev, [k]: v }));
 
   useEffect(() => {
     const fetchAssets = async () => {
       const { data } = await supabase
         .from('assets')
-        .select('id, address, asset_type, idle_years, grade, gov_cooperation, land_area, latitude, longitude, zoning, building_coverage, floor_area_ratio, ownership_type')
+        .select('*')
         .eq('is_published', true);
-      if (data) {
-        setAssets(data);
-        setFiltered(data);
-      }
+      if (data) setAssets(data as Asset[]);
     };
     fetchAssets();
   }, []);
 
-  useEffect(() => {
-    let result = assets;
-    if (gradeFilter.length > 0) {
-      result = result.filter(a => a.grade && gradeFilter.includes(a.grade));
-    }
-    if (typeFilter !== 'all') {
-      result = result.filter(a => a.asset_type === typeFilter);
-    }
-    if (govOnly) {
-      result = result.filter(a => a.gov_cooperation);
-    }
-    if (search) {
-      result = result.filter(a => a.address.includes(search));
-    }
-    setFiltered(result);
-  }, [assets, gradeFilter, typeFilter, govOnly, search]);
+  const filtered = useMemo(() => {
+    return assets.filter((a) => {
+      if (f.search && !a.address.toLowerCase().includes(f.search.toLowerCase())) return false;
+      if (f.gradeFilter.length && !(a.grade && f.gradeFilter.includes(a.grade))) return false;
+      if (f.typeFilter !== 'all' && a.asset_type !== f.typeFilter) return false;
+      if (f.ownership !== 'all' && a.ownership_type !== f.ownership) return false;
+      if (f.zoning && !(a.zoning || '').toLowerCase().includes(f.zoning.toLowerCase())) return false;
+      if (f.idleMin && (a.idle_years ?? -Infinity) < Number(f.idleMin)) return false;
+      if (f.idleMax && (a.idle_years ?? Infinity) > Number(f.idleMax)) return false;
+      if (f.landMin && (a.land_area ?? -Infinity) < Number(f.landMin)) return false;
+      if (f.landMax && (a.land_area ?? Infinity) > Number(f.landMax)) return false;
+      if (f.populationTrend !== 'all' && a.population_trend !== f.populationTrend) return false;
+      if (f.commercialDensity !== 'all' && a.commercial_density !== f.commercialDensity) return false;
+      if (f.historicalValue !== 'all' && a.historical_value !== f.historicalValue) return false;
+      if (f.naturalScenery !== 'all' && a.natural_scenery !== f.naturalScenery) return false;
+      if (f.buildingCondition !== 'all' && a.building_condition !== f.buildingCondition) return false;
+      if (f.useChangeExpansion !== 'all' && a.use_change_expansion !== f.useChangeExpansion) return false;
+      for (const [k, v] of Object.entries(f.bools)) {
+        if (v && !a[k as keyof Asset]) return false;
+      }
+      return true;
+    });
+  }, [assets, f]);
 
-  const toggleGrade = (g: string) => {
-    setGradeFilter(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
-  };
+  const toggleGrade = (g: string) =>
+    update('gradeFilter', f.gradeFilter.includes(g) ? f.gradeFilter.filter((x) => x !== g) : [...f.gradeFilter, g]);
+
+  const activeCount =
+    (f.search ? 1 : 0) +
+    f.gradeFilter.length +
+    (f.typeFilter !== 'all' ? 1 : 0) +
+    (f.ownership !== 'all' ? 1 : 0) +
+    (f.zoning ? 1 : 0) +
+    (f.idleMin || f.idleMax ? 1 : 0) +
+    (f.landMin || f.landMax ? 1 : 0) +
+    (f.populationTrend !== 'all' ? 1 : 0) +
+    (f.commercialDensity !== 'all' ? 1 : 0) +
+    (f.historicalValue !== 'all' ? 1 : 0) +
+    (f.naturalScenery !== 'all' ? 1 : 0) +
+    (f.buildingCondition !== 'all' ? 1 : 0) +
+    (f.useChangeExpansion !== 'all' ? 1 : 0) +
+    Object.values(f.bools).filter(Boolean).length;
+
+  const FilterPanel = (
+    <div className="space-y-4">
+      <Accordion type="multiple" defaultValue={['basic', 'spec', 'location', 'regulation']} className="w-full">
+        <AccordionItem value="basic">
+          <AccordionTrigger className="text-sm">기본 정보</AccordionTrigger>
+          <AccordionContent className="space-y-3 pt-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">자산 등급</Label>
+              <div className="flex flex-wrap gap-1">
+                {grades.map((g) => (
+                  <button
+                    key={g}
+                    onClick={() => toggleGrade(g)}
+                    className={`rounded-md px-2.5 py-1 text-xs font-bold transition-colors ${
+                      f.gradeFilter.includes(g) ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">자산 유형</Label>
+              <Select value={f.typeFilter} onValueChange={(v) => update('typeFilter', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {assetTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">소유 구분</Label>
+              <Select value={f.ownership} onValueChange={(v) => update('ownership', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {ownershipTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="spec">
+          <AccordionTrigger className="text-sm">제원 / 규모</AccordionTrigger>
+          <AccordionContent className="space-y-3 pt-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">용도지역 (텍스트 검색)</Label>
+              <Input className="h-9" value={f.zoning} onChange={(e) => update('zoning', e.target.value)} placeholder="예: 일반주거" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">방치 기간 (년)</Label>
+              <div className="flex items-center gap-1">
+                <Input className="h-9" type="number" placeholder="최소" value={f.idleMin} onChange={(e) => update('idleMin', e.target.value)} />
+                <span className="text-xs text-muted-foreground">~</span>
+                <Input className="h-9" type="number" placeholder="최대" value={f.idleMax} onChange={(e) => update('idleMax', e.target.value)} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">대지면적 (㎡)</Label>
+              <div className="flex items-center gap-1">
+                <Input className="h-9" type="number" placeholder="최소" value={f.landMin} onChange={(e) => update('landMin', e.target.value)} />
+                <span className="text-xs text-muted-foreground">~</span>
+                <Input className="h-9" type="number" placeholder="최대" value={f.landMax} onChange={(e) => update('landMax', e.target.value)} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">건물 상태</Label>
+              <Select value={f.buildingCondition} onValueChange={(v) => update('buildingCondition', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {conditionOptions.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="location">
+          <AccordionTrigger className="text-sm">입지 / 가치</AccordionTrigger>
+          <AccordionContent className="space-y-3 pt-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">인구 추이</Label>
+              <Select value={f.populationTrend} onValueChange={(v) => update('populationTrend', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {populationTrends.map((p) => <SelectItem key={p.v} value={p.v}>{p.l}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">상권 밀도</Label>
+              <Select value={f.commercialDensity} onValueChange={(v) => update('commercialDensity', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {densityOptions.map((p) => <SelectItem key={p.v} value={p.v}>{p.l}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">역사적 가치</Label>
+              <Select value={f.historicalValue} onValueChange={(v) => update('historicalValue', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {valueGrades.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">자연 경관</Label>
+              <Select value={f.naturalScenery} onValueChange={(v) => update('naturalScenery', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {valueGrades.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="regulation">
+          <AccordionTrigger className="text-sm">규제 / 제도</AccordionTrigger>
+          <AccordionContent className="space-y-3 pt-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">용도변경 가능성</Label>
+              <Select value={f.useChangeExpansion} onValueChange={(v) => update('useChangeExpansion', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {expansionOptions.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2 pt-1">
+              {BOOL_FLAGS.map((b) => (
+                <div key={b.key as string} className="flex items-center justify-between">
+                  <Label htmlFor={`bf-${b.key as string}`} className="text-xs font-normal">{b.label}</Label>
+                  <Switch
+                    id={`bf-${b.key as string}`}
+                    checked={!!f.bools[b.key as string]}
+                    onCheckedChange={(v) => update('bools', { ...f.bools, [b.key as string]: v })}
+                  />
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      {activeCount > 0 && (
+        <Button variant="outline" size="sm" className="w-full" onClick={() => setF(initialFilters)}>
+          <X className="mr-1 h-3 w-3" /> 필터 전체 초기화 ({activeCount})
+        </Button>
+      )}
+    </div>
+  );
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 border-b bg-background px-4 py-3">
-        <Input
-          placeholder="주소 검색..."
-          className="w-48"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="자산 유형" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">전체 유형</SelectItem>
-            {assetTypes.map(t => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="flex gap-1">
-          {grades.map(g => (
-            <button
-              key={g}
-              onClick={() => toggleGrade(g)}
-              className={`rounded-md px-2.5 py-1 text-xs font-bold transition-colors ${
-                gradeFilter.includes(g) ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
-            >
-              {g}
-            </button>
-          ))}
+      {/* Top search bar */}
+      <div className="flex items-center gap-2 border-b bg-background px-4 py-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="주소로 검색하세요..."
+            className="pl-9"
+            value={f.search}
+            onChange={(e) => update('search', e.target.value)}
+          />
         </div>
-        <div className="flex items-center gap-2">
-          <Switch id="gov-filter" checked={govOnly} onCheckedChange={setGovOnly} />
-          <Label htmlFor="gov-filter" className="text-xs">정부협력</Label>
-        </div>
+
+        {/* Mobile filter trigger */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm" className="lg:hidden">
+              <SlidersHorizontal className="mr-1 h-4 w-4" />
+              필터 {activeCount > 0 && <Badge variant="secondary" className="ml-1">{activeCount}</Badge>}
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[320px] overflow-y-auto sm:w-[380px]">
+            <SheetHeader>
+              <SheetTitle>필터</SheetTitle>
+            </SheetHeader>
+            <div className="mt-4">{FilterPanel}</div>
+          </SheetContent>
+        </Sheet>
+
         <Badge variant="secondary" className="ml-auto">{filtered.length}건</Badge>
       </div>
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
+        {/* Desktop filter sidebar */}
+        <aside className="hidden w-[280px] shrink-0 overflow-y-auto border-r bg-muted/20 p-4 lg:block">
+          {FilterPanel}
+        </aside>
+
         {/* Map area */}
         <div className="hidden flex-1 md:flex">
           <NaverMap
             markers={filtered
-              .filter(a => a.latitude && a.longitude)
-              .map(a => ({ lat: a.latitude!, lng: a.longitude!, title: a.address }))}
+              .filter((a) => a.latitude && a.longitude)
+              .map((a) => ({ lat: a.latitude!, lng: a.longitude!, title: a.address }))}
             onMarkerClick={(idx) => {
-              const validAssets = filtered.filter(a => a.latitude && a.longitude);
+              const validAssets = filtered.filter((a) => a.latitude && a.longitude);
               setSelectedAsset(validAssets[idx]);
             }}
           />
@@ -136,11 +374,11 @@ const PropertiesPage = () => {
         <div className="w-full overflow-y-auto border-l p-4 md:w-[400px]">
           {filtered.length === 0 ? (
             <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-              <p className="text-sm">등록된 자산이 없습니다</p>
+              <p className="text-sm">조건에 맞는 자산이 없습니다</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {filtered.map(asset => (
+              {filtered.map((asset) => (
                 <div key={asset.id} onClick={() => setSelectedAsset(asset)} className="cursor-pointer">
                   <AssetCard asset={asset} onAuthRequired={() => setAuthOpen(true)} />
                 </div>
