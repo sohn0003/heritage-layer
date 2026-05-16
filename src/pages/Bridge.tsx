@@ -2,25 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Check, ArrowRight, Compass, Wrench, Crown, Info } from 'lucide-react';
+import { Check, ArrowRight, Compass, Wrench, Crown } from 'lucide-react';
 
 interface Level {
   key: 'L1' | 'L2' | 'L3';
   name: string;
   title: string;
-  price: string;
-  priceNote?: string;
   target: string;
   role: string;
-  successFee?: string;
   Icon: React.ComponentType<{ className?: string }>;
   items: string[];
   highlight?: boolean;
@@ -31,8 +20,6 @@ const levels: Level[] = [
     key: 'L1',
     name: 'Level 1',
     title: '사업성 검토 자문',
-    price: '₩500만~1,000만',
-    priceNote: '고정',
     target: '소형 투자자 · 첫 개발 도전자',
     role: '판단 지원 — 숫자 너머의 맥락을 더합니다',
     Icon: Compass,
@@ -48,11 +35,8 @@ const levels: Level[] = [
     key: 'L2',
     name: 'Level 2',
     title: '착수 지원',
-    price: '₩1,500만~3,000만',
-    priceNote: '+ 성공보수',
     target: '중소 시행사 · 인허가/금융 역량 부족 투자자',
     role: '실제 인허가·금융 준비 단계까지 함께 갑니다',
-    successFee: '금융 조달 성사 시 조달액의 0.5~1%',
     Icon: Wrench,
     highlight: true,
     items: [
@@ -68,7 +52,6 @@ const levels: Level[] = [
     key: 'L3',
     name: 'Level 3',
     title: '전체 PM',
-    price: '개발비의 3~5%',
     target: '패밀리 오피스 · 전체 위탁 원하는 기업·기관',
     role: '전 과정 책임 관리 — 시간 없는 자본을 위해',
     Icon: Crown,
@@ -83,19 +66,11 @@ const levels: Level[] = [
   },
 ];
 
-const customerMatrix = [
-  { type: '대형 시행사·개발사', sub: 'Enterprise', bridge: '불필요', note: '자체 역량 보유 · 정보 수집 목적' },
-  { type: '중소 시행사 (특정 역량 부족)', sub: 'Enterprise', bridge: 'Level 1~2 선택적', note: '인허가·지자체 협의 수요 높음' },
-  { type: '패밀리 오피스·고액 투자자', sub: 'Pro 또는 Enterprise', bridge: 'Level 3 + Level 2 연계', note: '전체 위탁 수요 · 최우선 타깃' },
-  { type: '소규모 시행사·첫 개발 도전자', sub: 'Pro', bridge: 'Level 1 → 업셀', note: '검토 후 Level 2~3으로 자연 연결' },
-  { type: '기관 투자자', sub: 'Enterprise', bridge: 'Level 2~3 협의', note: '딜 플로우 확보 + PM 위탁 목적' },
-];
-
 const processSteps = [
   { n: '01', title: '상담 신청', desc: '프로젝트 개요·자산 정보 공유. 초기 적합도 확인.' },
   { n: '02', title: '자산·사업성 검토', desc: '알고리즘 분석 + 전문가 해석. 적정 레벨 제안.' },
   { n: '03', title: '계약·착수', desc: '레벨별 계약 체결. 인허가·금융·PM 실행 시작.' },
-  { n: '04', title: '실행·정산', desc: '진행 보고 및 마일스톤 정산. 성공보수 정산 포함.' },
+  { n: '04', title: '실행·정산', desc: '진행 보고 및 마일스톤 정산.' },
 ];
 
 const Bridge = () => {
@@ -153,7 +128,7 @@ const Bridge = () => {
                 Bridge Solution
                 <Badge className="bg-accent text-accent-foreground">실행 지원</Badge>
               </CardTitle>
-              <p className="text-sm text-muted-foreground">프로젝트 단위 계약 · 착수금 + 성공보수</p>
+              <p className="text-sm text-muted-foreground">프로젝트 단위 계약</p>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
               <p>· 인허가·지자체 협의·PF 구조화 등 실제 실행 지원</p>
@@ -175,7 +150,7 @@ const Bridge = () => {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {levels.map(({ key, name, title, price, priceNote, target, role, successFee, Icon, items, highlight }) => (
+            {levels.map(({ key, name, title, target, role, Icon, items, highlight }) => (
               <Card
                 key={key}
                 className={`flex flex-col transition-all hover:-translate-y-1 hover:shadow-lg ${
@@ -183,26 +158,13 @@ const Bridge = () => {
                 }`}
               >
                 <CardHeader className="pb-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    {successFee && (
-                      <Badge variant="outline" className="border-accent text-accent">
-                        + 성공보수
-                      </Badge>
-                    )}
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                    <Icon className="h-5 w-5" />
                   </div>
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     {name}
                   </p>
                   <CardTitle className="mt-1 text-xl">{title}</CardTitle>
-                  <div className="mt-3">
-                    <span className="text-2xl font-bold">{price}</span>
-                    {priceNote && (
-                      <span className="ml-1 text-sm text-muted-foreground">{priceNote}</span>
-                    )}
-                  </div>
                   <p className="mt-3 text-sm text-muted-foreground">{role}</p>
                   <p className="mt-1 text-xs text-muted-foreground/80">타깃: {target}</p>
                 </CardHeader>
@@ -215,12 +177,6 @@ const Bridge = () => {
                       </li>
                     ))}
                   </ul>
-                  {successFee && (
-                    <p className="mt-4 rounded-md bg-accent/10 px-3 py-2 text-xs text-foreground">
-                      <Info className="mr-1 inline h-3 w-3 text-accent" />
-                      {successFee}
-                    </p>
-                  )}
                 </CardContent>
               </Card>
             ))}
@@ -232,42 +188,8 @@ const Bridge = () => {
         </div>
       </section>
 
-      {/* Customer matrix */}
-      <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="mb-8 text-center">
-          <h2 className="font-serif text-3xl font-semibold">누가 어느 레벨을 쓰는가</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            고객 유형별 권장 조합. 상담 시 적합한 레벨을 함께 설계합니다.
-          </p>
-        </div>
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>고객 유형</TableHead>
-                  <TableHead>구독 레벨</TableHead>
-                  <TableHead>브릿지 레벨</TableHead>
-                  <TableHead>비고</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {customerMatrix.map((row) => (
-                  <TableRow key={row.type}>
-                    <TableCell className="font-medium">{row.type}</TableCell>
-                    <TableCell>{row.sub}</TableCell>
-                    <TableCell>{row.bridge}</TableCell>
-                    <TableCell className="text-muted-foreground">{row.note}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </section>
-
       {/* Process */}
-      <section className="bg-muted/30 py-16">
+      <section className="py-16">
         <div className="mx-auto max-w-5xl px-4">
           <div className="mb-10 text-center">
             <h2 className="font-serif text-3xl font-semibold">진행 프로세스</h2>
