@@ -225,10 +225,47 @@ const Bridge = () => {
         <p className="mt-3 text-muted-foreground">
           자산 주소와 개요만 알려주시면, 가장 적합한 레벨을 제안드립니다.
         </p>
-        <Button size="lg" className="mt-6" onClick={() => navigate('/contact')}>
+        <Button size="lg" className="mt-6" onClick={() => openInquiry('L1')}>
           상담 신청하기 <ArrowRight className="ml-1 h-4 w-4" />
         </Button>
       </section>
+
+      {/* Bridge Solution 의뢰 Dialog */}
+      <Dialog open={inquiryOpen} onOpenChange={setInquiryOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Bridge Solution 의뢰</DialogTitle>
+            <DialogDescription>
+              희망 레벨과 프로젝트 정보를 알려주시면 담당자가 빠르게 안내드립니다.
+            </DialogDescription>
+          </DialogHeader>
+          <BridgeInquiryForm
+            defaultLevel={inquiryLevel}
+            onSuccess={() => {
+              setInquiryOpen(false);
+              setSuccessOpen(true);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-accent/15">
+              <CheckCircle2 className="h-8 w-8 text-accent" />
+            </div>
+            <DialogTitle className="text-center text-xl">문의가 접수되었습니다</DialogTitle>
+            <DialogDescription className="text-center">
+              담당자가 순차적으로 안내 연락을 드리겠습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button className="w-full" onClick={() => setSuccessOpen(false)}>확인</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
