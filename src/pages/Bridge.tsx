@@ -104,7 +104,7 @@ const Bridge = () => {
             사업성 검토부터 인허가·금융 조달, 전체 PM까지 — 필요한 만큼 선택하세요.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" variant="secondary" onClick={() => navigate('/contact')}>
+            <Button size="lg" variant="secondary" onClick={() => openInquiry('L1')}>
               프로젝트 상담 신청
             </Button>
             <Button
