@@ -47,11 +47,13 @@ const Pricing = () => {
   const { user, subscriptionTier } = useAuth();
   const { openCheckout, loading } = usePaddleCheckout();
   const [entBilling, setEntBilling] = useState<EnterpriseBilling>('monthly');
+  const [authOpen, setAuthOpen] = useState(false);
   const currentTier: TierKey = subscriptionTier;
 
   const startCheckout = async (priceId: string) => {
     if (!user) {
-      navigate('/about');
+      toast.info('구독을 시작하려면 먼저 로그인해 주세요.');
+      setAuthOpen(true);
       return;
     }
     try {
