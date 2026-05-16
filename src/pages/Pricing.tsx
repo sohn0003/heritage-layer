@@ -167,6 +167,24 @@ const Pricing = () => {
                 <p className="mt-1 text-xs text-muted-foreground/80">{tier.target}</p>
               </CardHeader>
               <CardContent className="flex flex-1 flex-col">
+                {tier.key === 'enterprise' && (
+                  <div className="mb-4 inline-flex w-fit items-center gap-1 rounded-full bg-muted p-1 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setEntBilling('monthly')}
+                      className={`rounded-full px-3 py-1 transition-colors ${entBilling === 'monthly' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground'}`}
+                    >
+                      월간
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEntBilling('yearly')}
+                      className={`rounded-full px-3 py-1 transition-colors ${entBilling === 'yearly' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground'}`}
+                    >
+                      연간
+                    </button>
+                  </div>
+                )}
                 <ul className="space-y-2.5 text-sm">
                   {features.map((f) => {
                     const v = f[tier.key];
