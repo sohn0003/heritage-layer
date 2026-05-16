@@ -102,7 +102,8 @@ const Mypage = () => {
     );
   }
 
-  const isPro = subscriptionTier === 'pro';
+  const isPro = hasProAccess;
+  const planLabel = tierLabel(subscriptionTier);
 
   const savedReports: { id: string; title: string; date: string }[] = [];
 
@@ -115,7 +116,7 @@ const Mypage = () => {
           <div className="flex items-center gap-2 rounded-full border border-border px-3 py-1 text-sm">
             <Crown className={`h-4 w-4 ${isPro ? 'text-accent' : 'text-muted-foreground'}`} />
             <span className={isPro ? 'text-accent font-medium' : 'text-muted-foreground'}>
-              {isPro ? 'Pro' : 'Free'}
+              {planLabel}
             </span>
           </div>
         </div>
@@ -140,11 +141,14 @@ const Mypage = () => {
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">구독 등급</span>
               <span className={`text-sm font-medium ${isPro ? 'text-accent' : ''}`}>
-                {isPro ? 'Pro' : 'Free'}
+                {planLabel}
               </span>
             </div>
           </CardContent>
         </Card>
+
+        {/* Subscription Management */}
+        <SubscriptionCard refreshKey={subRefreshKey} />
 
         {/* Admin: Deal Interest Inbox */}
         {isAdmin && (
