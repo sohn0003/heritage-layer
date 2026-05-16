@@ -17,6 +17,9 @@ import Contact from "@/pages/Contact";
 import AdminProperties from "@/pages/admin/AdminProperties";
 import AdminDealSignals from "@/pages/admin/AdminDealSignals";
 import NotFound from "@/pages/NotFound";
+import Terms from "@/pages/legal/Terms";
+import Refund from "@/pages/legal/Refund";
+import Privacy from "@/pages/legal/Privacy";
 
 const queryClient = new QueryClient();
 
