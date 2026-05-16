@@ -13,7 +13,7 @@ const Privacy = () => (
     <ul>
       <li>상호: (주)더레이어코퍼레이션 (The Layer Corporation Co., Ltd.)</li>
       <li>서비스: Heritage Layer (heritagelayer.com)</li>
-      <li>개인정보 보호 문의: contact@heritagelayer.com</li>
+      <li>개인정보 보호 문의: contact@thelayercorp.com</li>
     </ul>
     <p>회사는 본 처리방침에서 정한 범위 내에서 개인정보 처리자(data controller)로서의 책임을 부담합니다.</p>
 
@@ -84,7 +84,7 @@ const Privacy = () => (
       <li>마케팅 수신 동의 철회</li>
     </ul>
     <p>
-      위 권리는 마이페이지 또는 contact@heritagelayer.com으로 신청하실 수 있으며, 회사는 신청 접수 후 지체 없이(최대 30일
+      위 권리는 마이페이지 또는 contact@thelayercorp.com으로 신청하실 수 있으며, 회사는 신청 접수 후 지체 없이(최대 30일
       이내) 조치합니다. 이용자는 또한 대한민국 개인정보 보호위원회(privacy.go.kr) 등 관할 감독기관에 민원을 제기할 권리가
       있습니다.
     </p>
@@ -122,7 +122,7 @@ const Privacy = () => (
 
     <h2>11. 문의</h2>
     <ul>
-      <li>개인정보 보호 담당: contact@heritagelayer.com</li>
+      <li>개인정보 보호 담당: contact@thelayercorp.com</li>
       <li>결제 관련 개인정보 처리: Paddle.com Market Limited (privacy@paddle.com)</li>
     </ul>
   </LegalLayout>
