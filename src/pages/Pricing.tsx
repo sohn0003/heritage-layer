@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, X, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import AuthModal from '@/components/common/AuthModal';
 
 type TierKey = 'free' | 'pro' | 'enterprise';
 type EnterpriseBilling = 'monthly' | 'yearly';
@@ -46,11 +47,13 @@ const Pricing = () => {
   const { user, subscriptionTier } = useAuth();
   const { openCheckout, loading } = usePaddleCheckout();
   const [entBilling, setEntBilling] = useState<EnterpriseBilling>('monthly');
+  const [authOpen, setAuthOpen] = useState(false);
   const currentTier: TierKey = subscriptionTier;
 
   const startCheckout = async (priceId: string) => {
     if (!user) {
-      navigate('/about');
+      toast.info('구독을 시작하려면 먼저 로그인해 주세요.');
+      setAuthOpen(true);
       return;
     }
     try {
@@ -86,7 +89,7 @@ const Pricing = () => {
       target: '진입 채널 · 모든 사용자',
       cta: {
         label: currentTier !== 'free' ? '상위 플랜 이용 중' : user ? '현재 이용 중' : '무료로 시작하기',
-        onClick: () => !user && navigate('/about'),
+        onClick: () => !user && setAuthOpen(true),
         disabled: !!user,
         variant: 'outline',
       },
@@ -241,6 +244,7 @@ const Pricing = () => {
           <p>Enterprise는 계약 기반으로 운영되며, 문의 후 별도 안내드립니다.</p>
         </div>
       </div>
+      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 };
