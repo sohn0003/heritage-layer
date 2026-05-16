@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/common/Navbar";
+import { PaymentTestModeBanner } from "@/components/common/PaymentTestModeBanner";
 import Home from "@/pages/Home";
 import Properties from "@/pages/Properties";
 import Analysis from "@/pages/Analysis";
@@ -26,6 +27,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <PaymentTestModeBanner />
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
