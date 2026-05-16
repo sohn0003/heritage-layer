@@ -25,7 +25,7 @@ const Refund = () => (
         이메일로 로그인 → 거래 내역에서 "Request a refund"
       </li>
       <li>
-        <strong>이메일 문의</strong>: contact@heritagelayer.com으로 결제 이메일, 거래 ID, 환불 사유(선택)를 보내주시면
+        <strong>이메일 문의</strong>: contact@thelayercorp.com으로 결제 이메일, 거래 ID, 환불 사유(선택)를 보내주시면
         영업일 기준 3일 이내에 처리해 드립니다.
       </li>
     </ul>
@@ -58,7 +58,7 @@ const Refund = () => (
 
     <h2>7. 문의</h2>
     <ul>
-      <li>이메일: contact@heritagelayer.com</li>
+      <li>이메일: contact@thelayercorp.com</li>
       <li>Paddle: <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
     </ul>
   </LegalLayout>

@@ -823,8 +823,7 @@ const HomePage = () => {
           </div>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</p>
-            <p className="flex items-center gap-2"><Phone className="h-4 w-4" /> 010-0000-0000</p>
-            <p className="flex items-center gap-2"><Mail className="h-4 w-4" /> contact@heritagelayer.com</p>
+            <p className="flex items-center gap-2"><Mail className="h-4 w-4" /> contact@thelayercorp.com</p>
           </div>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Service</p>

@@ -135,7 +135,7 @@ const Terms = () => (
     <ul>
       <li>상호: (주)더레이어코퍼레이션 (The Layer Corporation Co., Ltd.)</li>
       <li>서비스명: Heritage Layer (heritagelayer.com)</li>
-      <li>문의: contact@heritagelayer.com</li>
+      <li>문의: contact@thelayercorp.com</li>
       <li>결제·환불 관련 문의: <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
     </ul>
   </LegalLayout>
