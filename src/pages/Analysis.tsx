@@ -50,8 +50,8 @@ const AnalysisPage = () => {
   const [searchParams] = useSearchParams();
   const assetId = searchParams.get('id');
   const navigate = useNavigate();
-  const { user, subscriptionTier } = useAuth();
-  const isPro = subscriptionTier === 'pro';
+  const { user, hasProAccess } = useAuth();
+  const isPro = hasProAccess;
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);

@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, FileText, User, Crown, ArrowRight, Inbox } from 'lucide-react';
+import SubscriptionCard from '@/components/mypage/SubscriptionCard';
+import { tierLabel } from '@/lib/entitlements';
+import { toast } from 'sonner';
 
 interface SavedAsset {
   id: string;
@@ -18,10 +21,29 @@ interface SavedAsset {
 }
 
 const Mypage = () => {
-  const { user, subscriptionTier, isAdmin, loading } = useAuth();
+  const { user, subscriptionTier, hasProAccess, isAdmin, loading, refreshTier } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [savedAssets, setSavedAssets] = useState<SavedAsset[]>([]);
   const [profileName, setProfileName] = useState<string>('');
+  const [subRefreshKey, setSubRefreshKey] = useState(0);
+
+  // 결제 완료 후 리다이렉트 처리 — Realtime이 누락될 경우를 대비한 보장 refetch
+  useEffect(() => {
+    if (searchParams.get('checkout') === 'success') {
+      toast.success('구독이 활성화되었습니다.', { description: '결제 정보가 곧 반영됩니다.' });
+      const tryRefresh = async (delay: number) => {
+        setTimeout(async () => {
+          await refreshTier();
+          setSubRefreshKey(k => k + 1);
+        }, delay);
+      };
+      tryRefresh(1500);
+      tryRefresh(5000);
+      searchParams.delete('checkout');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, refreshTier]);
 
   useEffect(() => {
     if (!user) return;
