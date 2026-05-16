@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, ArrowRight, Compass, Wrench, Crown } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Check, ArrowRight, Compass, Wrench, Crown, CheckCircle2 } from 'lucide-react';
+import BridgeInquiryForm, { type BridgeLevel } from '@/components/common/BridgeInquiryForm';
 
 interface Level {
   key: 'L1' | 'L2' | 'L3';
@@ -75,6 +78,14 @@ const processSteps = [
 
 const Bridge = () => {
   const navigate = useNavigate();
+  const [inquiryOpen, setInquiryOpen] = useState(false);
+  const [inquiryLevel, setInquiryLevel] = useState<BridgeLevel>('L1');
+  const [successOpen, setSuccessOpen] = useState(false);
+
+  const openInquiry = (lvl: BridgeLevel = 'L1') => {
+    setInquiryLevel(lvl);
+    setInquiryOpen(true);
+  };
 
   return (
     <div className="min-h-screen pt-20">
@@ -93,7 +104,7 @@ const Bridge = () => {
             사업성 검토부터 인허가·금융 조달, 전체 PM까지 — 필요한 만큼 선택하세요.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" variant="secondary" onClick={() => navigate('/contact')}>
+            <Button size="lg" variant="secondary" onClick={() => openInquiry('L1')}>
               프로젝트 상담 신청
             </Button>
             <Button
@@ -214,10 +225,47 @@ const Bridge = () => {
         <p className="mt-3 text-muted-foreground">
           자산 주소와 개요만 알려주시면, 가장 적합한 레벨을 제안드립니다.
         </p>
-        <Button size="lg" className="mt-6" onClick={() => navigate('/contact')}>
+        <Button size="lg" className="mt-6" onClick={() => openInquiry('L1')}>
           상담 신청하기 <ArrowRight className="ml-1 h-4 w-4" />
         </Button>
       </section>
+
+      {/* Bridge Solution 의뢰 Dialog */}
+      <Dialog open={inquiryOpen} onOpenChange={setInquiryOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Bridge Solution 의뢰</DialogTitle>
+            <DialogDescription>
+              희망 레벨과 프로젝트 정보를 알려주시면 담당자가 빠르게 안내드립니다.
+            </DialogDescription>
+          </DialogHeader>
+          <BridgeInquiryForm
+            defaultLevel={inquiryLevel}
+            onSuccess={() => {
+              setInquiryOpen(false);
+              setSuccessOpen(true);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-accent/15">
+              <CheckCircle2 className="h-8 w-8 text-accent" />
+            </div>
+            <DialogTitle className="text-center text-xl">문의가 접수되었습니다</DialogTitle>
+            <DialogDescription className="text-center">
+              담당자가 순차적으로 안내 연락을 드리겠습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button className="w-full" onClick={() => setSuccessOpen(false)}>확인</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

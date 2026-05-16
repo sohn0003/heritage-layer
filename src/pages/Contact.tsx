@@ -9,10 +9,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Mail, Building2, FileQuestion, CheckCircle2 } from 'lucide-react';
+import BridgeInquiryForm from '@/components/common/BridgeInquiryForm';
 
 const inquiryTypes = [
-  { v: 'asset_report', l: '매물 제보' },
-  { v: 'pm_request', l: '유휴자산 개발 PM 의뢰' },
+  { v: 'asset_report', l: '유휴자산 등록 의뢰' },
+  { v: 'bridge_solution', l: 'Bridge Solution 의뢰' },
 ];
 
 const ContactPage = () => {
@@ -54,11 +55,10 @@ const ContactPage = () => {
           <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Contact</span>
           <h1 className="mt-3 text-3xl font-bold md:text-4xl">문의하기</h1>
           <p className="mt-3 text-muted-foreground">
-            매물 제보 또는 유휴자산 개발 PM 의뢰를 남겨주세요. 담당자가 빠르게 안내드립니다.
+            유휴자산 등록 또는 Bridge Solution 의뢰를 남겨주세요. 담당자가 빠르게 안내드립니다.
           </p>
         </div>
 
-        {/* Contact info chips */}
         <div className="mb-8">
           <div className="flex items-center gap-3 rounded-xl border bg-card/60 p-4 backdrop-blur">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15">
@@ -73,72 +73,71 @@ const ContactPage = () => {
 
         <Card>
           <CardContent className="p-6 md:p-8">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <FileQuestion className="h-4 w-4 text-accent" /> 문의 항목 *
-                </Label>
-                <Select value={type} onValueChange={setType}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {inquiryTypes.map((t) => (
-                      <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="mb-5 space-y-2">
+              <Label className="flex items-center gap-2">
+                <FileQuestion className="h-4 w-4 text-accent" /> 문의 항목 *
+              </Label>
+              <Select value={type} onValueChange={setType}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {inquiryTypes.map((t) => (
+                    <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="name">이름 *</Label>
-                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} required />
+            {type === 'bridge_solution' ? (
+              <BridgeInquiryForm onSuccess={() => setSuccessOpen(true)} />
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">이름 *</Label>
+                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="org" className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4 text-muted-foreground" /> 소속 (선택)
+                    </Label>
+                    <Input id="org" value={organization} onChange={(e) => setOrganization(e.target.value)} maxLength={200} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="org" className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-muted-foreground" /> 소속 (선택)
-                  </Label>
-                  <Input id="org" value={organization} onChange={(e) => setOrganization(e.target.value)} maxLength={200} />
-                </div>
-              </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="phone">연락처 *</Label>
-                  <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={50} placeholder="010-0000-0000" required />
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">연락처 *</Label>
+                    <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={50} placeholder="010-0000-0000" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">이메일 *</Label>
+                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={100} placeholder="email@example.com" required />
+                  </div>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="email">이메일 *</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={100} placeholder="email@example.com" required />
+                  <Label htmlFor="message">문의 내용 *</Label>
+                  <Textarea
+                    id="message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    rows={6}
+                    maxLength={2000}
+                    required
+                    placeholder="제보하실 자산의 위치, 유형, 특이사항 등을 자유롭게 작성해주세요."
+                  />
+                  <p className="text-right text-xs text-muted-foreground">{message.length}/2000</p>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="message">문의 내용 *</Label>
-                <Textarea
-                  id="message"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  rows={6}
-                  maxLength={2000}
-                  required
-                  placeholder={
-                    type === 'asset_report'
-                      ? '제보하실 자산의 위치, 유형, 특이사항 등을 자유롭게 작성해주세요.'
-                      : '의뢰하실 자산 정보와 검토하고자 하는 개발 방향을 알려주세요.'
-                  }
-                />
-                <p className="text-right text-xs text-muted-foreground">{message.length}/2000</p>
-              </div>
-
-              <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                {loading ? '접수 중...' : '문의하기'}
-              </Button>
-            </form>
+                <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                  {loading ? '접수 중...' : '문의하기'}
+                </Button>
+              </form>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Success dialog */}
       <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
