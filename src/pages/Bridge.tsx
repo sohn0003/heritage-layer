@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, ArrowRight, Compass, Wrench, Crown } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Check, ArrowRight, Compass, Wrench, Crown, CheckCircle2 } from 'lucide-react';
+import BridgeInquiryForm, { type BridgeLevel } from '@/components/common/BridgeInquiryForm';
 
 interface Level {
   key: 'L1' | 'L2' | 'L3';
