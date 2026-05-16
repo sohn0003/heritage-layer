@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, FileText, User, Crown, ArrowRight, Inbox } from 'lucide-react';
+import SubscriptionCard from '@/components/mypage/SubscriptionCard';
+import { tierLabel } from '@/lib/entitlements';
+import { toast } from 'sonner';
 
 interface SavedAsset {
   id: string;
@@ -18,10 +21,29 @@ interface SavedAsset {
 }
 
 const Mypage = () => {
-  const { user, subscriptionTier, isAdmin, loading } = useAuth();
+  const { user, subscriptionTier, hasProAccess, isAdmin, loading, refreshTier } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [savedAssets, setSavedAssets] = useState<SavedAsset[]>([]);
   const [profileName, setProfileName] = useState<string>('');
+  const [subRefreshKey, setSubRefreshKey] = useState(0);
+
+  // 결제 완료 후 리다이렉트 처리 — Realtime이 누락될 경우를 대비한 보장 refetch
+  useEffect(() => {
+    if (searchParams.get('checkout') === 'success') {
+      toast.success('구독이 활성화되었습니다.', { description: '결제 정보가 곧 반영됩니다.' });
+      const tryRefresh = async (delay: number) => {
+        setTimeout(async () => {
+          await refreshTier();
+          setSubRefreshKey(k => k + 1);
+        }, delay);
+      };
+      tryRefresh(1500);
+      tryRefresh(5000);
+      searchParams.delete('checkout');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, refreshTier]);
 
   useEffect(() => {
     if (!user) return;
@@ -80,7 +102,8 @@ const Mypage = () => {
     );
   }
 
-  const isPro = subscriptionTier === 'pro';
+  const isPro = hasProAccess;
+  const planLabel = tierLabel(subscriptionTier);
 
   const savedReports: { id: string; title: string; date: string }[] = [];
 
@@ -93,7 +116,7 @@ const Mypage = () => {
           <div className="flex items-center gap-2 rounded-full border border-border px-3 py-1 text-sm">
             <Crown className={`h-4 w-4 ${isPro ? 'text-accent' : 'text-muted-foreground'}`} />
             <span className={isPro ? 'text-accent font-medium' : 'text-muted-foreground'}>
-              {isPro ? 'Pro' : 'Free'}
+              {planLabel}
             </span>
           </div>
         </div>
@@ -118,11 +141,14 @@ const Mypage = () => {
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">구독 등급</span>
               <span className={`text-sm font-medium ${isPro ? 'text-accent' : ''}`}>
-                {isPro ? 'Pro' : 'Free'}
+                {planLabel}
               </span>
             </div>
           </CardContent>
         </Card>
+
+        {/* Subscription Management */}
+        <SubscriptionCard refreshKey={subRefreshKey} />
 
         {/* Admin: Deal Interest Inbox */}
         {isAdmin && (
