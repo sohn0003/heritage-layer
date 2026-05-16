@@ -49,11 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .eq('user_id', session.user.id);
           const admin = roles?.some(r => r.role === 'admin') ?? false;
           setIsAdmin(admin);
-          // Admin은 자동으로 Pro 권한 부여
+          // Admin은 자동으로 Enterprise 권한 부여
           if (admin) {
-            setSubscriptionTier('pro');
+            setSubscriptionTier('enterprise');
           } else if (profile) {
-            setSubscriptionTier(profile.subscription_tier as 'free' | 'pro');
+            setSubscriptionTier(profile.subscription_tier as 'free' | 'pro' | 'enterprise');
           }
         }, 0);
       } else {
