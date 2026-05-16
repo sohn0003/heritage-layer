@@ -94,10 +94,12 @@ const Pricing = () => {
       target: '중소 시행사 · 패밀리 오피스 · 자산운용사 · 기관 투자자',
       badge: '기업·기관',
       cta: {
-        label: currentTier === 'enterprise' ? '이용 중' : '문의하기',
-        onClick: () => navigate('/contact'),
+        label: currentTier === 'enterprise' ? '이용 중' : 'Enterprise 구독 시작하기',
+        onClick: () => {
+          if (!user) navigate('/about');
+          // 결제 연동 예정
+        },
         disabled: currentTier === 'enterprise',
-        variant: 'outline',
       },
     },
   ];
