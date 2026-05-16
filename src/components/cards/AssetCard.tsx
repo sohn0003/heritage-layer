@@ -34,7 +34,7 @@ const ASSET_ICONS: Record<string, React.ComponentType<{ className?: string }>> =
 };
 
 const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
-  const { user } = useAuth();
+  const { user, subscriptionTier } = useAuth();
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
