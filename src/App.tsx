@@ -43,6 +43,9 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin/properties" element={<AdminProperties />} />
             <Route path="/admin/signals" element={<AdminDealSignals />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/refund" element={<Refund />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
