@@ -6,7 +6,7 @@ import NaverMap from '@/components/map/NaverMap';
 import { supabase } from '@/integrations/supabase/client';
 import {
   ArrowRight, Search, Brain, Handshake, School, Home as HomeIcon,
-  Building2, TrendingDown, Mail, Phone, MapPin, Sparkles, BarChart3,
+  Building2, TrendingDown, Mail, MapPin, Sparkles, BarChart3,
   Database, Layers, ChevronDown,
 } from 'lucide-react';
 
