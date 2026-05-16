@@ -42,7 +42,26 @@ const renderCell = (v: boolean | string) => {
 const Pricing = () => {
   const navigate = useNavigate();
   const { user, subscriptionTier } = useAuth();
+  const { openCheckout, loading } = usePaddleCheckout();
   const currentTier: TierKey = subscriptionTier;
+
+  const startCheckout = async (priceId: string) => {
+    if (!user) {
+      navigate('/about');
+      return;
+    }
+    try {
+      await openCheckout({
+        priceId,
+        customerEmail: user.email,
+        customData: { userId: user.id },
+        successUrl: `${window.location.origin}/mypage?checkout=success`,
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : '결제 창을 열 수 없습니다.';
+      toast.error(msg);
+    }
+  };
 
   const tiers: Array<{
     key: TierKey;
@@ -79,12 +98,11 @@ const Pricing = () => {
       badge: '추천',
       highlight: true,
       cta: {
-        label: currentTier === 'pro' || currentTier === 'enterprise' ? '이용 중' : 'Pro 구독 시작하기',
-        onClick: () => {
-          if (!user) navigate('/about');
-          // 결제 연동 예정
-        },
-        disabled: currentTier === 'pro' || currentTier === 'enterprise',
+        label: currentTier === 'pro' || currentTier === 'enterprise'
+          ? '이용 중'
+          : loading ? '결제창 여는 중...' : 'Pro 구독 시작하기',
+        onClick: () => startCheckout('pro_monthly'),
+        disabled: currentTier === 'pro' || currentTier === 'enterprise' || loading,
       },
     },
     {
@@ -96,12 +114,11 @@ const Pricing = () => {
       target: '중소 시행사 · 패밀리 오피스 · 자산운용사 · 기관 투자자',
       badge: '기업·기관',
       cta: {
-        label: currentTier === 'enterprise' ? '이용 중' : 'Enterprise 구독 시작하기',
-        onClick: () => {
-          if (!user) navigate('/about');
-          // 결제 연동 예정
-        },
-        disabled: currentTier === 'enterprise',
+        label: currentTier === 'enterprise'
+          ? '이용 중'
+          : loading ? '결제창 여는 중...' : 'Enterprise 구독 시작하기',
+        onClick: () => startCheckout('enterprise_monthly'),
+        disabled: currentTier === 'enterprise' || loading,
       },
     },
   ];
