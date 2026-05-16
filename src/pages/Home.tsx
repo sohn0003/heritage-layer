@@ -833,8 +833,16 @@ const HomePage = () => {
             <button onClick={() => navigate('/pricing')} className="block hover:text-foreground">요금 안내</button>
           </div>
         </div>
-        <div className="mx-auto mt-10 max-w-5xl border-t pt-6 text-center text-xs text-muted-foreground">
-          © 2025 더레이어코퍼레이션 (The Layer Corporation). All rights reserved.
+        <div className="mx-auto mt-10 max-w-5xl border-t pt-6 flex flex-col items-center gap-3 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <button onClick={() => navigate('/terms')} className="hover:text-foreground">이용약관</button>
+            <span className="opacity-40">·</span>
+            <button onClick={() => navigate('/privacy')} className="hover:text-foreground">개인정보 처리방침</button>
+            <span className="opacity-40">·</span>
+            <button onClick={() => navigate('/refund')} className="hover:text-foreground">환불 정책</button>
+          </div>
+          <p>© 2025 (주)더레이어코퍼레이션 (The Layer Corporation Co., Ltd.). All rights reserved.</p>
+          <p className="opacity-70">Our order process is conducted by our online reseller Paddle.com, which is the Merchant of Record for all our orders.</p>
         </div>
       </footer>
     </div>

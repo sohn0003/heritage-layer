@@ -17,6 +17,9 @@ import Contact from "@/pages/Contact";
 import AdminProperties from "@/pages/admin/AdminProperties";
 import AdminDealSignals from "@/pages/admin/AdminDealSignals";
 import NotFound from "@/pages/NotFound";
+import Terms from "@/pages/legal/Terms";
+import Refund from "@/pages/legal/Refund";
+import Privacy from "@/pages/legal/Privacy";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +43,9 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin/properties" element={<AdminProperties />} />
             <Route path="/admin/signals" element={<AdminDealSignals />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/refund" element={<Refund />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
