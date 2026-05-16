@@ -11,6 +11,7 @@ import Analysis from "@/pages/Analysis";
 import About from "@/pages/About";
 import Mypage from "@/pages/Mypage";
 import Pricing from "@/pages/Pricing";
+import Bridge from "@/pages/Bridge";
 import Contact from "@/pages/Contact";
 import AdminProperties from "@/pages/admin/AdminProperties";
 import AdminDealSignals from "@/pages/admin/AdminDealSignals";
