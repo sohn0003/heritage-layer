@@ -89,7 +89,7 @@ const Pricing = () => {
       target: '진입 채널 · 모든 사용자',
       cta: {
         label: currentTier !== 'free' ? '상위 플랜 이용 중' : user ? '현재 이용 중' : '무료로 시작하기',
-        onClick: () => !user && navigate('/about'),
+        onClick: () => !user && setAuthOpen(true),
         disabled: !!user,
         variant: 'outline',
       },
