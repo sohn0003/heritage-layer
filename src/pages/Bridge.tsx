@@ -78,6 +78,14 @@ const processSteps = [
 
 const Bridge = () => {
   const navigate = useNavigate();
+  const [inquiryOpen, setInquiryOpen] = useState(false);
+  const [inquiryLevel, setInquiryLevel] = useState<BridgeLevel>('L1');
+  const [successOpen, setSuccessOpen] = useState(false);
+
+  const openInquiry = (lvl: BridgeLevel = 'L1') => {
+    setInquiryLevel(lvl);
+    setInquiryOpen(true);
+  };
 
   return (
     <div className="min-h-screen pt-20">
