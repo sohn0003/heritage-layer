@@ -6,7 +6,7 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   isAdmin: boolean;
-  subscriptionTier: 'free' | 'pro';
+  subscriptionTier: 'free' | 'pro' | 'enterprise';
   loading: boolean;
   signOut: () => Promise<void>;
 }
