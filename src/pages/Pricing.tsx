@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePaddleCheckout } from '@/hooks/usePaddleCheckout';
@@ -7,6 +8,7 @@ import { Check, X, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 type TierKey = 'free' | 'pro' | 'enterprise';
+type EnterpriseBilling = 'monthly' | 'yearly';
 
 interface FeatureRow {
   label: string;
@@ -43,6 +45,7 @@ const Pricing = () => {
   const navigate = useNavigate();
   const { user, subscriptionTier } = useAuth();
   const { openCheckout, loading } = usePaddleCheckout();
+  const [entBilling, setEntBilling] = useState<EnterpriseBilling>('monthly');
   const currentTier: TierKey = subscriptionTier;
 
   const startCheckout = async (priceId: string) => {
@@ -108,16 +111,16 @@ const Pricing = () => {
     {
       key: 'enterprise',
       name: 'Enterprise',
-      price: '₩300,000',
-      priceNote: '/ 월 (연간 ₩3,000,000)',
+      price: entBilling === 'yearly' ? '₩3,000,000' : '₩300,000',
+      priceNote: entBilling === 'yearly' ? '/ 년 (약 17% 절약)' : '/ 월',
       tagline: '정보 + 실행 지원 · 현장 검증 포함',
       target: '중소 시행사 · 패밀리 오피스 · 자산운용사 · 기관 투자자',
       badge: '기업·기관',
       cta: {
         label: currentTier === 'enterprise'
           ? '이용 중'
-          : loading ? '결제창 여는 중...' : 'Enterprise 구독 시작하기',
-        onClick: () => startCheckout('enterprise_monthly'),
+          : loading ? '결제창 여는 중...' : `Enterprise ${entBilling === 'yearly' ? '연간' : '월간'} 시작하기`,
+        onClick: () => startCheckout(entBilling === 'yearly' ? 'enterprise_yearly' : 'enterprise_monthly'),
         disabled: currentTier === 'enterprise' || loading,
       },
     },
