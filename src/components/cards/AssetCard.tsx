@@ -34,7 +34,7 @@ const ASSET_ICONS: Record<string, React.ComponentType<{ className?: string }>> =
 };
 
 const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
-  const { user } = useAuth();
+  const { user, subscriptionTier } = useAuth();
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -74,6 +74,22 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
       if (error) toast({ title: '해제 실패', description: error.message, variant: 'destructive' });
       else { setIsSaved(false); toast({ title: '저장이 해제되었습니다' }); }
     } else {
+      // Free tier: 관심자산 최대 5개 제한
+      if (subscriptionTier === 'free') {
+        const { count } = await supabase
+          .from('saved_assets')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id);
+        if ((count ?? 0) >= 5) {
+          toast({
+            title: 'Free 플랜 저장 한도 도달',
+            description: '관심 자산은 최대 5개까지 저장할 수 있어요. Pro로 업그레이드하면 무제한으로 저장할 수 있습니다.',
+            variant: 'destructive',
+          });
+          setSaving(false);
+          return;
+        }
+      }
       const { error } = await supabase.from('saved_assets').insert({ user_id: user.id, asset_id: asset.id });
       if (error && error.code !== '23505') {
         toast({ title: '저장 실패', description: error.message, variant: 'destructive' });

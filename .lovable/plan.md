@@ -1,69 +1,138 @@
-## 목표
+# Heritage Layer 구독·브릿지 리빌딩 계획
 
-관리자 페이지에서 매물 저장(신규/수정) 시 `calculateScore()`를 자동 실행하여 `scoring_grade`, `scoring_total`, `scoring_detail`을 계산·저장하고, 표시용 `grade`도 자동 동기화합니다. 수동 등급 입력 UI는 제거하고, 엑셀 업/다운로드에서도 등급 컬럼을 제외합니다.
+전달주신 정의서를 기준으로 두 가지 작업을 진행합니다. 결제 연동(토스페이먼츠)은 이번 단계에서는 다루지 않고, **구조와 화면**만 정비합니다.
 
-## 작업 범위
+---
 
-### 1. 신규 파일: `src/lib/assetScoring.ts`
-- 폼/DB 값 → `AssetInput`(scoring.ts) 매퍼
-- `calculateScoringFields(asset)` → `{ scoring_grade, scoring_total, scoring_detail, grade }` 반환
-- 저장 직전(insert/update/upsert) payload에 머지하는 헬퍼 제공
+## 1. 구독 서비스 리빌딩 (2단계 → 3단계)
 
-### 2. 값 매핑 (한글/단순값 → scoring enum)
+### 1-1. 가격 체계 변경
+
+| 구분 | 현재 | 변경 후 |
+|---|---|---|
+| Free | ₩0 | ₩0 (관심자산 **5개 제한** 명시) |
+| Pro | ₩49,000 / 월 | **₩39,000 / 월** |
+| Enterprise | 없음 | **₩300,000 / 월** (연간 ₩3,000,000) **신규** |
+
+### 1-2. Pricing 페이지 (`/pricing`) 전면 개편
+
+- 카드 레이아웃을 **3컬럼**으로 재구성 (모바일에서는 세로 스택)
+- 가운데 Pro를 "추천", 우측 Enterprise를 "기업·기관 추천"으로 강조
+- 정의서의 **기능 비교표**(Free/Pro/Enterprise)를 그대로 반영한 풀 비교 테이블을 카드 아래에 추가
+- 각 플랜 카드에 **타깃 유저** 한 줄 설명 포함
+  - Free: "유휴자산 탐색 진입"
+  - Pro: "개인 투자자·소형 운영자"
+  - Enterprise: "기업·기관 투자자"
+- Enterprise 카드 CTA는 결제 대신 **"문의하기"** → `/contact` 이동 (계약 기반이므로 결제 전 상담 필수)
+- Pro 카드 CTA는 "Pro 구독 시작하기" (결제 미연동 상태이므로 현재는 비활성 또는 추후 결제 연결 자리만 마련)
+- 하단에 "실행 지원이 필요하신가요? **Bridge Solution 보러가기**" 링크 배너 추가
+
+### 1-3. 권한 체계 확장
+
+- `subscription_tier`: `'free' | 'pro'` → **`'free' | 'pro' | 'enterprise'`**
+- DB `profiles.subscription_tier` 컬럼은 text라 스키마 변경 불필요. **AuthContext 타입만 확장**
+- Admin은 자동 Enterprise 권한 부여
+- 기존 `ProLockOverlay`는 "Pro 이상" 잠금 / Enterprise 전용 콘텐츠가 생기면 추후 별도 처리 (이번 단계에서는 Pro = Enterprise 동일 권한으로 처리)
+
+### 1-4. Free 5개 제한 (선택 사항)
+
+- 정의서상 Free는 **관심자산 저장 최대 5개**
+- `saved_assets` 저장 시 클라이언트에서 `subscription_tier === 'free'`이고 5개 이상이면 토스트로 "Pro 업그레이드 안내"
+- (RLS 기반 강제 제한은 이번 단계 범위 밖, 추후 트리거로 보강 가능)
+
+---
+
+## 2. Bridge Solution 설명 페이지 신규 추가
+
+### 2-1. 라우트 및 네비게이션
+
+- 신규 페이지: `/bridge` → `src/pages/Bridge.tsx`
+- Navbar 메뉴에 **"Bridge Solution"** 항목 추가 (About / Properties / **Bridge** / Contact 순)
+- 모바일 메뉴도 동일 반영
+
+### 2-2. 페이지 구성 (단일 페이지, 풀 스크롤)
 
 ```text
-building_condition:
-  양호 → remodel_possible
-  보통 → partial_reinforcement
-  노후 → major_repair
-  심각 → demolish_rebuild
-
-historical_value:
-  상 → registered_heritage
-  중 → architectural_art
-  하 → ordinary
-
-natural_scenery:
-  상 → waterfront_view
-  중 → good_nature
-  하 → ordinary_urban
-
-zoning_upgrade_gain / use_change_expansion:
-  높음 → over_50 / major
-  중간 → between_20_50 / minor
-  낮음 → under_20 / minor
-  없음 → impossible / none
-
-zoning(자유 텍스트): 키워드 매칭
-  포함 "중심상업"→commercial_central, "근린상업"→commercial_neighborhood,
-  "일반상업"/"상업"→commercial_general, "준주거"→semi_residential,
-  "2종"→residential_2nd, "3종"→residential_3rd, "1종"→residential_1st,
-  "준공업"→semi_industrial, "자연녹지"→green_natural,
-  "생산녹지"→green_production, "보전녹지"→green_conservation,
-  "농림"→agricultural, "자연환경보전"→nature_conservation
-  매칭 실패 시 residential_2nd 기본값
+┌─────────────────────────────────────────┐
+│ Hero                                     │
+│  "정보를 넘어, 실행까지"                  │
+│  Bridge Solution = 프로젝트 단위 실행 지원 │
+│  구독은 정보 / Bridge는 실행 (대비 카피)   │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│ Why Bridge — 구독 vs Bridge 비교 카드    │
+│  ┌─────────────┐  ┌──────────────────┐   │
+│  │ 구독 서비스  │  │ Bridge Solution  │   │
+│  │ 정보 접근권  │  │ 실행 지원        │   │
+│  │ 월정액      │  │ 프로젝트 단위     │   │
+│  └─────────────┘  └──────────────────┘   │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│ 3 Levels — Level 1 / 2 / 3 카드 3개      │
+│  각 카드: 레벨명 · 가격 · 타깃 · 핵심 역할 │
+│           · 포함 항목 리스트              │
+│  Level 2/3 카드에는 "+성공보수" 뱃지       │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│ 고객 유형별 추천 매트릭스 (정의서 표)      │
+│  고객유형 / 구독 레벨 / 브릿지 레벨 / 비고 │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│ Process — 4 step 타임라인                │
+│  ① 상담 신청 → ② 자산 검토 → ③ 계약·착수 │
+│  → ④ 실행·정산                           │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│ CTA — "프로젝트 상담 신청하기"            │
+│  /contact 이동 (PartnerForm 활용)         │
+└─────────────────────────────────────────┘
 ```
 
-- 누락 숫자값(현재 건폐율/용적률 등)은 0 처리 또는 가능하면 `building_coverage`/`floor_area_ratio`로 대체
-- `ownership_type === '사유'` → `isPrivateLand: true`, 그 외 `isPublicAsset: true`
-- `estimatedROI`: 현재 폼/DB에 없음 → IRR 결과(`irr_result`)가 있으면 거기서 추출, 없으면 7로 기본 설정 (D2 중간점)
+### 2-3. 3개 레벨 카드 상세 내용 (정의서 그대로)
 
-### 3. `src/pages/admin/AdminProperties.tsx` 수정
-- `handleSave`에서 payload 구성 직후 `calculateScoringFields(payload)` 호출, 결과를 payload에 병합 후 insert/update
-- 등급 Select UI 제거 (수동 입력 차단), `grade` 칼럼은 자동값
-- 폼/`emptyForm`에서 `grade` 필드 제거
-- 테이블의 "등급" 컬럼은 그대로 유지(자동 계산값 표시)
-- 안내문 "점수 및 IRR은 알고리즘이 자동 계산합니다" 유지/강화
+- **Level 1 사업성 검토 자문** — ₩500만~1,000만 (고정) / 소형 투자자·첫 개발 도전자
+  - 알고리즘 분석 해설, 개발 방향 타당성, 투자비 개략 산출, 우선협상 전략, A4 10~15장 보고서
+- **Level 2 착수 지원** — ₩1,500만~3,000만 + **성공보수** / 중소 시행사·인허가/금융 역량 부족 투자자
+  - Level 1 포함, 인허가 사전 검토, 지자체 사전 협의 동행, PF/자본조달 설계, 금융기관 제안서, 금융기관 소개 (조달액 0.5~1%)
+- **Level 3 전체 PM** — 개발비의 **3~5%** / 패밀리 오피스·전체 위탁 기업
+  - 예산 수립·관리, 공정 스케줄, 업체 선정·관리, 인허가 컨설팅, PF 구조 관리, Level 2 연계
 
-### 4. `src/lib/assetExcel.ts` 수정
-- `ASSET_COLUMNS`에서 `grade`, `scoring_grade`, `scoring_total`, `scoring_detail`, `scoring_*` 자동계산 컬럼을 export 대상에서 제외 (이미 일부 제외돼 있으면 `grade`도 추가)
-- 임포트 시에도 무시 (업서트 후 한 건씩 또는 일괄 재계산하여 `grade/scoring_*` 채움)
-- 임포트 루프에서 각 행 업서트 직후 `calculateScoringFields` 적용
+### 2-4. 디자인 톤
 
-### 5. (선택) 일회성: 기존 데이터 재계산
-- 추후 별도 요청 시 처리(이번 작업에서는 신규 저장/엑셀 업로드부터 적용)
+- 기존 디자인 시스템(navy `#1B2E4A`, gold `#D4952B`, Playfair + Noto Sans KR) 유지
+- 레벨 카드는 골드 액센트 보더 + 호버 시 lift
+- 비교/매트릭스 표는 `Card` + `Table` 컴포넌트 활용
 
-## 영향 범위
-- DB 스키마 변경 없음
-- `src/algorithm/scoring/scoring.ts` 변경 없음(요청대로 유지)
-- 변경 파일: `src/pages/admin/AdminProperties.tsx`, `src/lib/assetExcel.ts`, 신규 `src/lib/assetScoring.ts`
+---
+
+## 3. 변경 파일 목록
+
+**수정**
+- `src/pages/Pricing.tsx` — 3컬럼 + 풀 비교표 + Bridge 링크
+- `src/contexts/AuthContext.tsx` — `subscriptionTier` 타입 `'enterprise'` 추가
+- `src/components/common/Navbar.tsx` — Bridge 메뉴 추가
+- `src/App.tsx` — `/bridge` 라우트 추가
+- `src/components/cards/AssetCard.tsx` 또는 저장 로직 위치 — Free 5개 제한 토스트 (해당 코드 확인 후 적용)
+
+**신규**
+- `src/pages/Bridge.tsx`
+- (필요 시) `src/components/bridge/LevelCard.tsx`, `CustomerMatrix.tsx` 등 분리
+
+---
+
+## 4. 이번 범위에서 제외 (별도 진행)
+
+- 토스페이먼츠 결제 연동 — 이전 답변의 절차대로 가맹점 가입·정기결제 승인 완료 후 진행
+- Enterprise 전용 콘텐츠 잠금 (벌크 분석, 자산 검증 리포트 UI 등) — 데이터/알고리즘 준비 후 별도 작업
+- Free 5개 제한의 서버사이드 강제(트리거)
+
+---
+
+## 확인 요청
+
+진행 전 두 가지만 확정해 주세요.
+
+1. **Enterprise 카드 CTA**: "문의하기 → /contact" 방향으로 진행해도 될까요? (계약 기반이므로 결제보다 상담이 자연스럽습니다)
+2. **Pro 가격 변경(₩49,000 → ₩39,000)**: 정의서대로 인하 진행할까요? 기존 구독자가 없는 상태이므로 즉시 적용 가능합니다.
+
+위 두 가지가 OK이면 바로 구현 들어가겠습니다.
