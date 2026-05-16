@@ -244,6 +244,7 @@ const Pricing = () => {
           <p>Enterprise는 계약 기반으로 운영되며, 문의 후 별도 안내드립니다.</p>
         </div>
       </div>
+      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 };
