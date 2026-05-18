@@ -1,7 +1,14 @@
 import LegalLayout from '@/components/legal/LegalLayout';
+import Seo from '@/components/common/Seo';
 
 const Privacy = () => (
-  <LegalLayout title="개인정보 처리방침 (Privacy Notice)">
+  <>
+    <Seo
+      title="개인정보 처리방침 — Heritage Layer"
+      description="Heritage Layer 개인정보 처리방침."
+      path="/privacy"
+    />
+    <LegalLayout title="개인정보 처리방침 (Privacy Notice)">
     <p>
       <strong>(주)더레이어코퍼레이션 (The Layer Corporation Co., Ltd.)</strong>(이하 "회사")은(는) Heritage Layer
       서비스(이하 "서비스")의 이용과 관련하여 이용자의 개인정보를 중요시하며, 「개인정보 보호법」 등 관련 법령을
