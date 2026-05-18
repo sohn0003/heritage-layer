@@ -845,7 +845,7 @@ const HomePage = () => {
           background:
             'radial-gradient(1000px 500px at 80% 0%, hsl(35 60% 22%) 0%, transparent 60%),' +
             'radial-gradient(900px 500px at 15% 90%, hsl(220 50% 18%) 0%, transparent 55%),' +
-            'linear-gradient(180deg, hsl(220 35% 10%) 0%, hsl(220 40% 8%) 100%)',
+            'linear-gradient(180deg, hsl(220 25% 6%) 0%, hsl(220 38% 10%) 20%, hsl(220 38% 10%) 80%, hsl(220 25% 6%) 100%)',
         }}
       >
         {/* 미세 그리드 */}
