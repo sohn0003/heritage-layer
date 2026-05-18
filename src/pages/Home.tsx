@@ -63,11 +63,15 @@ const CountUp = ({ end, duration = 2000, suffix = '', decimals = 0 }: { end: num
 };
 
 // ─── Card primitives ──────────────────────────────
-// 솔리드 화이트 카드 + 입체 그림자 (가독성 우선)
+// 솔리드 화이트 카드 + 입체 그림자 (가독성 우선).
+// CSS 변수로 카드 내부의 text-foreground / text-muted-foreground 도 어두운 톤으로 재정의.
 const glassCardStyle: React.CSSProperties = {
   background: '#ffffff',
   border: '1px solid rgba(27, 46, 74, 0.08)',
   color: 'hsl(220 30% 12%)',
+  ['--foreground' as any]: '220 30% 12%',
+  ['--muted-foreground' as any]: '220 15% 40%',
+  ['--card-foreground' as any]: '220 30% 12%',
   boxShadow:
     '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
 };

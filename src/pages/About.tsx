@@ -50,6 +50,10 @@ const glassCardStyle: React.CSSProperties = {
   background: '#ffffff',
   border: '1px solid rgba(27, 46, 74, 0.08)',
   color: 'hsl(220 30% 12%)',
+  ['--foreground' as any]: '220 30% 12%',
+  ['--muted-foreground' as any]: '220 15% 40%',
+  ['--card-foreground' as any]: '220 30% 12%',
+  ['--muted' as any]: '220 15% 90%',
   boxShadow:
     '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
 };
