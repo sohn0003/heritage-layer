@@ -132,7 +132,8 @@ const Privacy = () => (
       <li>개인정보 보호 담당: contact@thelayercorp.com</li>
       <li>결제 관련 개인정보 처리: Paddle.com Market Limited (privacy@paddle.com)</li>
     </ul>
-  </LegalLayout>
+    </LegalLayout>
+  </>
 );
 
 export default Privacy;

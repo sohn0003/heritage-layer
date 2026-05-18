@@ -68,7 +68,8 @@ const Refund = () => (
       <li>이메일: contact@thelayercorp.com</li>
       <li>Paddle: <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
     </ul>
-  </LegalLayout>
+    </LegalLayout>
+  </>
 );
 
 export default Refund;
