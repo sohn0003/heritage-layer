@@ -300,7 +300,7 @@ const AboutPage = () => {
               { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(25 90% 55%)' },
               { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(var(--primary))' },
             ].map((s) => (
-              <div key={s.label} className="rounded-3xl p-6 text-center transition-transform hover:-translate-y-1"
+              <div key={s.label} className="rounded-2xl p-5 sm:p-6 sm:rounded-3xl text-center transition-transform hover:-translate-y-1"
                 style={glassCardStyle}>
                 <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl"
                   style={{ background: `${s.color.replace(')', ' / 0.15)')}` }}>
@@ -315,7 +315,7 @@ const AboutPage = () => {
           </div>
 
           {/* 권역 막대 */}
-          <div className="rounded-3xl p-7" style={glassCardStyle}>
+          <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
             <h3 className="mb-5 text-lg font-semibold">권역별 폐교 분포 (Top 5)</h3>
             <div className="space-y-5">
               <InsightBar label="전남" value={839} max={1000} color="hsl(0 70% 55%)" suffix="개" />
@@ -343,7 +343,7 @@ const AboutPage = () => {
               ].map((p, i) => (
                 <div
                   key={p.t}
-                  className={`flex flex-col items-center gap-6 rounded-3xl p-6 md:p-8 md:flex-row ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
+                  className={`flex flex-col items-center gap-6 rounded-2xl p-5 sm:p-6 sm:rounded-3xl md:p-8 md:flex-row ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
                   style={glassCardStyle}
                 >
                   <div

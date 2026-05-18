@@ -674,7 +674,7 @@ const HomePage = () => {
               { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(var(--accent))' },
               { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(0 70% 55%)' },
             ].map((s) => (
-              <div key={s.label} className="rounded-3xl p-6 text-center transition-transform hover:-translate-y-1" style={glassCardStyle}>
+              <div key={s.label} className="rounded-2xl p-5 sm:p-6 sm:rounded-3xl text-center transition-transform hover:-translate-y-1" style={glassCardStyle}>
                 <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl"
                   style={{ background: `${s.color.replace(')', ' / 0.15)')}` }}>
                   <s.icon className="h-7 w-7" style={{ color: s.color }} />
@@ -689,7 +689,7 @@ const HomePage = () => {
 
           {/* 두 컬럼 차트 */}
           <div className="mb-10 grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl p-7" style={glassCardStyle}>
+            <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
               <div className="mb-5 flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
                 <h3 className="text-lg font-semibold">권역별 폐교 분포 (Top 5)</h3>
@@ -704,7 +704,7 @@ const HomePage = () => {
               <p className="mt-5 text-xs text-muted-foreground">출처: 교육부 통계 (참고치)</p>
             </div>
 
-            <div className="rounded-3xl p-7" style={glassCardStyle}>
+            <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
               <div className="mb-5 flex items-center gap-2">
                 <Layers className="h-5 w-5 text-accent" />
                 <h3 className="text-lg font-semibold">소유 구분 비율</h3>
@@ -722,7 +722,7 @@ const HomePage = () => {
           </div>
 
           {/* 트렌드 차트 */}
-          <div className="rounded-3xl p-7" style={glassCardStyle}>
+          <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Database className="h-5 w-5 text-primary" />
@@ -758,7 +758,7 @@ const HomePage = () => {
             ].map((m, i) => (
               <div
                 key={i}
-                className="rounded-3xl p-6 text-center transition-transform hover:-translate-y-1"
+                className="rounded-2xl p-5 sm:p-6 sm:rounded-3xl text-center transition-transform hover:-translate-y-1"
                 style={glassCardStyle}
               >
                 <p className="text-5xl font-bold tabular-nums" style={{ color: 'hsl(var(--accent))' }}>
