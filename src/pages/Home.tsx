@@ -478,11 +478,11 @@ const Step2Graphic = () => {
         return (
           <div
             key={i}
-            className="absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl text-[10px] font-semibold transition-all duration-700"
+            className="absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl text-[10px] font-bold transition-all duration-700"
             style={{
               left: `${x}%`, top: `${y}%`,
               ...glassCardStyle,
-              color: 'hsl(var(--primary))',
+              color: 'hsl(220 65% 18%)',
               opacity: inView ? 1 : 0,
               transform: inView ? 'translate(-50%,-50%) scale(1)' : 'translate(-50%,-50%) scale(0)',
               transitionDelay: `${i * 100}ms`,
@@ -527,10 +527,10 @@ const Step3Graphic = () => {
   return (
     <div ref={ref} className="relative h-full w-full">
       <div
-        className="absolute left-2 top-1/2 flex h-20 w-20 -translate-y-1/2 flex-col items-center justify-center rounded-2xl text-[10px] font-semibold transition-all duration-700"
+        className="absolute left-2 top-1/2 flex h-20 w-20 -translate-y-1/2 flex-col items-center justify-center rounded-2xl text-[10px] font-bold transition-all duration-700"
         style={{
           ...glassCardStyle,
-          color: 'hsl(var(--primary))',
+          color: 'hsl(220 65% 18%)',
           opacity: inView ? 1 : 0,
           transform: inView ? 'translate(0,-50%)' : 'translate(-40px,-50%)',
         }}
@@ -539,10 +539,10 @@ const Step3Graphic = () => {
         지자체
       </div>
       <div
-        className="absolute right-2 top-1/2 flex h-20 w-20 -translate-y-1/2 flex-col items-center justify-center rounded-2xl text-[10px] font-semibold transition-all duration-700"
+        className="absolute right-2 top-1/2 flex h-20 w-20 -translate-y-1/2 flex-col items-center justify-center rounded-2xl text-[10px] font-bold transition-all duration-700"
         style={{
           ...glassCardStyle,
-          color: 'hsl(var(--accent))',
+          color: 'hsl(35 85% 30%)',
           opacity: inView ? 1 : 0,
           transform: inView ? 'translate(0,-50%)' : 'translate(40px,-50%)',
           transitionDelay: '150ms',
@@ -714,7 +714,7 @@ const HomePage = () => {
           background:
             'radial-gradient(1200px 600px at 20% 0%, hsl(220 50% 18%) 0%, transparent 60%),' +
             'radial-gradient(900px 500px at 85% 90%, hsl(35 60% 22%) 0%, transparent 55%),' +
-            'linear-gradient(180deg, hsl(220 40% 8%) 0%, hsl(220 35% 10%) 100%)',
+            'linear-gradient(180deg, hsl(220 25% 6%) 0%, hsl(220 38% 10%) 20%, hsl(220 38% 10%) 80%, hsl(220 25% 6%) 100%)',
         }}
       >
         {/* 애니메이트 그리드 배경 */}
@@ -845,7 +845,7 @@ const HomePage = () => {
           background:
             'radial-gradient(1000px 500px at 80% 0%, hsl(35 60% 22%) 0%, transparent 60%),' +
             'radial-gradient(900px 500px at 15% 90%, hsl(220 50% 18%) 0%, transparent 55%),' +
-            'linear-gradient(180deg, hsl(220 35% 10%) 0%, hsl(220 40% 8%) 100%)',
+            'linear-gradient(180deg, hsl(220 25% 6%) 0%, hsl(220 38% 10%) 20%, hsl(220 38% 10%) 80%, hsl(220 25% 6%) 100%)',
         }}
       >
         {/* 미세 그리드 */}

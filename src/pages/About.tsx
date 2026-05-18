@@ -373,7 +373,15 @@ const AboutPage = () => {
       </section>
 
       {/* ── MISSION: 우리는 누구인가 ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary to-primary/90 px-4 py-20 text-primary-foreground md:py-28">
+      <section
+        className="relative overflow-hidden px-4 py-20 text-[hsl(0_0%_96%)] md:py-28"
+        style={{
+          background:
+            'radial-gradient(1000px 500px at 80% 0%, hsl(35 60% 22%) 0%, transparent 60%),' +
+            'radial-gradient(900px 500px at 15% 90%, hsl(220 50% 18%) 0%, transparent 55%),' +
+            'linear-gradient(180deg, hsl(220 25% 6%) 0%, hsl(220 38% 10%) 20%, hsl(220 38% 10%) 80%, hsl(220 25% 6%) 100%)',
+        }}
+      >
         <Blob className="right-[-10%] top-10 h-96 w-96" color="hsl(40 90% 60%)" />
         <Blob className="left-[-10%] bottom-10 h-96 w-96" color="hsl(220 70% 50%)" />
         <div className="relative mx-auto max-w-3xl text-center">
