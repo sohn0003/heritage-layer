@@ -838,31 +838,72 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── METRICS: Heritage Layer 임팩트 ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
-        <Blob className="right-[10%] top-10 h-72 w-72" color="hsl(40 90% 75%)" />
-        <Blob className="left-[5%] bottom-10 h-72 w-72" color="hsl(220 60% 80%)" />
-        <div className="relative mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Impact</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">우리가 만들고 있는 변화</h2>
+      {/* ── METRICS: Heritage Layer 임팩트 (다크 / 라인 기반) ── */}
+      <section
+        className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28"
+        style={{
+          background:
+            'radial-gradient(1000px 500px at 80% 0%, hsl(35 60% 22%) 0%, transparent 60%),' +
+            'radial-gradient(900px 500px at 15% 90%, hsl(220 50% 18%) 0%, transparent 55%),' +
+            'linear-gradient(180deg, hsl(220 35% 10%) 0%, hsl(220 40% 8%) 100%)',
+        }}
+      >
+        {/* 미세 그리드 */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              'linear-gradient(hsl(0 0% 100% / 0.5) 1px, transparent 1px),' +
+              'linear-gradient(90deg, hsl(0 0% 100% / 0.5) 1px, transparent 1px)',
+            backgroundSize: '52px 52px',
+            maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
+          }}
+        />
+        <Blob className="right-[-10%] top-10 h-[420px] w-[420px]" color="hsl(40 90% 55%)" />
+        <Blob className="left-[-10%] bottom-10 h-[420px] w-[420px]" color="hsl(220 80% 60%)" />
+
+        <div className="relative mx-auto max-w-6xl text-[hsl(0_0%_96%)]">
+          <div className="mb-12 text-center sm:mb-14">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Impact</span>
+            <h2 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
+              <span className="bg-gradient-to-r from-white via-white to-[hsl(40_90%_75%)] bg-clip-text text-transparent">
+                우리가 만들고 있는 변화
+              </span>
+            </h2>
+            <p className="mt-4 text-[hsl(0_0%_75%)]">데이터가 곧 신호입니다 — 숫자로 보여드리는 Heritage Layer의 발자국.</p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+
+          {/* 4분할 - 좌측 그라데이션 라인으로만 구분 */}
+          <div
+            className="grid gap-px overflow-hidden rounded-2xl sm:grid-cols-2 lg:grid-cols-4"
+            style={{ background: 'hsl(0 0% 100% / 0.08)' }}
+          >
             {[
-              { v: 247, s: '', l: '분석 완료 자산' },
-              { v: 38,  s: '', l: '연결 진행 딜' },
-              { v: 12,  s: '', l: '협력 지자체' },
-              { v: 9.4, s: '%', l: '평균 추정 IRR', dec: 1 },
+              { v: 247, s: '',  l: '분석 완료 자산', color: 'hsl(220 90% 70%)' },
+              { v: 38,  s: '',  l: '연결 진행 딜',   color: 'hsl(40 95% 65%)' },
+              { v: 12,  s: '',  l: '협력 지자체',     color: 'hsl(160 70% 60%)' },
+              { v: 9.4, s: '%', l: '평균 추정 IRR',  color: 'hsl(0 80% 68%)', dec: 1 },
             ].map((m, i) => (
               <div
                 key={i}
-                className="rounded-2xl p-5 sm:p-6 sm:rounded-3xl text-center transition-transform hover:-translate-y-1"
-                style={glassCardStyle}
+                className="group relative p-6 transition-colors hover:bg-white/[0.03] sm:p-8"
+                style={{ background: 'hsl(220 40% 9%)' }}
               >
-                <p className="text-5xl font-bold tabular-nums" style={{ color: 'hsl(var(--accent))' }}>
+                {/* 상단 그라데이션 라인 */}
+                <div
+                  className="absolute inset-x-0 top-0 h-px"
+                  style={{ background: `linear-gradient(90deg, transparent, ${m.color}, transparent)` }}
+                />
+                <p className="text-xs uppercase tracking-[0.2em] text-[hsl(0_0%_65%)]">{m.l}</p>
+                <p
+                  className="mt-3 text-4xl font-bold tabular-nums sm:text-5xl"
+                  style={{ color: m.color, textShadow: `0 0 24px ${m.color}55` }}
+                >
                   <CountUp end={m.v} suffix={m.s} decimals={m.dec ?? 0} />
                 </p>
-                <p className="mt-2 text-sm text-muted-foreground">{m.l}</p>
+                {/* 하단 미세 라인 */}
+                <div className="mt-5 h-px w-full" style={{ background: `linear-gradient(90deg, ${m.color}40, transparent)` }} />
               </div>
             ))}
           </div>
