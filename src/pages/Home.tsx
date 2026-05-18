@@ -527,10 +527,10 @@ const Step3Graphic = () => {
   return (
     <div ref={ref} className="relative h-full w-full">
       <div
-        className="absolute left-2 top-1/2 flex h-20 w-20 -translate-y-1/2 flex-col items-center justify-center rounded-2xl text-[10px] font-semibold transition-all duration-700"
+        className="absolute left-2 top-1/2 flex h-20 w-20 -translate-y-1/2 flex-col items-center justify-center rounded-2xl text-[10px] font-bold transition-all duration-700"
         style={{
           ...glassCardStyle,
-          color: 'hsl(var(--primary))',
+          color: 'hsl(220 65% 18%)',
           opacity: inView ? 1 : 0,
           transform: inView ? 'translate(0,-50%)' : 'translate(-40px,-50%)',
         }}
@@ -539,10 +539,10 @@ const Step3Graphic = () => {
         지자체
       </div>
       <div
-        className="absolute right-2 top-1/2 flex h-20 w-20 -translate-y-1/2 flex-col items-center justify-center rounded-2xl text-[10px] font-semibold transition-all duration-700"
+        className="absolute right-2 top-1/2 flex h-20 w-20 -translate-y-1/2 flex-col items-center justify-center rounded-2xl text-[10px] font-bold transition-all duration-700"
         style={{
           ...glassCardStyle,
-          color: 'hsl(var(--accent))',
+          color: 'hsl(35 85% 30%)',
           opacity: inView ? 1 : 0,
           transform: inView ? 'translate(0,-50%)' : 'translate(40px,-50%)',
           transitionDelay: '150ms',
