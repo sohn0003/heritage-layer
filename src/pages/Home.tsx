@@ -215,11 +215,11 @@ const DonutChart = ({ segments, total }: { segments: { label: string; value: num
   );
 };
 
-// ─── 라인/에어리어 차트 (추이) ──────────────
+// ─── 라인/에어리어 차트 (추이) ─ 멀티 레이어 + 트래블링 글로우 ─
 const AreaTrendChart = ({ data, color }: { data: number[]; color: string }) => {
   const { ref, inView } = useInView<SVGSVGElement>();
-  const W = 480, H = 200, padX = 28, padY = 28;
-  const max = Math.max(...data) * 1.1;
+  const W = 480, H = 220, padX = 32, padY = 32;
+  const max = Math.max(...data) * 1.15;
   const stepX = (W - padX * 2) / (data.length - 1);
   const pts = data.map((v, i) => [padX + i * stepX, H - padY - (v / max) * (H - padY * 2)] as [number, number]);
 
@@ -242,66 +242,99 @@ const AreaTrendChart = ({ data, color }: { data: number[]; color: string }) => {
   return (
     <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ overflow: 'visible' }}>
       <defs>
+        {/* 영역 그라데이션 (위→아래 페이드) */}
         <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.35" />
+          <stop offset="0%" stopColor={color} stopOpacity="0.55" />
+          <stop offset="50%" stopColor={color} stopOpacity="0.18" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
+        {/* 라인 그라데이션 (왼→오른 멀티 컬러) */}
         <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor={color} stopOpacity="0.7" />
-          <stop offset="100%" stopColor={color} stopOpacity="1" />
+          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.9" />
+          <stop offset="55%" stopColor={color} stopOpacity="1" />
+          <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="1" />
+        </linearGradient>
+        {/* 글로우 라인 (두꺼운 블러 라인) */}
+        <linearGradient id="lineGlowGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={color} stopOpacity="0" />
+          <stop offset="50%" stopColor={color} stopOpacity="0.5" />
+          <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0.6" />
         </linearGradient>
         <filter id="lineGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feGaussianBlur stdDeviation="4" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
       </defs>
+
       {/* 그리드 라인 */}
       {[0.25, 0.5, 0.75].map((g) => (
         <line key={g} x1={padX} x2={W - padX}
           y1={padY + (H - padY * 2) * g} y2={padY + (H - padY * 2) * g}
-          stroke="hsl(var(--foreground) / 0.06)" strokeDasharray="3 5" />
+          stroke="hsl(var(--foreground) / 0.08)" strokeDasharray="3 6" />
       ))}
-      {/* 영역 */}
+
+      {/* 영역 (그라데이션 페이드) */}
       <path d={areaPath} fill="url(#areaGrad)"
         style={{ opacity: inView ? 1 : 0, transition: 'opacity 1400ms ease-out 400ms' }} />
-      {/* 라인 */}
-      <path d={linePath} fill="none" stroke="url(#lineGrad)" strokeWidth="2.5"
+
+      {/* 글로우 언더라인 (블러 처리된 굵은 라인) */}
+      <path d={linePath} fill="none" stroke="url(#lineGlowGrad)" strokeWidth="8"
         strokeLinecap="round" strokeLinejoin="round"
-        filter="url(#lineGlow)"
+        filter="url(#lineGlow)" opacity="0.7"
         strokeDasharray={1500} strokeDashoffset={inView ? 0 : 1500}
         style={{ transition: 'stroke-dashoffset 1800ms cubic-bezier(0.22, 1, 0.36, 1)' }} />
-      {/* 포인트 */}
+
+      {/* 메인 라인 */}
+      <path d={linePath} fill="none" stroke="url(#lineGrad)" strokeWidth="2.5"
+        strokeLinecap="round" strokeLinejoin="round"
+        strokeDasharray={1500} strokeDashoffset={inView ? 0 : 1500}
+        style={{ transition: 'stroke-dashoffset 1800ms cubic-bezier(0.22, 1, 0.36, 1)' }} />
+
+      {/* 트래블링 스파클 — 라인을 따라 빛이 흐르듯 이동 */}
+      {inView && (
+        <circle r="3.5" fill="white" style={{ filter: `drop-shadow(0 0 6px ${color}) drop-shadow(0 0 12px ${color})` }}>
+          <animateMotion dur="3.6s" repeatCount="indefinite" path={linePath} rotate="auto" />
+          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="3.6s" repeatCount="indefinite" />
+        </circle>
+      )}
+
+      {/* 데이터 포인트 */}
       {pts.map(([x, y], i) => {
         const isLast = i === pts.length - 1;
         return (
           <g key={i} style={{ opacity: inView ? 1 : 0, transition: `opacity 400ms ease-out ${900 + i * 90}ms` }}>
             {isLast && (
-              <circle cx={x} cy={y} r={10} fill={color} opacity="0.18">
-                <animate attributeName="r" values="6;14;6" dur="2.4s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.3;0;0.3" dur="2.4s" repeatCount="indefinite" />
+              <circle cx={x} cy={y} r={10} fill={color} opacity="0.25">
+                <animate attributeName="r" values="6;16;6" dur="2.4s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.4;0;0.4" dur="2.4s" repeatCount="indefinite" />
               </circle>
             )}
-            <circle cx={x} cy={y} r={isLast ? 5 : 3.5} fill="white" stroke={color} strokeWidth={isLast ? 2.5 : 1.8} />
+            <circle cx={x} cy={y} r={isLast ? 5 : 3.2}
+              fill={isLast ? color : 'hsl(220 35% 8%)'}
+              stroke={color} strokeWidth={isLast ? 2 : 1.6}
+              style={{ filter: isLast ? `drop-shadow(0 0 10px ${color})` : 'none' }} />
           </g>
         );
       })}
+
       {/* 최신값 라벨 */}
       {lastPt && (
         <g style={{ opacity: inView ? 1 : 0, transition: 'opacity 600ms ease-out 1600ms' }}>
-          <rect x={lastPt[0] - 28} y={lastPt[1] - 28} width="56" height="20" rx="10"
-            fill={color} />
-          <text x={lastPt[0]} y={lastPt[1] - 14} fontSize="11" fontWeight="600"
+          <rect x={lastPt[0] - 28} y={lastPt[1] - 30} width="56" height="20" rx="10"
+            fill={color} style={{ filter: `drop-shadow(0 4px 12px ${color}80)` }} />
+          <text x={lastPt[0]} y={lastPt[1] - 16} fontSize="11" fontWeight="700"
             textAnchor="middle" fill="white">
             {data[data.length - 1]}
           </text>
         </g>
       )}
+
       {/* X축 라벨 */}
       {['2019', '2020', '2021', '2022', '2023', '2024'].map((y, i) => (
-        <text key={y} x={padX + i * stepX} y={H - 6} fontSize="10"
+        <text key={y} x={padX + i * stepX} y={H - 8} fontSize="10"
           textAnchor="middle" fill="hsl(var(--muted-foreground))"
           letterSpacing="0.05em">
           {y}
