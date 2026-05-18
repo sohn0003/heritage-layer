@@ -34,8 +34,9 @@ const NaverMap = ({ markers = [], onMarkerClick, className }: NaverMapProps) => 
     });
 
     return () => {
-      // Clear markers first to avoid naver maps internal cleanup crash
-      markerInstances.current.forEach(m => m.setMap(null));
+      markerInstances.current.forEach(m => {
+        try { m.setMap(null); } catch (e) { /* ignore */ }
+      });
       markerInstances.current = [];
       if (mapInstance.current) {
         try {
