@@ -9,6 +9,7 @@ import {
   Building2, TrendingDown, Mail, MapPin, Sparkles, BarChart3,
   Database, Layers, ChevronDown,
 } from 'lucide-react';
+import Seo from '@/components/common/Seo';
 
 // ─── Hooks ────────────────────────────────────────
 const useInView = <T extends Element>(threshold = 0.2) => {
@@ -552,6 +553,11 @@ const HomePage = () => {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
+      <Seo
+        title="Heritage Layer — 유휴부지 부동산 재생 솔루션"
+        description="잠든 유휴부지에 생명력을 불어넣다. 한국 유휴 부동산을 발굴·분석·재생하는 데이터 기반 부동산 재생 플랫폼."
+        path="/"
+      />
       {/* 페이지 진행 바 */}
       <div
         className="fixed left-0 top-16 z-40 h-0.5 origin-left"

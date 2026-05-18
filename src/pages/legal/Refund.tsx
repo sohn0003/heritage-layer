@@ -1,7 +1,14 @@
 import LegalLayout from '@/components/legal/LegalLayout';
+import Seo from '@/components/common/Seo';
 
 const Refund = () => (
-  <LegalLayout title="환불 정책 (Refund Policy)">
+  <>
+    <Seo
+      title="환불 정책 — Heritage Layer"
+      description="Heritage Layer 환불 정책 안내."
+      path="/refund"
+    />
+    <LegalLayout title="환불 정책 (Refund Policy)">
     <p>
       <strong>(주)더레이어코퍼레이션 (The Layer Corporation Co., Ltd.)</strong>은(는) 이용자가 Heritage Layer
       서비스에 만족하지 못한 경우를 위해 다음과 같은 환불 정책을 운영합니다.
@@ -61,7 +68,8 @@ const Refund = () => (
       <li>이메일: contact@thelayercorp.com</li>
       <li>Paddle: <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
     </ul>
-  </LegalLayout>
+    </LegalLayout>
+  </>
 );
 
 export default Refund;

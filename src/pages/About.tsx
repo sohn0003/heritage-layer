@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import aboutHeroBg from '@/assets/about-hero-bg.png';
+import Seo from '@/components/common/Seo';
 
 // ── Hooks ───────────────────────────────────────
 const useInView = <T extends Element>(threshold = 0.2) => {
@@ -242,6 +243,11 @@ const AboutPage = () => {
 
   return (
     <div className="min-h-screen">
+      <Seo
+        title="회사 소개 — Heritage Layer"
+        description="(주)더레이어코퍼레이션이 운영하는 Heritage Layer의 비전, 팀, 그리고 유휴 부동산 재생 접근법을 소개합니다."
+        path="/about"
+      />
       {/* ── HERO ── */}
       <section
         className="relative flex items-center justify-center px-4 text-center"

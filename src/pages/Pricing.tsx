@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, X, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import AuthModal from '@/components/common/AuthModal';
+import Seo from '@/components/common/Seo';
 
 type TierKey = 'free' | 'pro' | 'enterprise';
 type EnterpriseBilling = 'monthly' | 'yearly';
@@ -131,6 +132,11 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen px-4 pb-20 pt-24">
+      <Seo
+        title="요금제 — Heritage Layer"
+        description="Free, Pro, Enterprise 요금제를 비교하고 Heritage Layer의 분석·딜 시그널 기능에 접근하세요."
+        path="/pricing"
+      />
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-14 text-center">

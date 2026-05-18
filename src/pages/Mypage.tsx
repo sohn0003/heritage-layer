@@ -8,6 +8,7 @@ import { Star, FileText, User, Crown, ArrowRight, Inbox } from 'lucide-react';
 import SubscriptionCard from '@/components/mypage/SubscriptionCard';
 import { tierLabel } from '@/lib/entitlements';
 import { toast } from 'sonner';
+import Seo from '@/components/common/Seo';
 
 interface SavedAsset {
   id: string;
@@ -109,6 +110,11 @@ const Mypage = () => {
 
   return (
     <div className="min-h-screen pt-20 px-4 pb-12">
+      <Seo
+        title="마이페이지 — Heritage Layer"
+        description="저장한 매물, 구독 정보 및 분석 리포트를 확인하세요."
+        path="/mypage"
+      />
       <div className="mx-auto max-w-4xl space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
