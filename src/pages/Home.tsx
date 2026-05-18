@@ -92,40 +92,58 @@ const Blob = ({ className, color }: { className?: string; color: string }) => (
   />
 );
 
-// ─── 막대 그래프 (가로) ─────────────────────────────
+// ─── 막대 그래프 (가로) ─ 라인 + 그라데이션 + 트래블 하이라이트 ─
 const InsightBar = ({
-  label, value, max, color, suffix = '',
-}: { label: string; value: number; max: number; color: string; suffix?: string }) => {
+  label, value, max, color, suffix = '', delay = 0,
+}: { label: string; value: number; max: number; color: string; suffix?: string; delay?: number }) => {
   const { ref, inView } = useInView<HTMLDivElement>();
   const pct = Math.min(100, (value / max) * 100);
+  const gradId = `bar-${label}-${Math.round(value)}`;
   return (
     <div ref={ref} className="group">
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-sm font-medium tracking-tight text-foreground">{label}</span>
-        <span className="text-xl font-semibold tabular-nums" style={{ color }}>
+        <span className="text-sm font-medium tracking-tight text-foreground/85">{label}</span>
+        <span className="text-xl font-semibold tabular-nums" style={{ color, textShadow: `0 0 18px ${color}55` }}>
           <CountUp end={value} suffix={suffix} />
         </span>
       </div>
-      <div
-        className="relative h-2 overflow-hidden rounded-full"
-        style={{ background: 'hsl(var(--foreground) / 0.06)' }}
-      >
+      {/* 베이스 라인 (얇은 트랙) */}
+      <div className="relative h-[3px] w-full overflow-visible rounded-full" style={{ background: 'hsl(var(--foreground) / 0.08)' }}>
+        {/* 그라데이션 바 */}
         <div
-          className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-[1600ms]"
+          className="absolute inset-y-0 left-0 rounded-full"
           style={{
             width: inView ? `${pct}%` : '0%',
-            background: `linear-gradient(90deg, ${color} 0%, ${color}b3 100%)`,
-            boxShadow: `0 0 20px ${color}40`,
-            transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+            background: `linear-gradient(90deg, ${color}00 0%, ${color} 30%, ${color} 70%, hsl(var(--accent)) 100%)`,
+            boxShadow: `0 0 14px ${color}80, 0 0 28px ${color}40`,
+            transition: `width 1700ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms`,
           }}
         />
-        {/* 글로시 하이라이트 */}
+        {/* 트래블링 하이라이트 (반복) */}
         <div
-          className="pointer-events-none absolute inset-y-0 left-0 rounded-full opacity-60"
+          className="pointer-events-none absolute inset-y-0 left-0 overflow-hidden rounded-full"
           style={{
             width: inView ? `${pct}%` : '0%',
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0) 55%)',
-            transition: 'width 1600ms cubic-bezier(0.22, 1, 0.36, 1)',
+            transition: `width 1700ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms`,
+          }}
+        >
+          <div
+            className="absolute inset-y-0 -left-1/3 w-1/3"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent)',
+              animation: inView ? `barShine 2.4s cubic-bezier(0.45, 0, 0.55, 1) ${delay + 700}ms infinite` : 'none',
+            }}
+          />
+        </div>
+        {/* 끝점 글로우 도트 */}
+        <div
+          className="pointer-events-none absolute -top-[3px] h-[9px] w-[9px] -translate-x-1/2 rounded-full"
+          style={{
+            left: inView ? `${pct}%` : '0%',
+            background: color,
+            boxShadow: `0 0 0 3px ${color}30, 0 0 14px ${color}aa`,
+            transition: `left 1700ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms, opacity 400ms ease-out ${delay + 1200}ms`,
+            opacity: inView ? 1 : 0,
           }}
         />
       </div>
