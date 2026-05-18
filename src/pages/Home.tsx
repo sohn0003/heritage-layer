@@ -62,21 +62,25 @@ const CountUp = ({ end, duration = 2000, suffix = '', decimals = 0 }: { end: num
   return <span ref={ref}>{decimals ? val.toFixed(decimals) : Math.round(val).toLocaleString()}{suffix}</span>;
 };
 
-// ─── Glass primitives ──────────────────────────────
+// ─── Card primitives ──────────────────────────────
+// 솔리드 화이트 카드 + 입체 그림자 (가독성 우선).
+// CSS 변수로 카드 내부의 text-foreground / text-muted-foreground 도 어두운 톤으로 재정의.
 const glassCardStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.32)',
-  backdropFilter: 'blur(22px) saturate(180%)',
-  WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-  border: '1px solid rgba(255, 255, 255, 0.45)',
-  boxShadow: '0 12px 48px -12px rgba(27, 46, 74, 0.22), inset 0 1px 0 rgba(255,255,255,0.5)',
+  background: '#ffffff',
+  border: '1px solid rgba(27, 46, 74, 0.08)',
+  color: 'hsl(220 30% 12%)',
+  ['--foreground' as any]: '220 30% 12%',
+  ['--muted-foreground' as any]: '220 15% 40%',
+  ['--card-foreground' as any]: '220 30% 12%',
+  ['--muted' as any]: '220 15% 90%',
+  boxShadow:
+    '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
 };
 const glassDarkStyle: React.CSSProperties = {
-  background: 'rgba(27, 46, 74, 0.55)',
-  backdropFilter: 'blur(18px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-  border: '1px solid rgba(255, 255, 255, 0.18)',
-  color: 'hsl(0 0% 95%)',
-  boxShadow: '0 10px 40px -10px rgba(0,0,0,0.35)',
+  background: 'hsl(220 35% 14%)',
+  border: '1px solid rgba(255, 255, 255, 0.08)',
+  color: 'hsl(0 0% 96%)',
+  boxShadow: '0 12px 40px -10px rgba(0,0,0,0.45)',
 };
 
 // 부드러운 색상 블롭 (배경 장식)
@@ -671,7 +675,7 @@ const HomePage = () => {
               { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(var(--accent))' },
               { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(0 70% 55%)' },
             ].map((s) => (
-              <div key={s.label} className="rounded-3xl p-6 text-center transition-transform hover:-translate-y-1" style={glassCardStyle}>
+              <div key={s.label} className="rounded-2xl p-5 sm:p-6 sm:rounded-3xl text-center transition-transform hover:-translate-y-1" style={glassCardStyle}>
                 <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl"
                   style={{ background: `${s.color.replace(')', ' / 0.15)')}` }}>
                   <s.icon className="h-7 w-7" style={{ color: s.color }} />
@@ -686,7 +690,7 @@ const HomePage = () => {
 
           {/* 두 컬럼 차트 */}
           <div className="mb-10 grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl p-7" style={glassCardStyle}>
+            <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
               <div className="mb-5 flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
                 <h3 className="text-lg font-semibold">권역별 폐교 분포 (Top 5)</h3>
@@ -701,7 +705,7 @@ const HomePage = () => {
               <p className="mt-5 text-xs text-muted-foreground">출처: 교육부 통계 (참고치)</p>
             </div>
 
-            <div className="rounded-3xl p-7" style={glassCardStyle}>
+            <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
               <div className="mb-5 flex items-center gap-2">
                 <Layers className="h-5 w-5 text-accent" />
                 <h3 className="text-lg font-semibold">소유 구분 비율</h3>
@@ -719,7 +723,7 @@ const HomePage = () => {
           </div>
 
           {/* 트렌드 차트 */}
-          <div className="rounded-3xl p-7" style={glassCardStyle}>
+          <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Database className="h-5 w-5 text-primary" />
@@ -755,7 +759,7 @@ const HomePage = () => {
             ].map((m, i) => (
               <div
                 key={i}
-                className="rounded-3xl p-6 text-center transition-transform hover:-translate-y-1"
+                className="rounded-2xl p-5 sm:p-6 sm:rounded-3xl text-center transition-transform hover:-translate-y-1"
                 style={glassCardStyle}
               >
                 <p className="text-5xl font-bold tabular-nums" style={{ color: 'hsl(var(--accent))' }}>
@@ -805,7 +809,7 @@ const HomePage = () => {
       <section className="relative overflow-hidden px-4 py-20 md:py-24">
         <Blob className="left-[20%] top-0 h-80 w-80" color="hsl(40 80% 75%)" />
         <Blob className="right-[15%] bottom-0 h-80 w-80" color="hsl(220 60% 80%)" />
-        <div className="relative mx-auto max-w-3xl rounded-3xl p-10 text-center md:p-14" style={glassCardStyle}>
+        <div className="relative mx-auto max-w-3xl rounded-2xl p-7 text-center sm:rounded-3xl sm:p-10 md:p-14" style={glassCardStyle}>
           <Sparkles className="mx-auto mb-4 h-10 w-10 text-accent" />
           <h2 className="text-3xl font-bold md:text-4xl">유휴 부동산을 새로운 기회로</h2>
           <p className="mt-4 text-muted-foreground">

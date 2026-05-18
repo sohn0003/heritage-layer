@@ -47,11 +47,15 @@ const CountUp = ({ end, duration = 1800, suffix = '', decimals = 0 }: { end: num
 };
 
 const glassCardStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.6)',
-  backdropFilter: 'blur(18px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-  border: '1px solid rgba(255, 255, 255, 0.6)',
-  boxShadow: '0 10px 40px -10px rgba(27, 46, 74, 0.18)',
+  background: '#ffffff',
+  border: '1px solid rgba(27, 46, 74, 0.08)',
+  color: 'hsl(220 30% 12%)',
+  ['--foreground' as any]: '220 30% 12%',
+  ['--muted-foreground' as any]: '220 15% 40%',
+  ['--card-foreground' as any]: '220 30% 12%',
+  ['--muted' as any]: '220 15% 90%',
+  boxShadow:
+    '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
 };
 
 const Blob = ({ className, color }: { className?: string; color: string }) => (
@@ -273,7 +277,7 @@ const AboutPage = () => {
 
       {/* ── PROBLEM: 왜 우리 비즈니스가 필요한가 ── */}
       <section
-        className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28"
+        className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-14 sm:py-20 md:py-28"
       >
         <Blob className="left-[-10%] top-10 h-96 w-96" color="hsl(0 70% 80%)" />
         <Blob className="right-[-10%] bottom-10 h-96 w-96" color="hsl(40 90% 80%)" />
@@ -296,7 +300,7 @@ const AboutPage = () => {
               { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(25 90% 55%)' },
               { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(var(--primary))' },
             ].map((s) => (
-              <div key={s.label} className="rounded-3xl p-6 text-center transition-transform hover:-translate-y-1"
+              <div key={s.label} className="rounded-2xl p-5 sm:p-6 sm:rounded-3xl text-center transition-transform hover:-translate-y-1"
                 style={glassCardStyle}>
                 <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl"
                   style={{ background: `${s.color.replace(')', ' / 0.15)')}` }}>
@@ -311,7 +315,7 @@ const AboutPage = () => {
           </div>
 
           {/* 권역 막대 */}
-          <div className="rounded-3xl p-7" style={glassCardStyle}>
+          <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
             <h3 className="mb-5 text-lg font-semibold">권역별 폐교 분포 (Top 5)</h3>
             <div className="space-y-5">
               <InsightBar label="전남" value={839} max={1000} color="hsl(0 70% 55%)" suffix="개" />
@@ -339,7 +343,7 @@ const AboutPage = () => {
               ].map((p, i) => (
                 <div
                   key={p.t}
-                  className={`flex flex-col items-center gap-6 rounded-3xl p-6 md:p-8 md:flex-row ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
+                  className={`flex flex-col items-center gap-6 rounded-2xl p-5 sm:p-6 sm:rounded-3xl md:p-8 md:flex-row ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
                   style={glassCardStyle}
                 >
                   <div
@@ -390,7 +394,7 @@ const AboutPage = () => {
       </section>
 
       {/* ── HOW WE WORK (구 "재생 방법론") — 세로 스택 + 모션 ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
+      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-14 sm:py-20 md:py-28">
         <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(220 50% 80%)" />
         <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(40 80% 80%)" />
 
@@ -428,7 +432,7 @@ const AboutPage = () => {
       </section>
 
       {/* ── PLATFORM / PRICING ── */}
-      <section className="relative overflow-hidden px-4 py-20 md:py-28">
+      <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
         <Blob className="left-1/2 top-10 h-96 w-96 -translate-x-1/2" color="hsl(40 90% 80%)" />
         <div className="relative mx-auto max-w-4xl">
           <div className="mb-12 text-center">
