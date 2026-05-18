@@ -607,7 +607,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden" style={{ fontSize: '0.8rem' }}>
       <Seo
         title="Heritage Layer — 유휴부지 부동산 재생 솔루션"
         description="잠든 유휴부지에 생명력을 불어넣다. 한국 유휴 부동산을 발굴·분석·재생하는 데이터 기반 부동산 재생 플랫폼."
