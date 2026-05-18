@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Check, ArrowRight, Compass, Wrench, Crown, CheckCircle2 } from 'lucide-react';
 import BridgeInquiryForm, { type BridgeLevel } from '@/components/common/BridgeInquiryForm';
+import Seo from '@/components/common/Seo';
 
 interface Level {
   key: 'L1' | 'L2' | 'L3';
@@ -89,6 +90,11 @@ const Bridge = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      <Seo
+        title="Bridge Solution — Heritage Layer"
+        description="자산 보유자와 개발사를 연결하는 Heritage Layer Bridge. 단계별 컨설팅과 매칭 서비스를 제공합니다."
+        path="/bridge"
+      />
       {/* Hero */}
       <section className="bg-primary text-primary-foreground">
         <div className="mx-auto max-w-5xl px-4 py-20 text-center md:py-28">

@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Mail, Building2, FileQuestion, CheckCircle2 } from 'lucide-react';
 import BridgeInquiryForm from '@/components/common/BridgeInquiryForm';
+import Seo from '@/components/common/Seo';
 
 const inquiryTypes = [
   { v: 'asset_report', l: '유휴자산 등록 의뢰' },
@@ -50,6 +51,11 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-muted/30 to-background pt-20">
+      <Seo
+        title="문의하기 — Heritage Layer"
+        description="유휴자산 등록 의뢰, Bridge Solution 의뢰 등 Heritage Layer에 문의하세요."
+        path="/contact"
+      />
       <div className="mx-auto max-w-3xl px-4 py-12 md:py-16">
         <div className="mb-10 text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Contact</span>

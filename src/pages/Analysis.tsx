@@ -18,6 +18,7 @@ import {
   TrendingUp, FileText, BarChart3, Building2, School, Home, Factory, Building,
   CheckCircle2, AlertTriangle, Sparkles, ShieldAlert,
 } from 'lucide-react';
+import Seo from '@/components/common/Seo';
 import GradeMeter from '@/components/common/GradeMeter';
 import RatioBar from '@/components/common/RatioBar';
 
@@ -246,6 +247,11 @@ const AnalysisPage = () => {
 
   return (
     <div className="pt-16">
+      <Seo
+        title="자산 분석 — Heritage Layer"
+        description="입지·법규·수익성 시나리오를 데이터 기반으로 분석하는 Heritage Layer Pro 분석 도구."
+        path="/analysis"
+      />
       {/* 자산 핵심 정보 헤더 (스크롤 시 함께 이동) */}
       <div className="border-b bg-background">
         <div className="mx-auto max-w-5xl px-4 py-5">
