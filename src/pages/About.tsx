@@ -47,11 +47,11 @@ const CountUp = ({ end, duration = 1800, suffix = '', decimals = 0 }: { end: num
 };
 
 const glassCardStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.6)',
-  backdropFilter: 'blur(18px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-  border: '1px solid rgba(255, 255, 255, 0.6)',
-  boxShadow: '0 10px 40px -10px rgba(27, 46, 74, 0.18)',
+  background: '#ffffff',
+  border: '1px solid rgba(27, 46, 74, 0.08)',
+  color: 'hsl(220 30% 12%)',
+  boxShadow:
+    '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
 };
 
 const Blob = ({ className, color }: { className?: string; color: string }) => (

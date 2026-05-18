@@ -62,21 +62,20 @@ const CountUp = ({ end, duration = 2000, suffix = '', decimals = 0 }: { end: num
   return <span ref={ref}>{decimals ? val.toFixed(decimals) : Math.round(val).toLocaleString()}{suffix}</span>;
 };
 
-// ─── Glass primitives ──────────────────────────────
+// ─── Card primitives ──────────────────────────────
+// 솔리드 화이트 카드 + 입체 그림자 (가독성 우선)
 const glassCardStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.32)',
-  backdropFilter: 'blur(22px) saturate(180%)',
-  WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-  border: '1px solid rgba(255, 255, 255, 0.45)',
-  boxShadow: '0 12px 48px -12px rgba(27, 46, 74, 0.22), inset 0 1px 0 rgba(255,255,255,0.5)',
+  background: '#ffffff',
+  border: '1px solid rgba(27, 46, 74, 0.08)',
+  color: 'hsl(220 30% 12%)',
+  boxShadow:
+    '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
 };
 const glassDarkStyle: React.CSSProperties = {
-  background: 'rgba(27, 46, 74, 0.55)',
-  backdropFilter: 'blur(18px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-  border: '1px solid rgba(255, 255, 255, 0.18)',
-  color: 'hsl(0 0% 95%)',
-  boxShadow: '0 10px 40px -10px rgba(0,0,0,0.35)',
+  background: 'hsl(220 35% 14%)',
+  border: '1px solid rgba(255, 255, 255, 0.08)',
+  color: 'hsl(0 0% 96%)',
+  boxShadow: '0 12px 40px -10px rgba(0,0,0,0.45)',
 };
 
 // 부드러운 색상 블롭 (배경 장식)
