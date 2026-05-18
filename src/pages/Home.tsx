@@ -707,85 +707,131 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── INSIGHT: 큰 통계 + 다양한 차트 ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
-        <Blob className="right-[-15%] top-10 h-[500px] w-[500px]" color="hsl(40 90% 75%)" />
-        <Blob className="left-[-15%] bottom-10 h-[500px] w-[500px]" color="hsl(220 60% 80%)" />
+      {/* ── INSIGHT: 큰 통계 + 다양한 차트 (다크 / 라인 기반) ── */}
+      <section
+        className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28"
+        style={{
+          background:
+            'radial-gradient(1200px 600px at 20% 0%, hsl(220 50% 18%) 0%, transparent 60%),' +
+            'radial-gradient(900px 500px at 85% 90%, hsl(35 60% 22%) 0%, transparent 55%),' +
+            'linear-gradient(180deg, hsl(220 40% 8%) 0%, hsl(220 35% 10%) 100%)',
+        }}
+      >
+        {/* 애니메이트 그리드 배경 */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              'linear-gradient(hsl(0 0% 100% / 0.5) 1px, transparent 1px),' +
+              'linear-gradient(90deg, hsl(0 0% 100% / 0.5) 1px, transparent 1px)',
+            backgroundSize: '52px 52px',
+            maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
+          }}
+        />
+        {/* 떠다니는 블롭 */}
+        <Blob className="right-[-15%] top-10 h-[500px] w-[500px]" color="hsl(40 90% 55%)" />
+        <Blob className="left-[-15%] bottom-10 h-[500px] w-[500px]" color="hsl(220 80% 60%)" />
 
-        <div className="relative mx-auto max-w-6xl">
-          <div className="mb-14 text-center">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Insight</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">전국 유휴 부동산 현황</h2>
-            <p className="mt-4 text-muted-foreground">방치된 자원이 매년 늘어나고 있습니다 — 새로운 기회로 전환할 시간입니다.</p>
+        <div className="relative mx-auto max-w-6xl text-[hsl(0_0%_96%)]">
+          <div className="mb-12 text-center sm:mb-14">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Insight</span>
+            <h2 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
+              <span className="bg-gradient-to-r from-white via-white to-[hsl(40_90%_75%)] bg-clip-text text-transparent">
+                전국 유휴 부동산 현황
+              </span>
+            </h2>
+            <p className="mt-4 text-[hsl(0_0%_75%)]">방치된 자원이 매년 늘어나고 있습니다 — 새로운 기회로 전환할 시간입니다.</p>
           </div>
 
-          {/* Big stat cards */}
-          <div className="mb-14 grid gap-6 sm:grid-cols-3">
+          {/* Big stat cards — 프레임 없이, 좌측 그라데이션 라인으로만 구분 */}
+          <div className="mb-14 grid gap-px overflow-hidden rounded-2xl sm:grid-cols-3"
+            style={{ background: 'hsl(0 0% 100% / 0.08)' }}>
             {[
-              { icon: School, label: '전국 폐교', value: 3955, suffix: '개', color: 'hsl(var(--primary))' },
-              { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(var(--accent))' },
-              { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(0 70% 55%)' },
+              { icon: School, label: '전국 폐교', value: 3955, suffix: '개', color: 'hsl(220 90% 70%)' },
+              { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(40 95% 65%)' },
+              { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(0 80% 65%)' },
             ].map((s) => (
-              <div key={s.label} className="rounded-2xl p-5 sm:p-6 sm:rounded-3xl text-center transition-transform hover:-translate-y-1" style={glassCardStyle}>
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl"
-                  style={{ background: `${s.color.replace(')', ' / 0.15)')}` }}>
-                  <s.icon className="h-7 w-7" style={{ color: s.color }} />
+              <div
+                key={s.label}
+                className="group relative p-6 transition-colors hover:bg-white/[0.03] sm:p-8"
+                style={{ background: 'hsl(220 40% 9%)' }}
+              >
+                {/* 상단 그라데이션 라인 */}
+                <div
+                  className="absolute inset-x-0 top-0 h-px"
+                  style={{ background: `linear-gradient(90deg, transparent, ${s.color}, transparent)` }}
+                />
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl"
+                    style={{ background: `${s.color.replace(')', ' / 0.12)')}`, boxShadow: `inset 0 0 0 1px ${s.color}30` }}>
+                    <s.icon className="h-5 w-5" style={{ color: s.color }} />
+                  </div>
+                  <p className="text-sm text-[hsl(0_0%_72%)]">{s.label}</p>
                 </div>
-                <p className="text-sm text-muted-foreground">{s.label}</p>
-                <p className="mt-2 text-4xl font-bold tabular-nums" style={{ color: s.color }}>
+                <p className="mt-4 text-4xl font-bold tabular-nums sm:text-5xl"
+                  style={{ color: s.color, textShadow: `0 0 24px ${s.color}50` }}>
                   <CountUp end={s.value} suffix={s.suffix} />
                 </p>
               </div>
             ))}
           </div>
 
-          {/* 두 컬럼 차트 */}
-          <div className="mb-10 grid gap-6 lg:grid-cols-2">
-            <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
-              <div className="mb-5 flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold">권역별 폐교 분포 (Top 5)</h3>
+          {/* 두 컬럼 차트 — 헤더 + 하단 그라데이션 라인만 */}
+          <div className="mb-10 grid gap-8 lg:grid-cols-2 lg:gap-10">
+            <div className="relative">
+              <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" style={{ color: 'hsl(220 90% 70%)' }} />
+                  <h3 className="text-base font-semibold tracking-tight sm:text-lg">권역별 폐교 분포 (Top 5)</h3>
+                </div>
+                <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[hsl(0_0%_60%)]">Top 5</span>
               </div>
-              <div className="space-y-5">
-                <InsightBar label="전남" value={839} max={1000} color="hsl(var(--primary))" suffix="개" />
-                <InsightBar label="경북" value={745} max={1000} color="hsl(var(--primary))" suffix="개" />
-                <InsightBar label="경남" value={584} max={1000} color="hsl(var(--accent))" suffix="개" />
-                <InsightBar label="강원" value={476} max={1000} color="hsl(var(--accent))" suffix="개" />
-                <InsightBar label="전북" value={329} max={1000} color="hsl(220 25% 55%)" suffix="개" />
+              <div className="space-y-6">
+                <InsightBar label="전남" value={839} max={1000} color="hsl(220 90% 70%)" suffix="개" delay={0} />
+                <InsightBar label="경북" value={745} max={1000} color="hsl(220 90% 70%)" suffix="개" delay={120} />
+                <InsightBar label="경남" value={584} max={1000} color="hsl(40 95% 65%)" suffix="개" delay={240} />
+                <InsightBar label="강원" value={476} max={1000} color="hsl(40 95% 65%)" suffix="개" delay={360} />
+                <InsightBar label="전북" value={329} max={1000} color="hsl(220 30% 65%)" suffix="개" delay={480} />
               </div>
-              <p className="mt-5 text-xs text-muted-foreground">출처: 교육부 통계 (참고치)</p>
+              <div className="mt-6 h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.15), transparent)' }} />
+              <p className="mt-3 text-xs text-[hsl(0_0%_60%)]">출처: 교육부 통계 (참고치)</p>
             </div>
 
-            <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
-              <div className="mb-5 flex items-center gap-2">
-                <Layers className="h-5 w-5 text-accent" />
-                <h3 className="text-lg font-semibold">소유 구분 비율</h3>
+            <div className="relative">
+              <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Layers className="h-5 w-5" style={{ color: 'hsl(40 95% 65%)' }} />
+                  <h3 className="text-base font-semibold tracking-tight sm:text-lg">소유 구분 비율</h3>
+                </div>
+                <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[hsl(0_0%_60%)]">Ownership</span>
               </div>
               <DonutChart
                 total={100}
                 segments={[
-                  { label: '국·공유', value: 62, color: 'hsl(var(--primary))' },
-                  { label: '사유',   value: 28, color: 'hsl(var(--accent))' },
-                  { label: '기타',   value: 10, color: 'hsl(220 25% 55%)' },
+                  { label: '국·공유', value: 62, color: 'hsl(220 90% 70%)' },
+                  { label: '사유',   value: 28, color: 'hsl(40 95% 65%)' },
+                  { label: '기타',   value: 10, color: 'hsl(220 30% 65%)' },
                 ]}
               />
-              <p className="mt-5 text-xs text-muted-foreground">국·공유 자산이 절반 이상 — 민관협력 기회가 큽니다.</p>
+              <div className="mt-6 h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.15), transparent)' }} />
+              <p className="mt-3 text-xs text-[hsl(0_0%_60%)]">국·공유 자산이 절반 이상 — 민관협력 기회가 큽니다.</p>
             </div>
           </div>
 
-          {/* 트렌드 차트 */}
-          <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
-            <div className="mb-3 flex items-center justify-between">
+          {/* 트렌드 차트 — 프레임 제거, 그라데이션 라인 강조 */}
+          <div className="relative pt-2">
+            <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Database className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold">연도별 신규 폐교 발생 추이</h3>
+                <Database className="h-5 w-5" style={{ color: 'hsl(40 95% 65%)' }} />
+                <h3 className="text-base font-semibold tracking-tight sm:text-lg">연도별 신규 폐교 발생 추이</h3>
               </div>
-              <span className="text-xs text-muted-foreground">단위: 개</span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[hsl(0_0%_60%)]">2019 → 2024 · 단위 개</span>
             </div>
-            <AreaTrendChart data={[112, 138, 165, 190, 224, 261]} color="hsl(var(--accent))" />
-            <div className="mt-3 grid grid-cols-3 gap-3 text-center text-xs text-muted-foreground sm:grid-cols-6">
+            <AreaTrendChart data={[112, 138, 165, 190, 224, 261]} color="hsl(40 95% 65%)" />
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs sm:grid-cols-6">
               {[112, 138, 165, 190, 224, 261].map((v, i) => (
-                <span key={i} className="font-semibold text-foreground">{v}</span>
+                <span key={i} className="font-semibold tabular-nums text-[hsl(0_0%_88%)]">{v}</span>
               ))}
             </div>
           </div>
