@@ -277,7 +277,7 @@ const AboutPage = () => {
 
       {/* ── PROBLEM: 왜 우리 비즈니스가 필요한가 ── */}
       <section
-        className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28"
+        className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-14 sm:py-20 md:py-28"
       >
         <Blob className="left-[-10%] top-10 h-96 w-96" color="hsl(0 70% 80%)" />
         <Blob className="right-[-10%] bottom-10 h-96 w-96" color="hsl(40 90% 80%)" />
@@ -394,7 +394,7 @@ const AboutPage = () => {
       </section>
 
       {/* ── HOW WE WORK (구 "재생 방법론") — 세로 스택 + 모션 ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
+      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-14 sm:py-20 md:py-28">
         <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(220 50% 80%)" />
         <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(40 80% 80%)" />
 
@@ -432,7 +432,7 @@ const AboutPage = () => {
       </section>
 
       {/* ── PLATFORM / PRICING ── */}
-      <section className="relative overflow-hidden px-4 py-20 md:py-28">
+      <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
         <Blob className="left-1/2 top-10 h-96 w-96 -translate-x-1/2" color="hsl(40 90% 80%)" />
         <div className="relative mx-auto max-w-4xl">
           <div className="mb-12 text-center">

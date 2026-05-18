@@ -808,7 +808,7 @@ const HomePage = () => {
       <section className="relative overflow-hidden px-4 py-20 md:py-24">
         <Blob className="left-[20%] top-0 h-80 w-80" color="hsl(40 80% 75%)" />
         <Blob className="right-[15%] bottom-0 h-80 w-80" color="hsl(220 60% 80%)" />
-        <div className="relative mx-auto max-w-3xl rounded-3xl p-10 text-center md:p-14" style={glassCardStyle}>
+        <div className="relative mx-auto max-w-3xl rounded-2xl p-7 text-center sm:rounded-3xl sm:p-10 md:p-14" style={glassCardStyle}>
           <Sparkles className="mx-auto mb-4 h-10 w-10 text-accent" />
           <h2 className="text-3xl font-bold md:text-4xl">유휴 부동산을 새로운 기회로</h2>
           <p className="mt-4 text-muted-foreground">
