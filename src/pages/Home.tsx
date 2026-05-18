@@ -714,7 +714,7 @@ const HomePage = () => {
           background:
             'radial-gradient(1200px 600px at 20% 0%, hsl(220 50% 18%) 0%, transparent 60%),' +
             'radial-gradient(900px 500px at 85% 90%, hsl(35 60% 22%) 0%, transparent 55%),' +
-            'linear-gradient(180deg, hsl(220 40% 8%) 0%, hsl(220 35% 10%) 100%)',
+            'linear-gradient(180deg, hsl(220 25% 6%) 0%, hsl(220 38% 10%) 20%, hsl(220 38% 10%) 80%, hsl(220 25% 6%) 100%)',
         }}
       >
         {/* 애니메이트 그리드 배경 */}
