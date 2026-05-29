@@ -915,9 +915,10 @@ const HomePage = () => {
       {/* fade: dark → light */}
       <div
         aria-hidden
-        className="h-32 -mt-px"
+        className="h-40 -mt-px"
         style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
       />
+
 
       {/* ── MAP ── */}
       <section className="relative overflow-hidden px-4 py-20 md:py-28">
