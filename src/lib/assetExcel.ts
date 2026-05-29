@@ -115,10 +115,16 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
       else val = raw === '' || raw === null || raw === undefined ? null : String(raw);
       payload[col.key] = val;
     }
-    if (!payload.address || !payload.asset_type) {
-      result.failed++;
-      result.errors.push(`행 ${i + 2}: 주소/자산 유형 누락`);
-      continue;
+    // 빈 칸 허용: 신규 삽입 시 필수 컬럼(address/asset_type)이 비어 있으면 placeholder로 채움
+    // (DB NOT NULL 제약 회피 — 이후 admin 페이지에서 수정 가능)
+    if (!id) {
+      if (!payload.address) payload.address = '(미입력)';
+      if (!payload.asset_type) payload.asset_type = '(미분류)';
+    } else {
+      // 업데이트: 빈 값은 보내지 않음 (기존 값 유지)
+      Object.keys(payload).forEach(k => {
+        if (payload[k] === null || payload[k] === undefined) delete payload[k];
+      });
     }
     // 자동 등급/점수 산출
     const scoring = calculateScoringFields(payload);
