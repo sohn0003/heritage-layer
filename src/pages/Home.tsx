@@ -707,15 +707,22 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* ── DARK BLOCK: INSIGHT + METRICS (연속 배경) ── */}
+      <div
+        aria-hidden
+        className="h-32 -mb-px"
+        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 38% 10%) 100%)' }}
+      />
+      <div
+        className="relative"
+        style={{
+          background:
+            'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(220 30% 8%) 50%, hsl(220 38% 10%) 100%)',
+        }}
+      >
       {/* ── INSIGHT: 큰 통계 + 다양한 차트 (다크 / 라인 기반) ── */}
       <section
         className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28"
-        style={{
-          background:
-            'radial-gradient(1200px 600px at 20% 0%, hsl(220 50% 18%) 0%, transparent 60%),' +
-            'radial-gradient(900px 500px at 85% 90%, hsl(35 60% 22%) 0%, transparent 55%),' +
-            'linear-gradient(180deg, hsl(220 25% 6%) 0%, hsl(220 38% 10%) 20%, hsl(220 38% 10%) 80%, hsl(220 25% 6%) 100%)',
-        }}
       >
         {/* 애니메이트 그리드 배경 */}
         <div
