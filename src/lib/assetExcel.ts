@@ -28,7 +28,7 @@ export const ASSET_COLUMNS: ColDef[] = [
   { key: 'legal_max_floor_area_ratio', label: '법정 최대 용적률(%)', type: 'number' },
   { key: 'current_floor_area', label: '현재 연면적(㎡)', type: 'number' },
   { key: 'land_value_per_sqm', label: '㎡당 토지가치(원)', type: 'number' },
-  { key: 'asset_use_type', label: '자산 활용 용도', type: 'string' },
+  
   { key: 'population_trend', label: '인구 추세', type: 'string' },
   { key: 'commercial_density', label: '상권 밀집도', type: 'string' },
   { key: 'distance_to_center', label: '중심지까지 거리(km)', type: 'number' },
