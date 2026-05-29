@@ -59,12 +59,13 @@ export const ASSET_READONLY_COLUMNS: ColDef[] = [
 export const exportAssetsToExcel = async () => {
   const { data, error } = await supabase.from('assets').select('*').order('created_at', { ascending: false });
   if (error) throw error;
+  const allCols = [...ASSET_COLUMNS, ...ASSET_READONLY_COLUMNS];
   const rows = (data || []).map((a: any) => {
     const r: Record<string, any> = {};
-    ASSET_COLUMNS.forEach(c => { r[c.label] = a[c.key] ?? ''; });
+    allCols.forEach(c => { r[c.label] = a[c.key] ?? ''; });
     return r;
   });
-  const ws = XLSX.utils.json_to_sheet(rows, { header: ASSET_COLUMNS.map(c => c.label) });
+  const ws = XLSX.utils.json_to_sheet(rows, { header: allCols.map(c => c.label) });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'assets');
   const ts = new Date().toISOString().slice(0, 10);
