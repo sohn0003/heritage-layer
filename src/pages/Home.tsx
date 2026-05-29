@@ -717,11 +717,6 @@ const HomePage = () => {
         className="relative overflow-hidden"
         style={{ background: 'hsl(220 38% 10%)' }}
       >
-        {/* 전체 다크 블록을 가로지르는 연속 블롭 (섹션 경계 제거) */}
-        <Blob className="right-[-15%] top-[8%] h-[600px] w-[600px]" color="hsl(40 90% 55%)" />
-        <Blob className="left-[-15%] top-[45%] h-[600px] w-[600px]" color="hsl(220 80% 60%)" />
-        <Blob className="right-[-10%] bottom-[5%] h-[500px] w-[500px]" color="hsl(40 90% 55%)" />
-
       {/* ── INSIGHT: 큰 통계 + 다양한 차트 (다크 / 라인 기반) ── */}
       <section
         className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28"
