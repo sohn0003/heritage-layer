@@ -707,19 +707,21 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── DARK BLOCK: INSIGHT + METRICS (연속 배경) ── */}
+      {/* ── DARK BLOCK: INSIGHT + METRICS (연속 단일 배경) ── */}
       <div
         aria-hidden
-        className="h-32 -mb-px"
+        className="h-40 -mb-px"
         style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 38% 10%) 100%)' }}
       />
       <div
-        className="relative"
-        style={{
-          background:
-            'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(220 30% 8%) 50%, hsl(220 38% 10%) 100%)',
-        }}
+        className="relative overflow-hidden"
+        style={{ background: 'hsl(220 38% 10%)' }}
       >
+        {/* 전체 다크 블록을 가로지르는 연속 블롭 (섹션 경계 제거) */}
+        <Blob className="right-[-15%] top-[8%] h-[600px] w-[600px]" color="hsl(40 90% 55%)" />
+        <Blob className="left-[-15%] top-[45%] h-[600px] w-[600px]" color="hsl(220 80% 60%)" />
+        <Blob className="right-[-10%] bottom-[5%] h-[500px] w-[500px]" color="hsl(40 90% 55%)" />
+
       {/* ── INSIGHT: 큰 통계 + 다양한 차트 (다크 / 라인 기반) ── */}
       <section
         className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28"
@@ -736,9 +738,8 @@ const HomePage = () => {
             maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
           }}
         />
-        {/* 떠다니는 블롭 */}
-        <Blob className="right-[-15%] top-10 h-[500px] w-[500px]" color="hsl(40 90% 55%)" />
-        <Blob className="left-[-15%] bottom-10 h-[500px] w-[500px]" color="hsl(220 80% 60%)" />
+
+
 
         <div className="relative mx-auto max-w-6xl text-[hsl(0_0%_96%)]">
           <div className="mb-12 text-center sm:mb-14">
@@ -861,8 +862,8 @@ const HomePage = () => {
             maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
           }}
         />
-        <Blob className="right-[-10%] top-10 h-[420px] w-[420px]" color="hsl(40 90% 55%)" />
-        <Blob className="left-[-10%] bottom-10 h-[420px] w-[420px]" color="hsl(220 80% 60%)" />
+
+
 
         <div className="relative mx-auto max-w-6xl text-[hsl(0_0%_96%)]">
           <div className="mb-12 text-center sm:mb-14">
@@ -914,9 +915,10 @@ const HomePage = () => {
       {/* fade: dark → light */}
       <div
         aria-hidden
-        className="h-32 -mt-px"
+        className="h-40 -mt-px"
         style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
       />
+
 
       {/* ── MAP ── */}
       <section className="relative overflow-hidden px-4 py-20 md:py-28">
