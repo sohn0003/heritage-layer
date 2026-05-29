@@ -359,20 +359,59 @@ const AboutPage = () => {
         </div>
       </section>
 
+      {/* ── HOW WE WORK (라이트, 다크 블록 진입 전) ── */}
+      <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
+        <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(220 50% 80%)" />
+        <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(40 80% 80%)" />
+
+        <div className="relative mx-auto max-w-6xl">
+          <div className="mb-16 text-center">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">How We Work</span>
+            <h2 className="mt-3 text-4xl font-bold md:text-5xl">우리가 일하는 방식</h2>
+            <p className="mt-4 text-muted-foreground">데이터 → 아이디어 → 실행, 3단계로 자산을 재생합니다</p>
+          </div>
+
+          <StepBlock
+            num="01" title="데이터로 가능성을 본다"
+            desc="전국 유휴자산 데이터를 수집하고 정제합니다. 위치, 법규, 인구, 시장 정보를 한곳에 모아 비교 가능한 형태로 만듭니다."
+            icon={Database} side="left" accent="hsl(var(--primary))"
+          >
+            <Step1Graphic />
+          </StepBlock>
+
+          <StepBlock
+            num="02" title="가장 잘 맞는 재생 방향을 찾는다"
+            desc="입지·법규·시장 데이터를 알고리즘이 결합하여 1·2·3순위 재생 시나리오를 자동 추천합니다. 사람이 며칠 걸릴 검토를 즉시 끝냅니다."
+            icon={Lightbulb} side="right" accent="hsl(var(--accent))"
+          >
+            <Step2Graphic />
+          </StepBlock>
+
+          <StepBlock
+            num="03" title="실제 사업으로 연결한다"
+            desc="프로젝트 매니징을 담당하고 개발에 필요한 리소스를 제공합니다."
+            icon={Rocket} side="left" accent="hsl(var(--primary))"
+          >
+            <Step3Graphic />
+          </StepBlock>
+        </div>
+      </section>
+
       {/* fade: light → dark */}
       <div
         aria-hidden
         className="h-40 -mb-px"
         style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 38% 10%) 100%)' }}
       />
-      {/* ── DARK BLOCK: INSIGHT(수치) + MISSION (연속 단일 배경) ── */}
+      {/* ── DARK BLOCK: INSIGHT + MISSION + PLATFORM (연속 단일 배경) ── */}
       <div
         className="relative overflow-hidden"
         style={{ background: 'hsl(220 38% 10%)' }}
       >
         {/* 전체 다크 블록을 가로지르는 연속 블롭 */}
-        <Blob className="right-[-15%] top-[8%] h-[600px] w-[600px]" color="hsl(40 90% 55%)" />
-        <Blob className="left-[-15%] top-[55%] h-[600px] w-[600px]" color="hsl(220 80% 60%)" />
+        <Blob className="right-[-15%] top-[6%] h-[600px] w-[600px]" color="hsl(40 90% 55%)" />
+        <Blob className="left-[-15%] top-[40%] h-[600px] w-[600px]" color="hsl(220 80% 60%)" />
+        <Blob className="right-[-10%] bottom-[5%] h-[600px] w-[600px]" color="hsl(40 90% 55%)" />
         {/* ── INSIGHT: 전국 유휴 현황 (다크) ── */}
         <section className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28">
           <div
@@ -475,6 +514,78 @@ const AboutPage = () => {
             </Button>
           </div>
         </section>
+
+        {/* ── PLATFORM / PRICING (다크 블록 내부, 글라스 카드) ── */}
+        <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
+          <div className="relative mx-auto max-w-4xl">
+            <div className="mb-12 text-center text-[hsl(0_0%_96%)]">
+              <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Platform</span>
+              <h2 className="mt-3 text-4xl font-bold md:text-5xl">플랫폼 소개</h2>
+              <p className="mx-auto mt-4 max-w-2xl text-[hsl(0_0%_78%)]">
+                Heritage Layer의 스코어링 시스템은 입지, 법규, 시장 데이터를 결합하여
+                각 자산의 재생 가능성을 <span className="font-semibold text-white">S~D 등급</span>으로 평가합니다.
+              </p>
+            </div>
+
+            <Card style={glassDarkCardStyle} className="border-0 overflow-hidden rounded-2xl">
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-b border-white/15 hover:bg-transparent">
+                      <TableHead className="w-1/2 py-5 text-base font-bold text-white">기능</TableHead>
+                      <TableHead className="py-5 text-center text-base font-bold text-white">무료</TableHead>
+                      <TableHead className="py-5 text-center text-base font-bold" style={{ color: 'hsl(40 90% 70%)' }}>Pro</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {comparison.map((row) => (
+                      <TableRow key={row.feature} className="border-b border-white/10 hover:bg-white/[0.04]">
+                        <TableCell className="py-4 text-base font-medium text-[hsl(0_0%_92%)]">{row.feature}</TableCell>
+                        <TableCell className="py-4 text-center">
+                          {row.free ? (
+                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: 'hsl(40 90% 70% / 0.18)' }}>
+                              <Check className="h-5 w-5" style={{ color: 'hsl(40 90% 75%)' }} strokeWidth={3} />
+                            </span>
+                          ) : (
+                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: 'hsl(0 0% 100% / 0.06)' }}>
+                              <X className="h-5 w-5" style={{ color: 'hsl(0 0% 60%)' }} strokeWidth={2.5} />
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="py-4 text-center">
+                          {row.pro ? (
+                            <span
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-full"
+                              style={{ background: 'linear-gradient(135deg, hsl(40 90% 60%), hsl(30 90% 55%))', boxShadow: '0 0 18px hsl(40 90% 55% / 0.4)' }}
+                            >
+                              <Check className="h-5 w-5 text-white" strokeWidth={3} />
+                            </span>
+                          ) : (
+                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: 'hsl(0 0% 100% / 0.06)' }}>
+                              <X className="h-5 w-5" style={{ color: 'hsl(0 0% 60%)' }} strokeWidth={2.5} />
+                            </span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button size="lg" className="bg-accent text-white hover:bg-accent/90" onClick={() => navigate('/pricing')}>요금 안내 보기</Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                onClick={() => navigate('/contact')}
+              >
+                문의하기 <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </section>
       </div>
       {/* fade: dark → light */}
       <div
@@ -483,116 +594,10 @@ const AboutPage = () => {
         style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
       />
 
-
-      {/* ── HOW WE WORK (구 "재생 방법론") — 세로 스택 + 모션 ── */}
-      <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
-        <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(220 50% 80%)" />
-        <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(40 80% 80%)" />
-
-        <div className="relative mx-auto max-w-6xl">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">How We Work</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">우리가 일하는 방식</h2>
-            <p className="mt-4 text-muted-foreground">데이터 → 아이디어 → 실행, 3단계로 자산을 재생합니다</p>
-          </div>
-
-          <StepBlock
-            num="01" title="데이터로 가능성을 본다"
-            desc="전국 유휴자산 데이터를 수집하고 정제합니다. 위치, 법규, 인구, 시장 정보를 한곳에 모아 비교 가능한 형태로 만듭니다."
-            icon={Database} side="left" accent="hsl(var(--primary))"
-          >
-            <Step1Graphic />
-          </StepBlock>
-
-          <StepBlock
-            num="02" title="가장 잘 맞는 재생 방향을 찾는다"
-            desc="입지·법규·시장 데이터를 알고리즘이 결합하여 1·2·3순위 재생 시나리오를 자동 추천합니다. 사람이 며칠 걸릴 검토를 즉시 끝냅니다."
-            icon={Lightbulb} side="right" accent="hsl(var(--accent))"
-          >
-            <Step2Graphic />
-          </StepBlock>
-
-          <StepBlock
-            num="03" title="실제 사업으로 연결한다"
-            desc="프로젝트 매니징을 담당하고 개발에 필요한 리소스를 제공합니다."
-            icon={Rocket} side="left" accent="hsl(var(--primary))"
-          >
-            <Step3Graphic />
-          </StepBlock>
-        </div>
-      </section>
-
-      {/* ── PLATFORM / PRICING ── */}
-      <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
-        <Blob className="left-1/2 top-10 h-96 w-96 -translate-x-1/2" color="hsl(40 90% 80%)" />
-        <div className="relative mx-auto max-w-4xl">
-          <div className="mb-12 text-center">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Platform</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">플랫폼 소개</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-              Heritage Layer의 스코어링 시스템은 입지, 법규, 시장 데이터를 결합하여
-              각 자산의 재생 가능성을 <span className="font-semibold text-foreground">S~D 등급</span>으로 평가합니다.
-            </p>
-          </div>
-
-          <Card style={glassCardStyle} className="border-0">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-b-2 border-accent/30">
-                    <TableHead className="w-1/2 py-5 text-base font-bold">기능</TableHead>
-                    <TableHead className="py-5 text-center text-base font-bold">무료</TableHead>
-                    <TableHead className="py-5 text-center text-base font-bold" style={{ color: 'hsl(var(--accent))' }}>Pro</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {comparison.map((row) => (
-                    <TableRow key={row.feature} className="hover:bg-accent/5">
-                      <TableCell className="py-4 text-base font-medium">{row.feature}</TableCell>
-                      <TableCell className="py-4 text-center">
-                        {row.free ? (
-                          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/15">
-                            <Check className="h-5 w-5" style={{ color: 'hsl(var(--accent))' }} strokeWidth={3} />
-                          </span>
-                        ) : (
-                          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-muted/40">
-                            <X className="h-5 w-5 text-muted-foreground/50" strokeWidth={2.5} />
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="py-4 text-center">
-                        {row.pro ? (
-                          <span
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full"
-                            style={{ background: 'linear-gradient(135deg, hsl(var(--accent)), hsl(35 90% 60%))' }}
-                          >
-                            <Check className="h-5 w-5 text-white" strokeWidth={3} />
-                          </span>
-                        ) : (
-                          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-muted/40">
-                            <X className="h-5 w-5 text-muted-foreground/50" strokeWidth={2.5} />
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button size="lg" onClick={() => navigate('/pricing')}>요금 안내 보기</Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/contact')}>
-              문의하기 <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
       <footer className="border-t px-4 py-8 text-center text-sm text-muted-foreground">
         <p>© 2025 더레이어코퍼레이션 (The Layer Corporation). All rights reserved.</p>
       </footer>
+
     </div>
   );
 };
