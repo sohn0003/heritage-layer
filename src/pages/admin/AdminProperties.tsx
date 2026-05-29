@@ -293,7 +293,7 @@ const AdminPropertiesPage = () => {
   const setF = (patch: Partial<AssetForm>) => setForm((f) => ({ ...f, ...patch }));
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-8 pt-24">
+    <div className="mx-auto max-w-6xl px-4 pb-8 pt-32">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">매물 관리</h1>
         <div className="flex gap-2">
