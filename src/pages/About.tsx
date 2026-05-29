@@ -277,7 +277,7 @@ const AboutPage = () => {
 
       {/* ── PROBLEM: 왜 우리 비즈니스가 필요한가 ── */}
       <section
-        className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-14 sm:py-20 md:py-28"
+        className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28"
       >
         <Blob className="left-[-10%] top-10 h-96 w-96" color="hsl(0 70% 80%)" />
         <Blob className="right-[-10%] bottom-10 h-96 w-96" color="hsl(40 90% 80%)" />
