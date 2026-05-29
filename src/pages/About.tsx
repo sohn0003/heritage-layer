@@ -58,6 +58,23 @@ const glassCardStyle: React.CSSProperties = {
     '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
 };
 
+// 다크 배경 위에 올리는 글라스 카드 — 폰트가 묻히지 않게 라이트 톤 텍스트 유지
+const glassDarkCardStyle: React.CSSProperties = {
+  background: 'hsl(0 0% 100% / 0.06)',
+  border: '1px solid hsl(0 0% 100% / 0.12)',
+  color: 'hsl(0 0% 96%)',
+  backdropFilter: 'blur(14px)',
+  WebkitBackdropFilter: 'blur(14px)',
+  ['--foreground' as any]: '0 0% 96%',
+  ['--muted-foreground' as any]: '0 0% 75%',
+  ['--card-foreground' as any]: '0 0% 96%',
+  ['--muted' as any]: '0 0% 100% / 0.08',
+  ['--border' as any]: '0 0% 100% / 0.12',
+  boxShadow:
+    '0 1px 2px rgba(0,0,0,0.2), 0 12px 32px -8px rgba(0,0,0,0.4), 0 32px 64px -20px rgba(0,0,0,0.5)',
+};
+
+
 const Blob = ({ className, color }: { className?: string; color: string }) => (
   <div aria-hidden className={`pointer-events-none absolute rounded-full blur-3xl ${className ?? ''}`}
     style={{ background: color, opacity: 0.4 }} />
