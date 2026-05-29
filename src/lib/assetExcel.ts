@@ -48,6 +48,14 @@ export const ASSET_COLUMNS: ColDef[] = [
   { key: 'is_balanced_dev_budget', label: '균형발전 예산 대상', type: 'boolean' },
 ];
 
+// Export 전용 (자동 계산 / 알고리즘 산출 — import 시 무시)
+export const ASSET_READONLY_COLUMNS: ColDef[] = [
+  { key: 'scoring_grade', label: '점수 등급 (자동)', type: 'string' },
+  { key: 'scoring_total', label: '총점 (자동)', type: 'number' },
+  { key: 'recommended_use_type', label: '추천 활용 용도 (자동)', type: 'string' },
+  { key: 'recommended_dev_direction', label: '추천 개발 방향 (자동)', type: 'string' },
+];
+
 export const exportAssetsToExcel = async () => {
   const { data, error } = await supabase.from('assets').select('*').order('created_at', { ascending: false });
   if (error) throw error;
