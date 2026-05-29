@@ -668,7 +668,7 @@ const HomePage = () => {
       </section>
 
       {/* ── PROCESS: 세로 스택, 풀스크린 모션 ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
+      <section className="relative overflow-hidden px-4 py-20 md:py-28">
         <Blob className="left-[-10%] top-20 h-96 w-96" color="hsl(220 50% 80%)" />
         <Blob className="right-[-10%] top-1/2 h-96 w-96" color="hsl(40 80% 80%)" />
 
