@@ -293,38 +293,8 @@ const AboutPage = () => {
             </p>
           </div>
 
-          {/* 큰 통계 카드 */}
-          <div className="mb-12 grid gap-5 sm:grid-cols-3">
-            {[
-              { icon: School, label: '전국 폐교', value: 3955, suffix: '개', color: 'hsl(0 70% 55%)' },
-              { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(25 90% 55%)' },
-              { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(var(--primary))' },
-            ].map((s) => (
-              <div key={s.label} className="rounded-2xl p-5 sm:p-6 sm:rounded-3xl text-center transition-transform hover:-translate-y-1"
-                style={glassCardStyle}>
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl"
-                  style={{ background: `${s.color.replace(')', ' / 0.15)')}` }}>
-                  <s.icon className="h-7 w-7" style={{ color: s.color }} />
-                </div>
-                <p className="text-sm text-muted-foreground">{s.label}</p>
-                <p className="mt-2 text-4xl font-bold tabular-nums" style={{ color: s.color }}>
-                  <CountUp end={s.value} suffix={s.suffix} />
-                </p>
-              </div>
-            ))}
-          </div>
+          {/* 통계 카드 & 권역 막대는 아래 다크 INSIGHT 블록으로 이동 */}
 
-          {/* 권역 막대 */}
-          <div className="rounded-2xl p-5 sm:p-7 sm:rounded-3xl" style={glassCardStyle}>
-            <h3 className="mb-5 text-lg font-semibold">권역별 폐교 분포 (Top 5)</h3>
-            <div className="space-y-5">
-              <InsightBar label="전남" value={839} max={1000} color="hsl(0 70% 55%)" suffix="개" />
-              <InsightBar label="경북" value={745} max={1000} color="hsl(0 70% 55%)" suffix="개" />
-              <InsightBar label="경남" value={584} max={1000} color="hsl(25 90% 55%)" suffix="개" />
-              <InsightBar label="강원" value={476} max={1000} color="hsl(25 90% 55%)" suffix="개" />
-              <InsightBar label="전북" value={329} max={1000} color="hsl(var(--primary))" suffix="개" />
-            </div>
-          </div>
 
           {/* 왜 재생되지 못할까요? — 큰 그래픽, 4단 스택 */}
           <div className="mt-16">
@@ -378,38 +348,124 @@ const AboutPage = () => {
         className="h-32 -mb-px"
         style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 38% 10%) 100%)' }}
       />
-      {/* ── MISSION: 우리는 누구인가 ── */}
-      <section
-        className="relative overflow-hidden px-4 py-20 text-[hsl(0_0%_96%)] md:py-28"
+      {/* ── DARK BLOCK: INSIGHT(수치) + MISSION (연속 배경, Home과 동일 포맷) ── */}
+      <div
+        className="relative"
         style={{
           background:
             'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(220 30% 8%) 50%, hsl(220 38% 10%) 100%)',
         }}
       >
-        <Blob className="right-[-10%] top-10 h-96 w-96" color="hsl(40 90% 60%)" />
-        <Blob className="left-[-10%] bottom-10 h-96 w-96" color="hsl(220 70% 50%)" />
-        <div className="relative mx-auto max-w-3xl text-center">
-          <Sparkles className="mx-auto mb-4 h-10 w-10" style={{ color: 'hsl(var(--accent))' }} />
-          <h2 className="text-3xl font-bold sm:text-5xl">
-            우리는 유휴자산을<br />가장 잘 아는 재생 사업자입니다
-          </h2>
-          <p className="mt-6 text-base leading-relaxed opacity-90 md:text-lg">
-            Heritage Layer는 전국의 유휴 부동산을 데이터 기반으로 분석하고,
-            최적의 재생 방향을 도출하여 실제 딜로 연결하는 플랫폼입니다.
-            폐교, 빈집, 유휴 공공시설을 새로운 가치의 공간으로 전환합니다.
-          </p>
-          <Button size="lg" className="mt-8 bg-accent text-white hover:bg-accent/90"
-            onClick={() => navigate('/properties')}>
-            지금 자산 탐색하기 <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      </section>
+        {/* ── INSIGHT: 전국 유휴 현황 (다크) ── */}
+        <section className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.07]"
+            style={{
+              backgroundImage:
+                'linear-gradient(hsl(0 0% 100% / 0.5) 1px, transparent 1px),' +
+                'linear-gradient(90deg, hsl(0 0% 100% / 0.5) 1px, transparent 1px)',
+              backgroundSize: '52px 52px',
+              maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
+            }}
+          />
+          <Blob className="right-[-15%] top-10 h-[500px] w-[500px]" color="hsl(40 90% 55%)" />
+          <Blob className="left-[-15%] bottom-10 h-[500px] w-[500px]" color="hsl(220 80% 60%)" />
+
+          <div className="relative mx-auto max-w-6xl text-[hsl(0_0%_96%)]">
+            <div className="mb-12 text-center sm:mb-14">
+              <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Insight</span>
+              <h2 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
+                <span className="bg-gradient-to-r from-white via-white to-[hsl(40_90%_75%)] bg-clip-text text-transparent">
+                  방치된 자원, 숫자로 보다
+                </span>
+              </h2>
+              <p className="mt-4 text-[hsl(0_0%_75%)]">전국에 쌓이는 유휴 자산 — 데이터가 곧 기회의 좌표입니다.</p>
+            </div>
+
+            {/* Big stat cards */}
+            <div
+              className="mb-14 grid gap-px overflow-hidden rounded-2xl sm:grid-cols-3"
+              style={{ background: 'hsl(0 0% 100% / 0.08)' }}
+            >
+              {[
+                { icon: School, label: '전국 폐교', value: 3955, suffix: '개', color: 'hsl(220 90% 70%)' },
+                { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(40 95% 65%)' },
+                { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(0 80% 65%)' },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  className="group relative p-6 transition-colors hover:bg-white/[0.03] sm:p-8"
+                  style={{ background: 'hsl(220 40% 9%)' }}
+                >
+                  <div
+                    className="absolute inset-x-0 top-0 h-px"
+                    style={{ background: `linear-gradient(90deg, transparent, ${s.color}, transparent)` }}
+                  />
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-xl"
+                      style={{ background: `${s.color.replace(')', ' / 0.12)')}`, boxShadow: `inset 0 0 0 1px ${s.color}30` }}
+                    >
+                      <s.icon className="h-5 w-5" style={{ color: s.color }} />
+                    </div>
+                    <p className="text-sm text-[hsl(0_0%_72%)]">{s.label}</p>
+                  </div>
+                  <p
+                    className="mt-4 text-4xl font-bold tabular-nums sm:text-5xl"
+                    style={{ color: s.color, textShadow: `0 0 24px ${s.color}50` }}
+                  >
+                    <CountUp end={s.value} suffix={s.suffix} />
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* 권역 막대 — 다크 */}
+            <div className="relative">
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="text-base font-semibold tracking-tight sm:text-lg">권역별 폐교 분포 (Top 5)</h3>
+                <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[hsl(0_0%_60%)]">Top 5</span>
+              </div>
+              <div className="space-y-6">
+                <InsightBar label="전남" value={839} max={1000} color="hsl(220 90% 70%)" suffix="개" />
+                <InsightBar label="경북" value={745} max={1000} color="hsl(220 90% 70%)" suffix="개" />
+                <InsightBar label="경남" value={584} max={1000} color="hsl(40 95% 65%)" suffix="개" />
+                <InsightBar label="강원" value={476} max={1000} color="hsl(40 95% 65%)" suffix="개" />
+                <InsightBar label="전북" value={329} max={1000} color="hsl(220 30% 65%)" suffix="개" />
+              </div>
+              <div className="mt-6 h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.15), transparent)' }} />
+              <p className="mt-3 text-xs text-[hsl(0_0%_60%)]">출처: 교육부 통계 (참고치)</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── MISSION ── */}
+        <section className="relative overflow-hidden px-4 py-16 text-[hsl(0_0%_96%)] sm:py-20 md:py-24">
+          <div className="relative mx-auto max-w-3xl text-center">
+            <Sparkles className="mx-auto mb-4 h-10 w-10" style={{ color: 'hsl(var(--accent))' }} />
+            <h2 className="text-3xl font-bold sm:text-5xl">
+              우리는 유휴자산을<br />가장 잘 아는 재생 사업자입니다
+            </h2>
+            <p className="mt-6 text-base leading-relaxed opacity-90 md:text-lg">
+              Heritage Layer는 전국의 유휴 부동산을 데이터 기반으로 분석하고,
+              최적의 재생 방향을 도출하여 실제 딜로 연결하는 플랫폼입니다.
+              폐교, 빈집, 유휴 공공시설을 새로운 가치의 공간으로 전환합니다.
+            </p>
+            <Button size="lg" className="mt-8 bg-accent text-white hover:bg-accent/90"
+              onClick={() => navigate('/properties')}>
+              지금 자산 탐색하기 <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </section>
+      </div>
       {/* fade: dark → light */}
       <div
         aria-hidden
         className="h-32 -mt-px"
         style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
       />
+
 
       {/* ── HOW WE WORK (구 "재생 방법론") — 세로 스택 + 모션 ── */}
       <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
