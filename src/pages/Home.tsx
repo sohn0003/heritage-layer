@@ -911,22 +911,14 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      </div>
-      {/* fade: dark → light */}
-      <div
-        aria-hidden
-        className="h-40 -mt-px"
-        style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
-      />
 
 
       {/* ── MAP ── */}
       <section className="relative overflow-hidden px-4 py-20 md:py-28">
-        <Blob className="left-1/2 top-10 h-96 w-96 -translate-x-1/2" color="hsl(220 60% 85%)" />
-        <div className="relative mx-auto max-w-5xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Explore</span>
+        <div className="relative mx-auto max-w-5xl text-center text-[hsl(0_0%_96%)]">
+          <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Explore</span>
           <h2 className="mt-3 text-4xl font-bold md:text-5xl">전국 유휴자산 지도</h2>
-          <p className="mb-10 mt-4 text-muted-foreground">데이터 기반으로 전국의 재생 가능 자산을 한눈에 확인하세요</p>
+          <p className="mb-10 mt-4 text-[hsl(0_0%_75%)]">데이터 기반으로 전국의 재생 가능 자산을 한눈에 확인하세요</p>
           <button
             onClick={() => navigate('/properties')}
             className="group relative mx-auto mb-8 block aspect-[16/9] w-full max-w-4xl overflow-hidden rounded-3xl transition-all hover:scale-[1.01]"
@@ -955,8 +947,6 @@ const HomePage = () => {
 
       {/* ── CTA ── */}
       <section className="relative overflow-hidden px-4 py-20 md:py-24">
-        <Blob className="left-[20%] top-0 h-80 w-80" color="hsl(40 80% 75%)" />
-        <Blob className="right-[15%] bottom-0 h-80 w-80" color="hsl(220 60% 80%)" />
         <div className="relative mx-auto max-w-3xl rounded-2xl p-7 text-center sm:rounded-3xl sm:p-10 md:p-14" style={glassCardStyle}>
           <Sparkles className="mx-auto mb-4 h-10 w-10 text-accent" />
           <h2 className="text-3xl font-bold md:text-4xl">유휴 부동산을 새로운 기회로</h2>
@@ -969,6 +959,13 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      </div>
+      {/* fade: dark → light */}
+      <div
+        aria-hidden
+        className="h-32 -mt-px"
+        style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
+      />
 
       {/* ── FOOTER ── */}
       <footer className="border-t bg-card px-4 py-14">
