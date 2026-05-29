@@ -345,17 +345,17 @@ const AboutPage = () => {
       {/* fade: light → dark */}
       <div
         aria-hidden
-        className="h-32 -mb-px"
+        className="h-40 -mb-px"
         style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 38% 10%) 100%)' }}
       />
-      {/* ── DARK BLOCK: INSIGHT(수치) + MISSION (연속 배경, Home과 동일 포맷) ── */}
+      {/* ── DARK BLOCK: INSIGHT(수치) + MISSION (연속 단일 배경) ── */}
       <div
-        className="relative"
-        style={{
-          background:
-            'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(220 30% 8%) 50%, hsl(220 38% 10%) 100%)',
-        }}
+        className="relative overflow-hidden"
+        style={{ background: 'hsl(220 38% 10%)' }}
       >
+        {/* 전체 다크 블록을 가로지르는 연속 블롭 */}
+        <Blob className="right-[-15%] top-[8%] h-[600px] w-[600px]" color="hsl(40 90% 55%)" />
+        <Blob className="left-[-15%] top-[55%] h-[600px] w-[600px]" color="hsl(220 80% 60%)" />
         {/* ── INSIGHT: 전국 유휴 현황 (다크) ── */}
         <section className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28">
           <div
