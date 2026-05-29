@@ -246,7 +246,7 @@ const AboutPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen" style={{ zoom: 0.8 } as React.CSSProperties}>
+    <div className="min-h-screen bg-gradient-to-b from-background via-muted/30 to-background" style={{ zoom: 0.8 } as React.CSSProperties}>
       <Seo
         title="회사 소개 — Heritage Layer"
         description="(주)더레이어코퍼레이션이 운영하는 Heritage Layer의 비전, 팀, 그리고 유휴 부동산 재생 접근법을 소개합니다."
@@ -277,7 +277,7 @@ const AboutPage = () => {
 
       {/* ── PROBLEM: 왜 우리 비즈니스가 필요한가 ── */}
       <section
-        className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-14 sm:py-20 md:py-28"
+        className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28"
       >
         <Blob className="left-[-10%] top-10 h-96 w-96" color="hsl(0 70% 80%)" />
         <Blob className="right-[-10%] bottom-10 h-96 w-96" color="hsl(40 90% 80%)" />
@@ -372,14 +372,18 @@ const AboutPage = () => {
         </div>
       </section>
 
+      {/* fade: light → dark */}
+      <div
+        aria-hidden
+        className="h-32 -mb-px"
+        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 38% 10%) 100%)' }}
+      />
       {/* ── MISSION: 우리는 누구인가 ── */}
       <section
         className="relative overflow-hidden px-4 py-20 text-[hsl(0_0%_96%)] md:py-28"
         style={{
           background:
-            'radial-gradient(1000px 500px at 80% 0%, hsl(35 60% 22%) 0%, transparent 60%),' +
-            'radial-gradient(900px 500px at 15% 90%, hsl(220 50% 18%) 0%, transparent 55%),' +
-            'linear-gradient(180deg, hsl(220 25% 6%) 0%, hsl(220 38% 10%) 20%, hsl(220 38% 10%) 80%, hsl(220 25% 6%) 100%)',
+            'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(220 30% 8%) 50%, hsl(220 38% 10%) 100%)',
         }}
       >
         <Blob className="right-[-10%] top-10 h-96 w-96" color="hsl(40 90% 60%)" />
@@ -400,9 +404,15 @@ const AboutPage = () => {
           </Button>
         </div>
       </section>
+      {/* fade: dark → light */}
+      <div
+        aria-hidden
+        className="h-32 -mt-px"
+        style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
+      />
 
       {/* ── HOW WE WORK (구 "재생 방법론") — 세로 스택 + 모션 ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-14 sm:py-20 md:py-28">
+      <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
         <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(220 50% 80%)" />
         <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(40 80% 80%)" />
 

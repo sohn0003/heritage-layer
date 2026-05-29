@@ -607,7 +607,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden" style={{ zoom: 0.8 } as React.CSSProperties}>
+    <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-background via-muted/30 to-background" style={{ zoom: 0.8 } as React.CSSProperties}>
       <Seo
         title="Heritage Layer — 유휴부지 부동산 재생 솔루션"
         description="잠든 유휴부지에 생명력을 불어넣다. 한국 유휴 부동산을 발굴·분석·재생하는 데이터 기반 부동산 재생 플랫폼."
@@ -668,7 +668,7 @@ const HomePage = () => {
       </section>
 
       {/* ── PROCESS: 세로 스택, 풀스크린 모션 ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
+      <section className="relative overflow-hidden px-4 py-20 md:py-28">
         <Blob className="left-[-10%] top-20 h-96 w-96" color="hsl(220 50% 80%)" />
         <Blob className="right-[-10%] top-1/2 h-96 w-96" color="hsl(40 80% 80%)" />
 
@@ -707,15 +707,22 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* ── DARK BLOCK: INSIGHT + METRICS (연속 배경) ── */}
+      <div
+        aria-hidden
+        className="h-32 -mb-px"
+        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 38% 10%) 100%)' }}
+      />
+      <div
+        className="relative"
+        style={{
+          background:
+            'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(220 30% 8%) 50%, hsl(220 38% 10%) 100%)',
+        }}
+      >
       {/* ── INSIGHT: 큰 통계 + 다양한 차트 (다크 / 라인 기반) ── */}
       <section
         className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28"
-        style={{
-          background:
-            'radial-gradient(1200px 600px at 20% 0%, hsl(220 50% 18%) 0%, transparent 60%),' +
-            'radial-gradient(900px 500px at 85% 90%, hsl(35 60% 22%) 0%, transparent 55%),' +
-            'linear-gradient(180deg, hsl(220 25% 6%) 0%, hsl(220 38% 10%) 20%, hsl(220 38% 10%) 80%, hsl(220 25% 6%) 100%)',
-        }}
       >
         {/* 애니메이트 그리드 배경 */}
         <div
@@ -841,12 +848,6 @@ const HomePage = () => {
       {/* ── METRICS: Heritage Layer 임팩트 (다크 / 라인 기반) ── */}
       <section
         className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28"
-        style={{
-          background:
-            'radial-gradient(1000px 500px at 80% 0%, hsl(35 60% 22%) 0%, transparent 60%),' +
-            'radial-gradient(900px 500px at 15% 90%, hsl(220 50% 18%) 0%, transparent 55%),' +
-            'linear-gradient(180deg, hsl(220 25% 6%) 0%, hsl(220 38% 10%) 20%, hsl(220 38% 10%) 80%, hsl(220 25% 6%) 100%)',
-        }}
       >
         {/* 미세 그리드 */}
         <div
@@ -909,9 +910,16 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      </div>
+      {/* fade: dark → light */}
+      <div
+        aria-hidden
+        className="h-32 -mt-px"
+        style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
+      />
 
       {/* ── MAP ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background px-4 py-20 md:py-28">
+      <section className="relative overflow-hidden px-4 py-20 md:py-28">
         <Blob className="left-1/2 top-10 h-96 w-96 -translate-x-1/2" color="hsl(220 60% 85%)" />
         <div className="relative mx-auto max-w-5xl text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Explore</span>
