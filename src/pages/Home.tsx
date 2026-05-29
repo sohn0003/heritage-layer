@@ -862,8 +862,8 @@ const HomePage = () => {
             maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
           }}
         />
-        <Blob className="right-[-10%] top-10 h-[420px] w-[420px]" color="hsl(40 90% 55%)" />
-        <Blob className="left-[-10%] bottom-10 h-[420px] w-[420px]" color="hsl(220 80% 60%)" />
+
+
 
         <div className="relative mx-auto max-w-6xl text-[hsl(0_0%_96%)]">
           <div className="mb-12 text-center sm:mb-14">
