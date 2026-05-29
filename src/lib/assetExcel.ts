@@ -28,7 +28,7 @@ export const ASSET_COLUMNS: ColDef[] = [
   { key: 'legal_max_floor_area_ratio', label: '법정 최대 용적률(%)', type: 'number' },
   { key: 'current_floor_area', label: '현재 연면적(㎡)', type: 'number' },
   { key: 'land_value_per_sqm', label: '㎡당 토지가치(원)', type: 'number' },
-  { key: 'asset_use_type', label: '자산 활용 용도', type: 'string' },
+  
   { key: 'population_trend', label: '인구 추세', type: 'string' },
   { key: 'commercial_density', label: '상권 밀집도', type: 'string' },
   { key: 'distance_to_center', label: '중심지까지 거리(km)', type: 'number' },
@@ -48,15 +48,24 @@ export const ASSET_COLUMNS: ColDef[] = [
   { key: 'is_balanced_dev_budget', label: '균형발전 예산 대상', type: 'boolean' },
 ];
 
+// Export 전용 (자동 계산 / 알고리즘 산출 — import 시 무시)
+export const ASSET_READONLY_COLUMNS: ColDef[] = [
+  { key: 'scoring_grade', label: '점수 등급 (자동)', type: 'string' },
+  { key: 'scoring_total', label: '총점 (자동)', type: 'number' },
+  { key: 'recommended_use_type', label: '추천 활용 용도 (자동)', type: 'string' },
+  { key: 'recommended_dev_direction', label: '추천 개발 방향 (자동)', type: 'string' },
+];
+
 export const exportAssetsToExcel = async () => {
   const { data, error } = await supabase.from('assets').select('*').order('created_at', { ascending: false });
   if (error) throw error;
+  const allCols = [...ASSET_COLUMNS, ...ASSET_READONLY_COLUMNS];
   const rows = (data || []).map((a: any) => {
     const r: Record<string, any> = {};
-    ASSET_COLUMNS.forEach(c => { r[c.label] = a[c.key] ?? ''; });
+    allCols.forEach(c => { r[c.label] = a[c.key] ?? ''; });
     return r;
   });
-  const ws = XLSX.utils.json_to_sheet(rows, { header: ASSET_COLUMNS.map(c => c.label) });
+  const ws = XLSX.utils.json_to_sheet(rows, { header: allCols.map(c => c.label) });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'assets');
   const ts = new Date().toISOString().slice(0, 10);
