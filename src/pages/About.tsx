@@ -462,7 +462,7 @@ const AboutPage = () => {
       {/* fade: dark → light */}
       <div
         aria-hidden
-        className="h-32 -mt-px"
+        className="h-40 -mt-px"
         style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
       />
 
