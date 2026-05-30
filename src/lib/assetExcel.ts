@@ -97,13 +97,31 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
 
   const result: ImportResult = { inserted: 0, updated: 0, failed: 0, errors: [] };
 
+  // 헤더 정규화: 괄호 내용/공백 제거하여 매칭 향상
+  const normalizeHeader = (s: string): string =>
+    String(s ?? '')
+      .replace(/\([^)]*\)/g, '')
+      .replace(/\[[^\]]*\]/g, '')
+      .replace(/\s+/g, '')
+      .toLowerCase()
+      .trim();
+
+  // label/key 기반 별칭 맵
+  const labelMap = new Map<string, ColDef>();
+  for (const col of ASSET_COLUMNS) {
+    labelMap.set(normalizeHeader(col.label), col);
+    labelMap.set(normalizeHeader(col.key), col);
+  }
+
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const payload: Record<string, any> = {};
     let id: string | null = null;
-    for (const col of ASSET_COLUMNS) {
-      if (!(col.label in row)) continue;
-      const raw = row[col.label];
+
+    for (const rawHeader of Object.keys(row)) {
+      const col = labelMap.get(normalizeHeader(rawHeader));
+      if (!col) continue;
+      const raw = row[rawHeader];
       if (col.key === 'id') {
         const s = String(raw ?? '').trim();
         if (s) id = s;
@@ -115,16 +133,18 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
       else val = raw === '' || raw === null || raw === undefined ? null : String(raw);
       payload[col.key] = val;
     }
-    // 빈 칸 허용: 신규 삽입 시 필수 컬럼(address/asset_type)이 비어 있으면 placeholder로 채움
-    // (DB NOT NULL 제약 회피 — 이후 admin 페이지에서 수정 가능)
-    if (!id) {
-      if (!payload.address) payload.address = '(미입력)';
-      if (!payload.asset_type) payload.asset_type = '(미분류)';
-    } else {
-      // 업데이트: 빈 값은 보내지 않음 (기존 값 유지)
+
+    if (id) {
+      // 업데이트: 빈 값은 제거하여 기존 값 유지
       Object.keys(payload).forEach(k => {
         if (payload[k] === null || payload[k] === undefined) delete payload[k];
       });
+    } else {
+      // 신규: 의미 있는 데이터가 전혀 없으면 빈 행으로 간주하고 스킵
+      const hasAnyData = Object.values(payload).some(v => v !== null && v !== undefined && v !== '');
+      if (!hasAnyData) continue;
+      if (!payload.address) payload.address = '(미입력)';
+      if (!payload.asset_type) payload.asset_type = '(미분류)';
     }
     // 자동 등급/점수 산출
     const scoring = calculateScoringFields(payload);
