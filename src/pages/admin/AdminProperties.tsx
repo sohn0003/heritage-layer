@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,7 +19,6 @@ import { Plus, Pencil, Trash2, Download, Upload } from 'lucide-react';
 import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
 import { calculateScoringFields, buildScoringInput } from '@/lib/assetScoring';
 import { analyzeAsset } from '@/algorithm/financial/irr-calculator';
-import { useRef } from 'react';
 import GradeBadge from '@/components/common/GradeBadge';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
@@ -136,6 +136,7 @@ const AdminPropertiesPage = () => {
   const [editId, setEditId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -287,6 +288,35 @@ const AdminPropertiesPage = () => {
     else { toast({ title: '매물이 삭제되었습니다' }); fetchAssets(); }
   };
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) => {
+      if (prev.size === assets.length && assets.length > 0) return new Set();
+      return new Set(assets.map((a) => a.id));
+    });
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`선택한 ${selectedIds.size}건을 삭제하시겠습니까?`)) return;
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from('assets').delete().in('id', ids);
+    if (error) toast({ title: '삭제 실패', description: error.message, variant: 'destructive' });
+    else {
+      toast({ title: `${selectedIds.size}건의 매물이 삭제되었습니다` });
+      setSelectedIds(new Set());
+      fetchAssets();
+    }
+  };
+
   if (authLoading) return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
   if (!isAdmin) return null;
 
@@ -294,6 +324,17 @@ const AdminPropertiesPage = () => {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-8 pt-32">
+      {selectedIds.size > 0 && (
+        <div className="mb-3 flex items-center gap-3 rounded-md border border-destructive/30 bg-destructive/5 px-4 py-2 text-sm text-destructive">
+          <span className="font-medium">{selectedIds.size}건 선택됨</span>
+          <Button variant="destructive" size="sm" onClick={handleDeleteSelected}>
+            <Trash2 className="mr-1 h-4 w-4" /> 선택 삭제
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
+            선택 해제
+          </Button>
+        </div>
+      )}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">매물 관리</h1>
         <div className="flex gap-2">
@@ -341,6 +382,13 @@ const AdminPropertiesPage = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={assets.length > 0 && selectedIds.size === assets.length ? true : selectedIds.size > 0 ? 'indeterminate' : false}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="전체 선택"
+                  />
+                </TableHead>
                 <TableHead>등급</TableHead>
                 <TableHead>주소</TableHead>
                 <TableHead>유형</TableHead>
@@ -352,7 +400,14 @@ const AdminPropertiesPage = () => {
             </TableHeader>
             <TableBody>
               {assets.map((a) => (
-                <TableRow key={a.id}>
+                <TableRow key={a.id} data-state={selectedIds.has(a.id) ? 'selected' : undefined}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(a.id)}
+                      onCheckedChange={() => toggleSelect(a.id)}
+                      aria-label={`${a.address} 선택`}
+                    />
+                  </TableCell>
                   <TableCell>{a.grade && <GradeBadge grade={a.grade} />}</TableCell>
                   <TableCell className="max-w-[200px] truncate text-sm">{a.address}</TableCell>
                   <TableCell><Badge variant="secondary" className="text-xs">{a.asset_type}</Badge></TableCell>
