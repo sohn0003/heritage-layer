@@ -324,6 +324,17 @@ const AdminPropertiesPage = () => {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-8 pt-32">
+      {selectedIds.size > 0 && (
+        <div className="mb-3 flex items-center gap-3 rounded-md border border-destructive/30 bg-destructive/5 px-4 py-2 text-sm text-destructive">
+          <span className="font-medium">{selectedIds.size}건 선택됨</span>
+          <Button variant="destructive" size="sm" onClick={handleDeleteSelected}>
+            <Trash2 className="mr-1 h-4 w-4" /> 선택 삭제
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
+            선택 해제
+          </Button>
+        </div>
+      )}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">매물 관리</h1>
         <div className="flex gap-2">
