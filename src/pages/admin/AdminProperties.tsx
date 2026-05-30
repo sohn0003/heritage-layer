@@ -288,6 +288,35 @@ const AdminPropertiesPage = () => {
     else { toast({ title: '매물이 삭제되었습니다' }); fetchAssets(); }
   };
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) => {
+      if (prev.size === assets.length && assets.length > 0) return new Set();
+      return new Set(assets.map((a) => a.id));
+    });
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`선택한 ${selectedIds.size}건을 삭제하시겠습니까?`)) return;
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from('assets').delete().in('id', ids);
+    if (error) toast({ title: '삭제 실패', description: error.message, variant: 'destructive' });
+    else {
+      toast({ title: `${selectedIds.size}건의 매물이 삭제되었습니다` });
+      setSelectedIds(new Set());
+      fetchAssets();
+    }
+  };
+
   if (authLoading) return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
   if (!isAdmin) return null;
 
