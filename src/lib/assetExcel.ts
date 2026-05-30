@@ -93,12 +93,11 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
   const buf = await file.arrayBuffer();
   const wb = XLSX.read(buf, { type: 'array' });
   const ws = wb.Sheets[wb.SheetNames[0]];
-  const rows: any[] = XLSX.utils.sheet_to_json(ws, { defval: '' });
 
   const result: ImportResult = { inserted: 0, updated: 0, failed: 0, errors: [] };
 
   // 헤더 정규화: 괄호 내용/공백 제거하여 매칭 향상
-  const normalizeHeader = (s: string): string =>
+  const normalizeHeader = (s: any): string =>
     String(s ?? '')
       .replace(/\([^)]*\)/g, '')
       .replace(/\[[^\]]*\]/g, '')
@@ -112,6 +111,29 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
     labelMap.set(normalizeHeader(col.label), col);
     labelMap.set(normalizeHeader(col.key), col);
   }
+
+  // 헤더 행 자동 감지: 처음 10행 중 알려진 컬럼과 가장 많이 매칭되는 행을 헤더로 사용
+  // (엑셀 상단에 주석/안내 행이 있어도 정상 처리)
+  const aoa: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+  if (aoa.length === 0) return result;
+  let headerRowIdx = 0;
+  let bestScore = -1;
+  const scanLimit = Math.min(10, aoa.length);
+  for (let r = 0; r < scanLimit; r++) {
+    const score = (aoa[r] || []).reduce((acc: number, cell: any) =>
+      acc + (labelMap.has(normalizeHeader(cell)) ? 1 : 0), 0);
+    if (score > bestScore) { bestScore = score; headerRowIdx = r; }
+  }
+  if (bestScore < 2) {
+    result.errors.push('헤더 행을 인식하지 못했습니다. 첫 시트의 헤더 라벨(예: "주소", "자산 유형")을 확인하세요.');
+    return result;
+  }
+  const headerRow = aoa[headerRowIdx].map((c: any) => String(c ?? ''));
+  const rows: any[] = aoa.slice(headerRowIdx + 1).map(arr => {
+    const o: Record<string, any> = {};
+    headerRow.forEach((h, i) => { if (h) o[h] = arr[i] ?? ''; });
+    return o;
+  });
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
