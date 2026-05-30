@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,7 +19,6 @@ import { Plus, Pencil, Trash2, Download, Upload } from 'lucide-react';
 import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
 import { calculateScoringFields, buildScoringInput } from '@/lib/assetScoring';
 import { analyzeAsset } from '@/algorithm/financial/irr-calculator';
-import { useRef } from 'react';
 import GradeBadge from '@/components/common/GradeBadge';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
