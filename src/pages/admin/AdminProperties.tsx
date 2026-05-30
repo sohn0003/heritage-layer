@@ -382,6 +382,13 @@ const AdminPropertiesPage = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={assets.length > 0 && selectedIds.size === assets.length ? true : selectedIds.size > 0 ? 'indeterminate' : false}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="전체 선택"
+                  />
+                </TableHead>
                 <TableHead>등급</TableHead>
                 <TableHead>주소</TableHead>
                 <TableHead>유형</TableHead>
@@ -393,7 +400,14 @@ const AdminPropertiesPage = () => {
             </TableHeader>
             <TableBody>
               {assets.map((a) => (
-                <TableRow key={a.id}>
+                <TableRow key={a.id} data-state={selectedIds.has(a.id) ? 'selected' : undefined}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(a.id)}
+                      onCheckedChange={() => toggleSelect(a.id)}
+                      aria-label={`${a.address} 선택`}
+                    />
+                  </TableCell>
                   <TableCell>{a.grade && <GradeBadge grade={a.grade} />}</TableCell>
                   <TableCell className="max-w-[200px] truncate text-sm">{a.address}</TableCell>
                   <TableCell><Badge variant="secondary" className="text-xs">{a.asset_type}</Badge></TableCell>
