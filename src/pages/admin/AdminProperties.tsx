@@ -494,6 +494,11 @@ const AdminPropertiesPage = () => {
                       <Label>경도</Label>
                       <Input type="number" step="any" value={form.longitude} onChange={(e) => setF({ longitude: e.target.value })} />
                     </div>
+                    <div className="col-span-2">
+                      <Button type="button" variant="outline" size="sm" onClick={handleGeocodeForm}>
+                        주소로 좌표 자동 채우기
+                      </Button>
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
