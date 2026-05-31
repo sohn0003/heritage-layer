@@ -87,7 +87,17 @@ const parseNum = (v: any): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
-export interface ImportResult { inserted: number; updated: number; failed: number; errors: string[]; }
+export interface ImportResult { inserted: number; updated: number; failed: number; geocoded: number; errors: string[]; }
+
+const geocodeAddress = async (address: string): Promise<{ latitude: number; longitude: number } | null> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('geocode-address', { body: { address } });
+    if (error || !data || (data as any).error) return null;
+    return { latitude: (data as any).latitude, longitude: (data as any).longitude };
+  } catch {
+    return null;
+  }
+};
 
 export const importAssetsFromExcel = async (file: File): Promise<ImportResult> => {
   const buf = await file.arrayBuffer();
