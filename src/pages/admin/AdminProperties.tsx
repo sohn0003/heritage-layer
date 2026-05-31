@@ -17,8 +17,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Download, Upload } from 'lucide-react';
 import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
-import { calculateScoringFields, buildScoringInput } from '@/lib/assetScoring';
-import { analyzeAsset } from '@/algorithm/financial/irr-calculator';
+import { calculateScoringFields } from '@/lib/assetScoring';
+import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
 import GradeBadge from '@/components/common/GradeBadge';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
@@ -129,6 +129,7 @@ const str = (v: string) => (v === '' ? null : v);
 
 const AdminPropertiesPage = () => {
   const { isAdmin, loading: authLoading } = useAuth();
+  const algoConfig = useAlgorithmConfig();
   const navigate = useNavigate();
   const [assets, setAssets] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -249,32 +250,10 @@ const AdminPropertiesPage = () => {
       }
     }
 
-    // 자동 등급/점수 산출
-    const scoring = calculateScoringFields(payload);
+    // 알고리즘 단일 진입점 — 점수/등급/IRR/추천 용도·방향을 한 번에 산출
+    const scoring = calculateScoringFields(payload, algoConfig);
 
-    // 알고리즘 자동 추천: 용도 / 개발 방향
-    let recommended_use_type: string | null = null;
-    let recommended_dev_direction: string | null = null;
-    try {
-      const { preliminaryROI, ...assetInputBase } = buildScoringInput(payload as any);
-      void preliminaryROI;
-      const result = analyzeAsset({
-        assetInput: assetInputBase,
-        landValuePerSqm: payload.land_value_per_sqm ?? 4_500_000,
-        loanRates: { pf: 5.5, collateral: 4.8 },
-        projectYears: 10,
-        residualValueRatio: 0.4,
-      });
-      const top = result.recommendation.scenarios[0];
-      if (top) {
-        recommended_use_type = top.useTypeSummary ?? null;
-        recommended_dev_direction = top.developmentDirectionLabel ?? null;
-      }
-    } catch (err) {
-      console.error('analyzeAsset 자동 추천 실패', err);
-    }
-
-    const finalPayload = { ...payload, ...scoring, recommended_use_type, recommended_dev_direction };
+    const finalPayload = { ...payload, ...scoring };
 
     if (editId) {
       const { error } = await supabase.from('assets').update(finalPayload).eq('id', editId);
@@ -363,6 +342,27 @@ const AdminPropertiesPage = () => {
 
   const setF = (patch: Partial<AssetForm>) => setForm((f) => ({ ...f, ...patch }));
 
+  const [rescoring, setRescoring] = useState(false);
+  const handleBulkRescore = async () => {
+    if (assets.length === 0) return;
+    if (!confirm(`${assets.length}건의 자산 등급을 현재 알고리즘 기준으로 재계산하시겠습니까?`)) return;
+    setRescoring(true);
+    let ok = 0, fail = 0;
+    for (const a of assets) {
+      try {
+        const scoring = calculateScoringFields(a, algoConfig);
+        const { error } = await supabase.from('assets').update(scoring).eq('id', a.id);
+        if (error) fail++; else ok++;
+      } catch (e) {
+        console.error('재계산 실패', a.id, e);
+        fail++;
+      }
+    }
+    setRescoring(false);
+    toast({ title: `등급 재계산 완료 · 성공 ${ok}건 / 실패 ${fail}건` });
+    fetchAssets();
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-4 pb-8 pt-32">
       {selectedIds.size > 0 && (
@@ -414,6 +414,9 @@ const AdminPropertiesPage = () => {
           />
           <Button variant="outline" onClick={handleBulkGeocode} disabled={bulkGeocoding}>
             {bulkGeocoding ? '변환 중...' : '좌표 일괄 변환'}
+          </Button>
+          <Button variant="outline" onClick={handleBulkRescore} disabled={rescoring || !algoConfig.loaded}>
+            {rescoring ? '재계산 중...' : '등급 일괄 재계산'}
           </Button>
           <Button onClick={openCreate}>
             <Plus className="mr-2 h-4 w-4" /> 신규 등록

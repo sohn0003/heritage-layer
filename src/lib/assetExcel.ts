@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { supabase } from '@/integrations/supabase/client';
-import { calculateScoringFields } from '@/lib/assetScoring';
+import { calculateScoringFields, loadAlgorithmConfig } from '@/lib/assetScoring';
 
 // 컬럼 정의: DB 키 ↔ 한글 헤더 ↔ 타입
 type ColType = 'string' | 'number' | 'boolean';
@@ -105,6 +105,7 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
   const ws = wb.Sheets[wb.SheetNames[0]];
 
   const result: ImportResult = { inserted: 0, updated: 0, failed: 0, geocoded: 0, errors: [] };
+  const algoConfig = await loadAlgorithmConfig();
 
   // 헤더 정규화: 괄호 내용/공백 제거하여 매칭 향상
   const normalizeHeader = (s: any): string =>
@@ -194,7 +195,7 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
     }
 
     // 자동 등급/점수 산출
-    const scoring = calculateScoringFields(payload);
+    const scoring = calculateScoringFields(payload, algoConfig);
     const finalPayload = { ...payload, ...scoring };
     try {
       if (id) {
