@@ -332,20 +332,6 @@ const AdminPropertiesPage = () => {
     return { latitude: (data as any).latitude, longitude: (data as any).longitude };
   };
 
-  const handleGeocodeForm = async () => {
-    if (!form.address.trim()) {
-      toast({ title: '주소를 먼저 입력하세요', variant: 'destructive' });
-      return;
-    }
-    toast({ title: '좌표를 조회 중입니다...' });
-    const r = await geocodeAddress(form.address.trim());
-    if (!r) {
-      toast({ title: '좌표 조회 실패', description: '주소를 확인해주세요', variant: 'destructive' });
-      return;
-    }
-    setF({ latitude: String(r.latitude), longitude: String(r.longitude) });
-    toast({ title: `좌표를 채웠습니다 (${r.latitude.toFixed(5)}, ${r.longitude.toFixed(5)})` });
-  };
 
   const [bulkGeocoding, setBulkGeocoding] = useState(false);
   const handleBulkGeocode = async () => {
