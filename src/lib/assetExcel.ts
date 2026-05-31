@@ -87,14 +87,24 @@ const parseNum = (v: any): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
-export interface ImportResult { inserted: number; updated: number; failed: number; errors: string[]; }
+export interface ImportResult { inserted: number; updated: number; failed: number; geocoded: number; errors: string[]; }
+
+const geocodeAddress = async (address: string): Promise<{ latitude: number; longitude: number } | null> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('geocode-address', { body: { address } });
+    if (error || !data || (data as any).error) return null;
+    return { latitude: (data as any).latitude, longitude: (data as any).longitude };
+  } catch {
+    return null;
+  }
+};
 
 export const importAssetsFromExcel = async (file: File): Promise<ImportResult> => {
   const buf = await file.arrayBuffer();
   const wb = XLSX.read(buf, { type: 'array' });
   const ws = wb.Sheets[wb.SheetNames[0]];
 
-  const result: ImportResult = { inserted: 0, updated: 0, failed: 0, errors: [] };
+  const result: ImportResult = { inserted: 0, updated: 0, failed: 0, geocoded: 0, errors: [] };
 
   // 헤더 정규화: 괄호 내용/공백 제거하여 매칭 향상
   const normalizeHeader = (s: any): string =>
@@ -168,6 +178,21 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
       if (!payload.address) payload.address = '(미입력)';
       if (!payload.asset_type) payload.asset_type = '(미분류)';
     }
+
+    // 좌표 없으면 자동 지오코딩
+    const hasLat = payload.latitude != null && payload.latitude !== '';
+    const hasLng = payload.longitude != null && payload.longitude !== '';
+    const addrForGeo = (payload.address && payload.address !== '(미입력)') ? String(payload.address).trim() : '';
+    if (!hasLat && !hasLng && addrForGeo) {
+      const geo = await geocodeAddress(addrForGeo);
+      if (geo) {
+        payload.latitude = geo.latitude;
+        payload.longitude = geo.longitude;
+        result.geocoded++;
+      }
+      await new Promise((res) => setTimeout(res, 120));
+    }
+
     // 자동 등급/점수 산출
     const scoring = calculateScoringFields(payload);
     const finalPayload = { ...payload, ...scoring };

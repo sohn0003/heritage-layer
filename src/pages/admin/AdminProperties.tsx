@@ -240,6 +240,15 @@ const AdminPropertiesPage = () => {
       is_balanced_dev_budget: form.is_balanced_dev_budget,
     };
 
+    // 좌표가 비어있으면 자동 지오코딩
+    if ((payload.latitude == null || payload.longitude == null) && payload.address?.trim()) {
+      const r = await geocodeAddress(payload.address.trim());
+      if (r) {
+        payload.latitude = r.latitude;
+        payload.longitude = r.longitude;
+      }
+    }
+
     // 자동 등급/점수 산출
     const scoring = calculateScoringFields(payload);
 
@@ -323,20 +332,6 @@ const AdminPropertiesPage = () => {
     return { latitude: (data as any).latitude, longitude: (data as any).longitude };
   };
 
-  const handleGeocodeForm = async () => {
-    if (!form.address.trim()) {
-      toast({ title: '주소를 먼저 입력하세요', variant: 'destructive' });
-      return;
-    }
-    toast({ title: '좌표를 조회 중입니다...' });
-    const r = await geocodeAddress(form.address.trim());
-    if (!r) {
-      toast({ title: '좌표 조회 실패', description: '주소를 확인해주세요', variant: 'destructive' });
-      return;
-    }
-    setF({ latitude: String(r.latitude), longitude: String(r.longitude) });
-    toast({ title: `좌표를 채웠습니다 (${r.latitude.toFixed(5)}, ${r.longitude.toFixed(5)})` });
-  };
 
   const [bulkGeocoding, setBulkGeocoding] = useState(false);
   const handleBulkGeocode = async () => {
@@ -406,7 +401,7 @@ const AdminPropertiesPage = () => {
                 const r = await importAssetsFromExcel(f);
                 toast({
                   title: '엑셀 업로드 완료',
-                  description: `신규 ${r.inserted}건 / 수정 ${r.updated}건 / 실패 ${r.failed}건${r.errors.length ? '\n' + r.errors.slice(0, 3).join('\n') : ''}`,
+                  description: `신규 ${r.inserted}건 / 수정 ${r.updated}건 / 실패 ${r.failed}건 / 좌표 자동추가 ${r.geocoded}건${r.errors.length ? '\n' + r.errors.slice(0, 3).join('\n') : ''}`,
                 });
                 fetchAssets();
               } catch (err: any) {
@@ -543,10 +538,8 @@ const AdminPropertiesPage = () => {
                       <Label>경도</Label>
                       <Input type="number" step="any" value={form.longitude} onChange={(e) => setF({ longitude: e.target.value })} />
                     </div>
-                    <div className="col-span-2">
-                      <Button type="button" variant="outline" size="sm" onClick={handleGeocodeForm}>
-                        주소로 좌표 자동 채우기
-                      </Button>
+                    <div className="col-span-2 text-xs text-muted-foreground">
+                      위/경도를 비워두면 저장 시 주소로부터 자동 추가됩니다.
                     </div>
                   </div>
                 </AccordionContent>

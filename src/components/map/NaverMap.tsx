@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
 
 interface NaverMapProps {
-  markers?: { lat: number; lng: number; title?: string }[];
+  markers?: { lat: number; lng: number; title?: string; id?: string }[];
   onMarkerClick?: (index: number) => void;
+  focusedMarkerId?: string | null;
   className?: string;
 }
 
@@ -12,17 +13,18 @@ declare global {
   }
 }
 
-const NaverMap = ({ markers = [], onMarkerClick, className }: NaverMapProps) => {
+const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: NaverMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markerInstances = useRef<any[]>([]);
+  const didInitialFit = useRef(false);
 
   useEffect(() => {
     if (!mapRef.current || !window.naver?.maps) return;
 
     const center = markers.length > 0
       ? new window.naver.maps.LatLng(markers[0].lat, markers[0].lng)
-      : new window.naver.maps.LatLng(36.5, 127.5); // 한국 중심
+      : new window.naver.maps.LatLng(36.5, 127.5);
 
     mapInstance.current = new window.naver.maps.Map(mapRef.current, {
       center,
@@ -42,54 +44,79 @@ const NaverMap = ({ markers = [], onMarkerClick, className }: NaverMapProps) => 
         try {
           mapInstance.current.destroy();
         } catch (e) {
-          // Naver maps internal cleanup error - safe to ignore
+          // ignore
         }
         mapInstance.current = null;
       }
+      didInitialFit.current = false;
     };
   }, []);
 
+  // Render markers
   useEffect(() => {
     if (!mapInstance.current || !window.naver?.maps) return;
 
-    // Clear existing markers
     markerInstances.current.forEach(m => m.setMap(null));
     markerInstances.current = [];
 
     markers.forEach((m, idx) => {
+      const isFocused = focusedMarkerId && m.id === focusedMarkerId;
       const marker = new window.naver.maps.Marker({
         position: new window.naver.maps.LatLng(m.lat, m.lng),
         map: mapInstance.current,
         title: m.title || '',
+        zIndex: isFocused ? 1000 : 100,
+        icon: isFocused
+          ? {
+              content: `<div style="width:24px;height:24px;border-radius:50%;background:hsl(38 65% 50%);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>`,
+              anchor: new window.naver.maps.Point(12, 12),
+            }
+          : undefined,
       });
 
       if (onMarkerClick) {
-        window.naver.maps.Event.addListener(marker, 'click', () => {
-          onMarkerClick(idx);
-        });
+        window.naver.maps.Event.addListener(marker, 'click', () => onMarkerClick(idx));
       }
 
       markerInstances.current.push(marker);
     });
 
-    // Fit bounds if multiple markers
-    if (markers.length > 1) {
-      const bounds = new window.naver.maps.LatLngBounds(
-        new window.naver.maps.LatLng(
-          Math.min(...markers.map(m => m.lat)),
-          Math.min(...markers.map(m => m.lng))
-        ),
-        new window.naver.maps.LatLng(
-          Math.max(...markers.map(m => m.lat)),
-          Math.max(...markers.map(m => m.lng))
-        )
-      );
-      mapInstance.current.fitBounds(bounds);
-    } else if (markers.length === 1) {
-      mapInstance.current.setCenter(new window.naver.maps.LatLng(markers[0].lat, markers[0].lng));
-      mapInstance.current.setZoom(14);
+    // Initial fit only — don't refit on every marker/focus change
+    if (!didInitialFit.current && markers.length > 0) {
+      if (markers.length > 1) {
+        const bounds = new window.naver.maps.LatLngBounds(
+          new window.naver.maps.LatLng(
+            Math.min(...markers.map(m => m.lat)),
+            Math.min(...markers.map(m => m.lng))
+          ),
+          new window.naver.maps.LatLng(
+            Math.max(...markers.map(m => m.lat)),
+            Math.max(...markers.map(m => m.lng))
+          )
+        );
+        mapInstance.current.fitBounds(bounds);
+      } else {
+        mapInstance.current.setCenter(new window.naver.maps.LatLng(markers[0].lat, markers[0].lng));
+        mapInstance.current.setZoom(14);
+      }
+      didInitialFit.current = true;
     }
-  }, [markers, onMarkerClick]);
+  }, [markers, focusedMarkerId, onMarkerClick]);
+
+  // Pan/zoom to focused marker
+  useEffect(() => {
+    if (!mapInstance.current || !window.naver?.maps || !focusedMarkerId) return;
+    const target = markers.find(m => m.id === focusedMarkerId);
+    if (!target) return;
+    const latlng = new window.naver.maps.LatLng(target.lat, target.lng);
+    try {
+      mapInstance.current.panTo(latlng);
+      mapInstance.current.setZoom(16, true);
+    } catch {
+      mapInstance.current.setCenter(latlng);
+      mapInstance.current.setZoom(16);
+    }
+  }, [focusedMarkerId, markers]);
 
   return <div ref={mapRef} className={className || 'h-full w-full'} />;
 };

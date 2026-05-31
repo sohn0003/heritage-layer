@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AssetCard from '@/components/cards/AssetCard';
 import AuthModal from '@/components/common/AuthModal';
 import NaverMap from '@/components/map/NaverMap';
@@ -94,8 +94,9 @@ const initialFilters = {
 const PropertiesPage = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [authOpen, setAuthOpen] = useState(false);
-  const [, setSelectedAsset] = useState<Asset | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [f, setF] = useState(initialFilters);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const update = <K extends keyof typeof initialFilters>(k: K, v: (typeof initialFilters)[K]) =>
     setF((prev) => ({ ...prev, [k]: v }));
@@ -368,10 +369,15 @@ const PropertiesPage = () => {
           <NaverMap
             markers={filtered
               .filter((a) => a.latitude && a.longitude)
-              .map((a) => ({ lat: a.latitude!, lng: a.longitude!, title: a.address }))}
+              .map((a) => ({ lat: a.latitude!, lng: a.longitude!, title: a.address, id: a.id }))}
+            focusedMarkerId={selectedAssetId}
             onMarkerClick={(idx) => {
               const validAssets = filtered.filter((a) => a.latitude && a.longitude);
-              setSelectedAsset(validAssets[idx]);
+              const picked = validAssets[idx];
+              if (!picked) return;
+              setSelectedAssetId(picked.id);
+              const el = cardRefs.current[picked.id];
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }}
           />
         </div>
@@ -384,11 +390,27 @@ const PropertiesPage = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {filtered.map((asset) => (
-                <div key={asset.id} onClick={() => setSelectedAsset(asset)} className="cursor-pointer">
-                  <AssetCard asset={asset} onAuthRequired={() => setAuthOpen(true)} />
-                </div>
-              ))}
+              {filtered.map((asset) => {
+                const isSelected = selectedAssetId === asset.id;
+                const hasCoords = asset.latitude != null && asset.longitude != null;
+                return (
+                  <div
+                    key={asset.id}
+                    ref={(el) => { cardRefs.current[asset.id] = el; }}
+                    onClick={() => {
+                      setSelectedAssetId(asset.id);
+                      if (!hasCoords) {
+                        // 좌표 없음 — 사용자에게 조용히 무시 (지도 이동 없음)
+                      }
+                    }}
+                    className={`cursor-pointer rounded-lg transition-all ${
+                      isSelected ? 'ring-2 ring-accent ring-offset-2 ring-offset-background' : ''
+                    }`}
+                  >
+                    <AssetCard asset={asset} onAuthRequired={() => setAuthOpen(true)} />
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
