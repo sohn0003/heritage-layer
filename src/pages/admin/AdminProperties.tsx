@@ -401,7 +401,7 @@ const AdminPropertiesPage = () => {
                 const r = await importAssetsFromExcel(f);
                 toast({
                   title: '엑셀 업로드 완료',
-                  description: `신규 ${r.inserted}건 / 수정 ${r.updated}건 / 실패 ${r.failed}건${r.errors.length ? '\n' + r.errors.slice(0, 3).join('\n') : ''}`,
+                  description: `신규 ${r.inserted}건 / 수정 ${r.updated}건 / 실패 ${r.failed}건 / 좌표 자동추가 ${r.geocoded}건${r.errors.length ? '\n' + r.errors.slice(0, 3).join('\n') : ''}`,
                 });
                 fetchAssets();
               } catch (err: any) {
