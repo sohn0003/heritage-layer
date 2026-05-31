@@ -129,6 +129,7 @@ const str = (v: string) => (v === '' ? null : v);
 
 const AdminPropertiesPage = () => {
   const { isAdmin, loading: authLoading } = useAuth();
+  const algoConfig = useAlgorithmConfig();
   const navigate = useNavigate();
   const [assets, setAssets] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
