@@ -195,7 +195,7 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
     }
 
     // 자동 등급/점수 산출
-    const scoring = calculateScoringFields(payload);
+    const scoring = calculateScoringFields(payload, algoConfig);
     const finalPayload = { ...payload, ...scoring };
     try {
       if (id) {
