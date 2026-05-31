@@ -17,8 +17,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Download, Upload } from 'lucide-react';
 import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
-import { calculateScoringFields, buildScoringInput } from '@/lib/assetScoring';
-import { analyzeAsset } from '@/algorithm/financial/irr-calculator';
+import { calculateScoringFields } from '@/lib/assetScoring';
+import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
 import GradeBadge from '@/components/common/GradeBadge';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
