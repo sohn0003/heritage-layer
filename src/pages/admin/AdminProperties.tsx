@@ -359,6 +359,9 @@ const AdminPropertiesPage = () => {
     setBulkGeocoding(false);
     toast({ title: `좌표 변환 완료 · 성공 ${ok}건 / 실패 ${fail}건` });
     fetchAssets();
+  };
+
+
 
   if (authLoading) return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
   if (!isAdmin) return null;
