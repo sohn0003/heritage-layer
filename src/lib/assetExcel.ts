@@ -104,7 +104,7 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
   const wb = XLSX.read(buf, { type: 'array' });
   const ws = wb.Sheets[wb.SheetNames[0]];
 
-  const result: ImportResult = { inserted: 0, updated: 0, failed: 0, errors: [] };
+  const result: ImportResult = { inserted: 0, updated: 0, failed: 0, geocoded: 0, errors: [] };
 
   // 헤더 정규화: 괄호 내용/공백 제거하여 매칭 향상
   const normalizeHeader = (s: any): string =>
