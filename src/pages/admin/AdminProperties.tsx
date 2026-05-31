@@ -249,32 +249,10 @@ const AdminPropertiesPage = () => {
       }
     }
 
-    // 자동 등급/점수 산출
-    const scoring = calculateScoringFields(payload);
+    // 알고리즘 단일 진입점 — 점수/등급/IRR/추천 용도·방향을 한 번에 산출
+    const scoring = calculateScoringFields(payload, algoConfig);
 
-    // 알고리즘 자동 추천: 용도 / 개발 방향
-    let recommended_use_type: string | null = null;
-    let recommended_dev_direction: string | null = null;
-    try {
-      const { preliminaryROI, ...assetInputBase } = buildScoringInput(payload as any);
-      void preliminaryROI;
-      const result = analyzeAsset({
-        assetInput: assetInputBase,
-        landValuePerSqm: payload.land_value_per_sqm ?? 4_500_000,
-        loanRates: { pf: 5.5, collateral: 4.8 },
-        projectYears: 10,
-        residualValueRatio: 0.4,
-      });
-      const top = result.recommendation.scenarios[0];
-      if (top) {
-        recommended_use_type = top.useTypeSummary ?? null;
-        recommended_dev_direction = top.developmentDirectionLabel ?? null;
-      }
-    } catch (err) {
-      console.error('analyzeAsset 자동 추천 실패', err);
-    }
-
-    const finalPayload = { ...payload, ...scoring, recommended_use_type, recommended_dev_direction };
+    const finalPayload = { ...payload, ...scoring };
 
     if (editId) {
       const { error } = await supabase.from('assets').update(finalPayload).eq('id', editId);
