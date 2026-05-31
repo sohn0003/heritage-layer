@@ -178,6 +178,21 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
       if (!payload.address) payload.address = '(미입력)';
       if (!payload.asset_type) payload.asset_type = '(미분류)';
     }
+
+    // 좌표 없으면 자동 지오코딩
+    const hasLat = payload.latitude != null && payload.latitude !== '';
+    const hasLng = payload.longitude != null && payload.longitude !== '';
+    const addrForGeo = (payload.address && payload.address !== '(미입력)') ? String(payload.address).trim() : '';
+    if (!hasLat && !hasLng && addrForGeo) {
+      const geo = await geocodeAddress(addrForGeo);
+      if (geo) {
+        payload.latitude = geo.latitude;
+        payload.longitude = geo.longitude;
+        result.geocoded++;
+      }
+      await new Promise((res) => setTimeout(res, 120));
+    }
+
     // 자동 등급/점수 산출
     const scoring = calculateScoringFields(payload);
     const finalPayload = { ...payload, ...scoring };
