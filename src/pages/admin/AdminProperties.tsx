@@ -317,6 +317,49 @@ const AdminPropertiesPage = () => {
     }
   };
 
+  const geocodeAddress = async (address: string): Promise<{ latitude: number; longitude: number } | null> => {
+    const { data, error } = await supabase.functions.invoke('geocode-address', { body: { address } });
+    if (error || !data || (data as any).error) return null;
+    return { latitude: (data as any).latitude, longitude: (data as any).longitude };
+  };
+
+  const handleGeocodeForm = async () => {
+    if (!form.address.trim()) {
+      toast({ title: '주소를 먼저 입력하세요', variant: 'destructive' });
+      return;
+    }
+    toast({ title: '좌표를 조회 중입니다...' });
+    const r = await geocodeAddress(form.address.trim());
+    if (!r) {
+      toast({ title: '좌표 조회 실패', description: '주소를 확인해주세요', variant: 'destructive' });
+      return;
+    }
+    setF({ latitude: String(r.latitude), longitude: String(r.longitude) });
+    toast({ title: `좌표를 채웠습니다 (${r.latitude.toFixed(5)}, ${r.longitude.toFixed(5)})` });
+  };
+
+  const [bulkGeocoding, setBulkGeocoding] = useState(false);
+  const handleBulkGeocode = async () => {
+    const targets = assets.filter((a) => !a.latitude || !a.longitude);
+    if (targets.length === 0) {
+      toast({ title: '좌표가 없는 자산이 없습니다' });
+      return;
+    }
+    if (!confirm(`${targets.length}건의 자산 좌표를 자동 변환하시겠습니까?`)) return;
+    setBulkGeocoding(true);
+    let ok = 0, fail = 0;
+    for (const a of targets) {
+      const r = await geocodeAddress(a.address);
+      if (r) {
+        const { error } = await supabase.from('assets').update({ latitude: r.latitude, longitude: r.longitude }).eq('id', a.id);
+        if (error) fail++; else ok++;
+      } else fail++;
+      await new Promise((res) => setTimeout(res, 120));
+    }
+    setBulkGeocoding(false);
+    toast({ title: `좌표 변환 완료 · 성공 ${ok}건 / 실패 ${fail}건` });
+    fetchAssets();
+
   if (authLoading) return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
   if (!isAdmin) return null;
 
