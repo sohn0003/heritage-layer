@@ -94,8 +94,9 @@ const initialFilters = {
 const PropertiesPage = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [authOpen, setAuthOpen] = useState(false);
-  const [, setSelectedAsset] = useState<Asset | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [f, setF] = useState(initialFilters);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const update = <K extends keyof typeof initialFilters>(k: K, v: (typeof initialFilters)[K]) =>
     setF((prev) => ({ ...prev, [k]: v }));
