@@ -240,6 +240,15 @@ const AdminPropertiesPage = () => {
       is_balanced_dev_budget: form.is_balanced_dev_budget,
     };
 
+    // 좌표가 비어있으면 자동 지오코딩
+    if ((payload.latitude == null || payload.longitude == null) && payload.address?.trim()) {
+      const r = await geocodeAddress(payload.address.trim());
+      if (r) {
+        payload.latitude = r.latitude;
+        payload.longitude = r.longitude;
+      }
+    }
+
     // 자동 등급/점수 산출
     const scoring = calculateScoringFields(payload);
 
