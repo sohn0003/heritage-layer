@@ -195,15 +195,99 @@ export interface ScoringFields {
   scoring_total: number;
   scoring_detail: any;
   grade: string;
+  irr_result: any;
+  recommended_use_type: string | null;
+  recommended_dev_direction: string | null;
 }
 
-export const calculateScoringFields = (a: AssetLikePayload): ScoringFields => {
-  const input = buildScoringInput(a);
-  const result = calculateScore(input);
+export interface AlgoConfigLite {
+  loanRates: { pf: number; collateral: number };
+  projectYears: number;
+  residualValueRatio: number;
+}
+
+const DEFAULT_ALGO_CONFIG: AlgoConfigLite = {
+  loanRates: { pf: 5.5, collateral: 4.8 },
+  projectYears: 10,
+  residualValueRatio: 0.4,
+};
+
+const DEFAULT_LAND_VALUE = 4_500_000;
+
+// 단일 진입점 — Admin 저장, Excel 업로드, Analysis 페이지가 모두 이 함수로
+// 동일한 입력/파라미터로 채점하도록 하여 등급 불일치를 방지합니다.
+import { analyzeAsset } from '@/algorithm/financial/irr-calculator';
+import { supabase } from '@/integrations/supabase/client';
+
+export const computeAssetAnalysis = (
+  a: AssetLikePayload,
+  config: AlgoConfigLite = DEFAULT_ALGO_CONFIG,
+) => {
+  const { preliminaryROI, ...assetInputBase } = buildScoringInput(a);
+  void preliminaryROI;
+  return analyzeAsset({
+    assetInput: assetInputBase,
+    landValuePerSqm: n(a.land_value_per_sqm, DEFAULT_LAND_VALUE) || DEFAULT_LAND_VALUE,
+    loanRates: config.loanRates,
+    projectYears: config.projectYears,
+    residualValueRatio: config.residualValueRatio,
+  });
+};
+
+export const calculateScoringFields = (
+  a: AssetLikePayload,
+  config: AlgoConfigLite = DEFAULT_ALGO_CONFIG,
+): ScoringFields => {
+  const result = computeAssetAnalysis(a, config);
+  const top = result.recommendation.scenarios[0];
   return {
-    scoring_grade: result.grade,
-    scoring_total: result.totalScore,
-    scoring_detail: result.detail,
-    grade: result.grade,
+    scoring_grade: result.scoring.grade,
+    scoring_total: result.scoring.totalScore,
+    scoring_detail: result.scoring.detail,
+    grade: result.scoring.grade,
+    irr_result: {
+      preliminaryROI: result.preliminaryROI,
+      scenarios: result.recommendation.scenarios.map((s: any) => ({
+        rank: s.rank,
+        irr: s.irr,
+        useTypeSummary: s.useTypeSummary,
+        developmentDirectionLabel: s.developmentDirectionLabel,
+      })),
+    },
+    recommended_use_type: top?.useTypeSummary ?? null,
+    recommended_dev_direction: top?.developmentDirectionLabel ?? null,
   };
+};
+
+// React 외부(Excel import 등)에서 사용할 비동기 설정 로더
+export const loadAlgorithmConfig = async (): Promise<AlgoConfigLite> => {
+  const cfg: AlgoConfigLite = {
+    loanRates: { ...DEFAULT_ALGO_CONFIG.loanRates },
+    projectYears: DEFAULT_ALGO_CONFIG.projectYears,
+    residualValueRatio: DEFAULT_ALGO_CONFIG.residualValueRatio,
+  };
+  try {
+    const [ratesRes, sysRes] = await Promise.all([
+      supabase.from('loan_rates').select('rate_type, rate_value, effective_date').order('effective_date', { ascending: false }),
+      supabase.from('system_config').select('key, value'),
+    ]);
+    const seen = new Set<string>();
+    (ratesRes.data ?? []).forEach((r: any) => {
+      if (seen.has(r.rate_type)) return;
+      seen.add(r.rate_type);
+      const v = Number(r.rate_value);
+      if (!Number.isFinite(v)) return;
+      if (r.rate_type === 'pf') cfg.loanRates.pf = v;
+      if (r.rate_type === 'collateral') cfg.loanRates.collateral = v;
+    });
+    (sysRes.data ?? []).forEach((row: any) => {
+      const v = Number(row.value);
+      if (!Number.isFinite(v)) return;
+      if (row.key === 'default_project_years') cfg.projectYears = v;
+      if (row.key === 'residual_value_ratio') cfg.residualValueRatio = v;
+    });
+  } catch (e) {
+    console.error('loadAlgorithmConfig 실패, 기본값 사용', e);
+  }
+  return cfg;
 };
