@@ -265,6 +265,12 @@ const Pricing = () => {
         </div>
       </div>
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+      <PaymentMethodModal
+        open={methodModalOpen}
+        onOpenChange={setMethodModalOpen}
+        planLabel={pendingPlanLabel}
+        onSelectPaddle={startPaddleCheckout}
+      />
     </div>
   );
 };
