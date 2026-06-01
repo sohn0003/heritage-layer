@@ -1,23 +1,24 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Check, Clock } from 'lucide-react';
-import { toast } from 'sonner';
+import paddleLogo from '@/assets/paddle-logo.png.asset.json';
+import tossLogo from '@/assets/toss-payments-logo.png.asset.json';
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   planLabel: string;
   onSelectPaddle: () => void;
+  onSelectToss?: () => void;
 }
 
-const PaymentMethodModal = ({ open, onOpenChange, planLabel, onSelectPaddle }: Props) => {
+const PaymentMethodModal = ({ open, onOpenChange, planLabel, onSelectPaddle, onSelectToss }: Props) => {
   const handlePaddle = () => {
     onOpenChange(false);
     onSelectPaddle();
   };
 
   const handleToss = () => {
-    toast.info('토스페이먼츠 결제는 곧 지원될 예정입니다.');
+    onOpenChange(false);
+    onSelectToss?.();
   };
 
   return (
@@ -30,57 +31,28 @@ const PaymentMethodModal = ({ open, onOpenChange, planLabel, onSelectPaddle }: P
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-2 space-y-3">
+        <div className="mt-2 grid grid-cols-2 gap-3">
           {/* Paddle */}
           <button
             type="button"
             onClick={handlePaddle}
-            className="group flex w-full items-center justify-between rounded-lg border border-border bg-card p-4 text-left transition-all hover:border-accent hover:shadow-md"
+            className="flex flex-col items-center justify-center gap-3 rounded-lg border border-border bg-card p-6 transition-all hover:border-accent hover:shadow-md"
           >
-            <div className="flex items-center gap-4">
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-md font-bold text-base"
-                style={{ backgroundColor: '#FDDD35', color: '#0A0E27' }}
-              >
-                P
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">Paddle</span>
-                  <Badge variant="secondary" className="gap-1 text-xs">
-                    <Check className="h-3 w-3" /> 사용 가능
-                  </Badge>
-                </div>
-                <p className="mt-0.5 text-xs text-muted-foreground">해외 카드 · 글로벌 결제</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <img src={paddleLogo.url} alt="Paddle" className="h-10 w-10 rounded-md" />
+              <span className="text-lg font-semibold">Paddle</span>
             </div>
-            <span className="text-sm text-muted-foreground group-hover:text-accent">선택 →</span>
+            <span className="text-xs text-muted-foreground">해외 카드 · 글로벌 결제</span>
           </button>
 
           {/* Toss Payments */}
           <button
             type="button"
             onClick={handleToss}
-            className="flex w-full items-center justify-between rounded-lg border border-dashed border-border bg-muted/30 p-4 text-left opacity-70"
+            className="flex flex-col items-center justify-center gap-3 rounded-lg border border-border bg-card p-6 transition-all hover:border-accent hover:shadow-md"
           >
-            <div className="flex items-center gap-4">
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-md font-bold text-base text-white"
-                style={{ backgroundColor: '#0064FF' }}
-              >
-                toss
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">토스페이먼츠</span>
-                  <Badge variant="outline" className="gap-1 text-xs">
-                    <Clock className="h-3 w-3" /> 준비 중
-                  </Badge>
-                </div>
-                <p className="mt-0.5 text-xs text-muted-foreground">국내 카드 · 계좌이체 · 간편결제</p>
-              </div>
-            </div>
-            <span className="text-sm text-muted-foreground">곧 출시</span>
+            <img src={tossLogo.url} alt="Toss Payments" className="h-10 object-contain" />
+            <span className="text-xs text-muted-foreground">국내 카드 · 계좌이체 · 간편결제</span>
           </button>
         </div>
 
