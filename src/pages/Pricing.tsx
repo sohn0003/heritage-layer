@@ -135,7 +135,10 @@ const Pricing = () => {
         label: currentTier === 'enterprise'
           ? '이용 중'
           : loading ? '결제창 여는 중...' : `Enterprise ${entBilling === 'yearly' ? '연간' : '월간'} 시작하기`,
-        onClick: () => startCheckout(entBilling === 'yearly' ? 'enterprise_yearly' : 'enterprise_monthly'),
+        onClick: () => openPaymentMethodModal(
+          entBilling === 'yearly' ? 'enterprise_yearly' : 'enterprise_monthly',
+          `Enterprise ${entBilling === 'yearly' ? '연간' : '월간'}`
+        ),
         disabled: currentTier === 'enterprise' || loading,
       },
     },
