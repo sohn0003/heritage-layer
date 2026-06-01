@@ -47,7 +47,7 @@ const TossSuccess = () => {
 
   return (
     <div className="min-h-screen px-4 pb-20 pt-24">
-      <Seo title="결제 완료 — Heritage Layer" path="/checkout/toss/success" />
+      <Seo title="결제 완료 — Heritage Layer" description="토스페이먼츠 구독 결제가 완료되었습니다." path="/checkout/toss/success" />
       <div className="mx-auto max-w-md">
         <Card>
           <CardHeader>

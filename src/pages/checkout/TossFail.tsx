@@ -12,7 +12,7 @@ const TossFail = () => {
 
   return (
     <div className="min-h-screen px-4 pb-20 pt-24">
-      <Seo title="결제 실패 — Heritage Layer" path="/checkout/toss/fail" />
+      <Seo title="결제 실패 — Heritage Layer" description="토스페이먼츠 결제가 실패했습니다." path="/checkout/toss/fail" />
       <div className="mx-auto max-w-md">
         <Card>
           <CardHeader>
