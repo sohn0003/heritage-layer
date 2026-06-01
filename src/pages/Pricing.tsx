@@ -81,6 +81,11 @@ const Pricing = () => {
     }
   };
 
+  const startTossCheckout = () => {
+    if (!pendingPriceId) return;
+    navigate(`/checkout/toss?priceId=${encodeURIComponent(pendingPriceId)}`);
+  };
+
   const tiers: Array<{
     key: TierKey;
     name: string;
@@ -270,6 +275,7 @@ const Pricing = () => {
         onOpenChange={setMethodModalOpen}
         planLabel={pendingPlanLabel}
         onSelectPaddle={startPaddleCheckout}
+        onSelectToss={startTossCheckout}
       />
     </div>
   );

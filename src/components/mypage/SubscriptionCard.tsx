@@ -17,7 +17,8 @@ interface SubscriptionRow {
   price_id: string;
   current_period_end: string | null;
   cancel_at_period_end: boolean | null;
-  paddle_customer_id: string;
+  paddle_customer_id: string | null;
+  provider: string;
 }
 
 interface Props {
@@ -46,7 +47,7 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
       setLoading(true);
       const { data } = await supabase
         .from('subscriptions')
-        .select('id, status, product_id, price_id, current_period_end, cancel_at_period_end, paddle_customer_id')
+        .select('id, status, product_id, price_id, current_period_end, cancel_at_period_end, paddle_customer_id, provider')
         .eq('user_id', user.id)
         .eq('environment', env)
         .order('created_at', { ascending: false })
@@ -61,6 +62,18 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
   const openPortal = async () => {
     setPortalLoading(true);
     try {
+      if (sub?.provider === 'toss') {
+        if (!confirm('토스페이먼츠 구독을 해지하시겠습니까? 즉시 해지되며, 다음 결제는 진행되지 않습니다.')) {
+          return;
+        }
+        const { data, error } = await supabase.functions.invoke('toss-cancel-subscription');
+        if (error || data?.error) {
+          throw new Error(data?.error ?? error?.message ?? '구독 해지에 실패했습니다.');
+        }
+        toast.success('구독이 해지되었습니다.');
+        window.location.reload();
+        return;
+      }
       const { data, error } = await supabase.functions.invoke('paddle-customer-portal');
       if (error || !data?.url) {
         throw new Error(error?.message || '구독 관리 페이지를 열 수 없습니다.');
