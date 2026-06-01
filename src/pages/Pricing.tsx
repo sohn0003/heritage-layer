@@ -8,6 +8,7 @@ import { Check, X, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import AuthModal from '@/components/common/AuthModal';
 import Seo from '@/components/common/Seo';
+import PaymentMethodModal from '@/components/payments/PaymentMethodModal';
 
 type TierKey = 'free' | 'pro' | 'enterprise';
 type EnterpriseBilling = 'monthly' | 'yearly';
@@ -49,17 +50,27 @@ const Pricing = () => {
   const { openCheckout, loading } = usePaddleCheckout();
   const [entBilling, setEntBilling] = useState<EnterpriseBilling>('monthly');
   const [authOpen, setAuthOpen] = useState(false);
+  const [methodModalOpen, setMethodModalOpen] = useState(false);
+  const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
+  const [pendingPlanLabel, setPendingPlanLabel] = useState<string>('');
   const currentTier: TierKey = subscriptionTier;
 
-  const startCheckout = async (priceId: string) => {
+  const openPaymentMethodModal = (priceId: string, planLabel: string) => {
     if (!user) {
       toast.info('구독을 시작하려면 먼저 로그인해 주세요.');
       setAuthOpen(true);
       return;
     }
+    setPendingPriceId(priceId);
+    setPendingPlanLabel(planLabel);
+    setMethodModalOpen(true);
+  };
+
+  const startPaddleCheckout = async () => {
+    if (!pendingPriceId || !user) return;
     try {
       await openCheckout({
-        priceId,
+        priceId: pendingPriceId,
         customerEmail: user.email,
         customData: { userId: user.id },
         successUrl: `${window.location.origin}/mypage?checkout=success`,
@@ -108,7 +119,7 @@ const Pricing = () => {
         label: currentTier === 'pro' || currentTier === 'enterprise'
           ? '이용 중'
           : loading ? '결제창 여는 중...' : 'Pro 구독 시작하기',
-        onClick: () => startCheckout('pro_monthly'),
+        onClick: () => openPaymentMethodModal('pro_monthly', 'Pro 월간'),
         disabled: currentTier === 'pro' || currentTier === 'enterprise' || loading,
       },
     },
@@ -124,7 +135,10 @@ const Pricing = () => {
         label: currentTier === 'enterprise'
           ? '이용 중'
           : loading ? '결제창 여는 중...' : `Enterprise ${entBilling === 'yearly' ? '연간' : '월간'} 시작하기`,
-        onClick: () => startCheckout(entBilling === 'yearly' ? 'enterprise_yearly' : 'enterprise_monthly'),
+        onClick: () => openPaymentMethodModal(
+          entBilling === 'yearly' ? 'enterprise_yearly' : 'enterprise_monthly',
+          `Enterprise ${entBilling === 'yearly' ? '연간' : '월간'}`
+        ),
         disabled: currentTier === 'enterprise' || loading,
       },
     },
@@ -251,6 +265,12 @@ const Pricing = () => {
         </div>
       </div>
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+      <PaymentMethodModal
+        open={methodModalOpen}
+        onOpenChange={setMethodModalOpen}
+        planLabel={pendingPlanLabel}
+        onSelectPaddle={startPaddleCheckout}
+      />
     </div>
   );
 };
