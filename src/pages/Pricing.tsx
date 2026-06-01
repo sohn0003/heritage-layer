@@ -275,6 +275,7 @@ const Pricing = () => {
         onOpenChange={setMethodModalOpen}
         planLabel={pendingPlanLabel}
         onSelectPaddle={startPaddleCheckout}
+        onSelectToss={startTossCheckout}
       />
     </div>
   );
