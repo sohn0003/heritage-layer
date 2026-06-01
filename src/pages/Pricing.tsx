@@ -119,7 +119,7 @@ const Pricing = () => {
         label: currentTier === 'pro' || currentTier === 'enterprise'
           ? '이용 중'
           : loading ? '결제창 여는 중...' : 'Pro 구독 시작하기',
-        onClick: () => startCheckout('pro_monthly'),
+        onClick: () => openPaymentMethodModal('pro_monthly', 'Pro 월간'),
         disabled: currentTier === 'pro' || currentTier === 'enterprise' || loading,
       },
     },
