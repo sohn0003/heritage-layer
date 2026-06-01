@@ -50,17 +50,27 @@ const Pricing = () => {
   const { openCheckout, loading } = usePaddleCheckout();
   const [entBilling, setEntBilling] = useState<EnterpriseBilling>('monthly');
   const [authOpen, setAuthOpen] = useState(false);
+  const [methodModalOpen, setMethodModalOpen] = useState(false);
+  const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
+  const [pendingPlanLabel, setPendingPlanLabel] = useState<string>('');
   const currentTier: TierKey = subscriptionTier;
 
-  const startCheckout = async (priceId: string) => {
+  const openPaymentMethodModal = (priceId: string, planLabel: string) => {
     if (!user) {
       toast.info('구독을 시작하려면 먼저 로그인해 주세요.');
       setAuthOpen(true);
       return;
     }
+    setPendingPriceId(priceId);
+    setPendingPlanLabel(planLabel);
+    setMethodModalOpen(true);
+  };
+
+  const startPaddleCheckout = async () => {
+    if (!pendingPriceId || !user) return;
     try {
       await openCheckout({
-        priceId,
+        priceId: pendingPriceId,
         customerEmail: user.email,
         customData: { userId: user.id },
         successUrl: `${window.location.origin}/mypage?checkout=success`,
