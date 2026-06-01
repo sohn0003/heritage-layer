@@ -308,11 +308,14 @@ export type Database = {
           current_period_start: string | null
           environment: string
           id: string
-          paddle_customer_id: string
-          paddle_subscription_id: string
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
           price_id: string
           product_id: string
+          provider: string
           status: string
+          toss_billing_key: string | null
+          toss_customer_key: string | null
           updated_at: string | null
           user_id: string
         }
@@ -323,11 +326,14 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           id?: string
-          paddle_customer_id: string
-          paddle_subscription_id: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           price_id: string
           product_id: string
+          provider?: string
           status?: string
+          toss_billing_key?: string | null
+          toss_customer_key?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -338,11 +344,14 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           id?: string
-          paddle_customer_id?: string
-          paddle_subscription_id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           price_id?: string
           product_id?: string
+          provider?: string
           status?: string
+          toss_billing_key?: string | null
+          toss_customer_key?: string | null
           updated_at?: string | null
           user_id?: string
         }
