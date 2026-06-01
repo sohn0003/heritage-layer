@@ -8,6 +8,7 @@ import { Check, X, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import AuthModal from '@/components/common/AuthModal';
 import Seo from '@/components/common/Seo';
+import PaymentMethodModal from '@/components/payments/PaymentMethodModal';
 
 type TierKey = 'free' | 'pro' | 'enterprise';
 type EnterpriseBilling = 'monthly' | 'yearly';
