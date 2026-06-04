@@ -68,7 +68,7 @@ const AnalysisPage = () => {
       return;
     }
     const fetchAsset = async () => {
-      const { data } = await supabase.from('assets').select('*').eq('id', assetId).maybeSingle();
+      const { data } = await supabase.from('assets_public').select('*').eq('id', assetId).maybeSingle();
       setAsset(data);
       setLoading(false);
     };
