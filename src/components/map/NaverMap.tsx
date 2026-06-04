@@ -7,6 +7,14 @@ interface NaverMapProps {
   className?: string;
 }
 
+const isValidKoreaCoordinate = (lat: number, lng: number) =>
+  Number.isFinite(lat) &&
+  Number.isFinite(lng) &&
+  lat >= 30 &&
+  lat <= 45 &&
+  lng >= 120 &&
+  lng <= 135;
+
 declare global {
   interface Window {
     naver: any;
@@ -60,6 +68,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
     markerInstances.current = [];
 
     markers.forEach((m, idx) => {
+      if (!isValidKoreaCoordinate(m.lat, m.lng)) return;
       const isFocused = focusedMarkerId && m.id === focusedMarkerId;
       const marker = new window.naver.maps.Marker({
         position: new window.naver.maps.LatLng(m.lat, m.lng),
@@ -82,21 +91,22 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
     });
 
     // Initial fit only — don't refit on every marker/focus change
-    if (!didInitialFit.current && markers.length > 0) {
-      if (markers.length > 1) {
+    const validMarkers = markers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
+    if (!didInitialFit.current && validMarkers.length > 0) {
+      if (validMarkers.length > 1) {
         const bounds = new window.naver.maps.LatLngBounds(
           new window.naver.maps.LatLng(
-            Math.min(...markers.map(m => m.lat)),
-            Math.min(...markers.map(m => m.lng))
+            Math.min(...validMarkers.map(m => m.lat)),
+            Math.min(...validMarkers.map(m => m.lng))
           ),
           new window.naver.maps.LatLng(
-            Math.max(...markers.map(m => m.lat)),
-            Math.max(...markers.map(m => m.lng))
+            Math.max(...validMarkers.map(m => m.lat)),
+            Math.max(...validMarkers.map(m => m.lng))
           )
         );
         mapInstance.current.fitBounds(bounds);
       } else {
-        mapInstance.current.setCenter(new window.naver.maps.LatLng(markers[0].lat, markers[0].lng));
+        mapInstance.current.setCenter(new window.naver.maps.LatLng(validMarkers[0].lat, validMarkers[0].lng));
         mapInstance.current.setZoom(14);
       }
       didInitialFit.current = true;
@@ -107,7 +117,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
   useEffect(() => {
     if (!mapInstance.current || !window.naver?.maps || !focusedMarkerId) return;
     const target = markers.find(m => m.id === focusedMarkerId);
-    if (!target) return;
+    if (!target || !isValidKoreaCoordinate(target.lat, target.lng)) return;
     const latlng = new window.naver.maps.LatLng(target.lat, target.lng);
     try {
       mapInstance.current.panTo(latlng);
