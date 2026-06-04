@@ -52,9 +52,15 @@ const TossCheckout = () => {
           failUrl: `${origin}/checkout/toss/fail`,
           customerEmail: user.email,
         });
-      } catch (e) {
-        console.error(e);
-        toast.error(e instanceof Error ? e.message : '토스 결제창을 열 수 없습니다.');
+      } catch (e: any) {
+        console.error('[Toss] requestBillingAuth failed:', e);
+        // 사용자가 결제창을 직접 닫은 경우는 조용히 처리
+        if (e?.code === 'USER_CANCEL') {
+          toast.info('결제가 취소되었습니다.');
+        } else {
+          const detail = e?.message || e?.code || '알 수 없는 오류';
+          toast.error(`토스 결제 오류: ${detail}`);
+        }
         navigate('/pricing');
       } finally {
         setLoading(false);
