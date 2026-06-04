@@ -82,18 +82,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  // Realtime: subscriptions 테이블 변경 → 사용자 등급 재조회
+  // 구독/등급 갱신: 창 포커스 또는 가시성 복귀 시 재조회
+  // (subscriptions 테이블은 보안상 Realtime 게시에서 제외됨)
   useEffect(() => {
     if (!user) return;
-    const channel = supabase
-      .channel(`subscriptions:${user.id}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'subscriptions', filter: `user_id=eq.${user.id}` },
-        () => { loadProfileAndRole(user.id); },
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const refresh = () => { loadProfileAndRole(user.id); };
+    const onVisibility = () => { if (document.visibilityState === 'visible') refresh(); };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [user]);
 
   const signOut = async () => {
