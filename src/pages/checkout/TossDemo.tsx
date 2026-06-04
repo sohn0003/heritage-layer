@@ -52,16 +52,8 @@ const TossDemo = () => {
           successUrl,
           failUrl,
         });
-      } else {
-        await payment.requestPayment({
-          method: 'EASY_PAY',
-          amount: { currency: 'KRW', value: DEMO_AMOUNT },
-          orderId,
-          orderName: 'Heritage Layer 결제창 테스트 (1,000원)',
-          successUrl,
-          failUrl,
-        });
       }
+
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : '결제창을 열 수 없습니다.');
