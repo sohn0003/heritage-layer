@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NaverMapProps {
   markers?: { lat: number; lng: number; title?: string; id?: string }[];
@@ -18,25 +19,56 @@ const isValidKoreaCoordinate = (lat: number, lng: number) =>
 declare global {
   interface Window {
     naver: any;
+    __initNaverMaps?: () => void;
   }
 }
+
+let naverMapsLoader: Promise<void> | null = null;
+
+const loadNaverMaps = () => {
+  if (window.naver?.maps) return Promise.resolve();
+  if (naverMapsLoader) return naverMapsLoader;
+
+  naverMapsLoader = (async () => {
+    const { data, error } = await supabase.functions.invoke('naver-map-config');
+    if (error || !data || !(data as any).ncpKeyId) throw new Error('네이버 지도 키를 불러오지 못했습니다.');
+
+    await new Promise<void>((resolve, reject) => {
+      window.__initNaverMaps = () => resolve();
+      const script = document.createElement('script');
+      script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent((data as any).ncpKeyId)}&callback=__initNaverMaps`;
+      script.async = true;
+      script.onerror = () => reject(new Error('네이버 지도 로딩에 실패했습니다.'));
+      document.head.appendChild(script);
+    });
+  })();
+
+  return naverMapsLoader;
+};
 
 const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: NaverMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markerInstances = useRef<any[]>([]);
   const didInitialFit = useRef(false);
+  const [mapReady, setMapReady] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!mapRef.current || !window.naver?.maps) return;
+    loadNaverMaps().then(() => setMapReady(true)).catch((e) => setMapError(e.message));
+  }, []);
 
-    const center = markers.length > 0
-      ? new window.naver.maps.LatLng(markers[0].lat, markers[0].lng)
+  useEffect(() => {
+    if (!mapReady || !mapRef.current || !window.naver?.maps || mapInstance.current) return;
+
+    const validMarkers = markers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
+    const center = validMarkers.length > 0
+      ? new window.naver.maps.LatLng(validMarkers[0].lat, validMarkers[0].lng)
       : new window.naver.maps.LatLng(36.5, 127.5);
 
     mapInstance.current = new window.naver.maps.Map(mapRef.current, {
       center,
-      zoom: markers.length > 0 ? 12 : 7,
+      zoom: validMarkers.length > 0 ? 12 : 7,
       zoomControl: true,
       zoomControlOptions: {
         position: window.naver.maps.Position.TOP_RIGHT,
@@ -58,7 +90,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       }
       didInitialFit.current = false;
     };
-  }, []);
+  }, [mapReady, markers]);
 
   // Render markers
   useEffect(() => {
@@ -127,6 +159,10 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       mapInstance.current.setZoom(16);
     }
   }, [focusedMarkerId, markers]);
+
+  if (mapError) {
+    return <div className={className || 'flex h-full w-full items-center justify-center bg-muted text-sm text-muted-foreground'}>{mapError}</div>;
+  }
 
   return <div ref={mapRef} className={className || 'h-full w-full'} />;
 };
