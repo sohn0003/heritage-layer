@@ -23,6 +23,7 @@ import Privacy from "@/pages/legal/Privacy";
 import TossCheckout from "@/pages/checkout/TossCheckout";
 import TossSuccess from "@/pages/checkout/TossSuccess";
 import TossFail from "@/pages/checkout/TossFail";
+import TossDemo from "@/pages/checkout/TossDemo";
 
 const queryClient = new QueryClient();
 
