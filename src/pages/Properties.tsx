@@ -13,6 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Seo from '@/components/common/Seo';
+import { hasValidKoreaCoordinate } from '@/lib/geo';
 
 interface Asset {
   id: string;
@@ -367,11 +368,11 @@ const PropertiesPage = () => {
         <div className="hidden flex-1 md:flex">
           <NaverMap
             markers={filtered
-              .filter((a) => a.latitude && a.longitude)
+              .filter(hasValidKoreaCoordinate)
               .map((a) => ({ lat: a.latitude!, lng: a.longitude!, title: a.address, id: a.id }))}
             focusedMarkerId={selectedAssetId}
             onMarkerClick={(idx) => {
-              const validAssets = filtered.filter((a) => a.latitude && a.longitude);
+              const validAssets = filtered.filter(hasValidKoreaCoordinate);
               const picked = validAssets[idx];
               if (!picked) return;
               setSelectedAssetId(picked.id);
@@ -391,7 +392,7 @@ const PropertiesPage = () => {
             <div className="space-y-3">
               {filtered.map((asset) => {
                 const isSelected = selectedAssetId === asset.id;
-                const hasCoords = asset.latitude != null && asset.longitude != null;
+                const hasCoords = hasValidKoreaCoordinate(asset);
                 return (
                   <div
                     key={asset.id}
