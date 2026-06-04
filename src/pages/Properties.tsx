@@ -104,9 +104,8 @@ const PropertiesPage = () => {
   useEffect(() => {
     const fetchAssets = async () => {
       const { data } = await supabase
-        .from('assets')
-        .select('*')
-        .eq('is_published', true);
+        .from('assets_public')
+        .select('*');
       if (data) setAssets(data as Asset[]);
     };
     fetchAssets();
