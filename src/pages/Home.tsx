@@ -978,16 +978,17 @@ const HomePage = () => {
               <p>(주)더레이어코퍼레이션</p>
               <p>대표자 : 이혜지</p>
               <p>사업자등록번호 : 354-87-02814</p>
+              <p>사업장 주소 : 서울특별시 강남구 테헤란로79길 6, 5층 브이636</p>
             </div>
           </div>
-          <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</p>
-            <p className="flex items-center gap-2"><Mail className="h-4 w-4" /> contact@thelayercorp.com</p>
+            <p className="flex items-center gap-2"><Mail className="h-3.5 w-3.5" /> contact@thelayercorp.com</p>
+            <p className="flex items-center gap-2"><Phone className="h-3.5 w-3.5" /> 010-5035-5901</p>
             <p>담당자 : 손성식</p>
-            <p>연락처 : 010-5035-5901</p>
           </div>
 
-          <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Service</p>
             <button onClick={() => navigate('/properties')} className="block hover:text-foreground">자산 탐색</button>
             <button onClick={() => navigate('/about')} className="block hover:text-foreground">회사 소개</button>
