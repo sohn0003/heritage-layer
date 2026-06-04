@@ -978,6 +978,7 @@ const HomePage = () => {
               <p>대표자 : 이혜지</p>
               <p>사업자등록번호 : 354-87-02814</p>
               <p>사업장 주소 : 서울특별시 강남구 테헤란로79길 6, 5층 브이636</p>
+              <p>통신판매업 신고번호 : 2024-서울강남-01639</p>
             </div>
           </div>
           <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
