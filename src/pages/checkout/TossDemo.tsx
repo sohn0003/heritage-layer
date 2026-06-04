@@ -18,7 +18,7 @@ const TossDemo = () => {
   const status = params.get('status'); // 'success' | 'fail' | null
   const orderId = useMemo(() => `demo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`, []);
 
-  const startPayment = async (method: 'CARD' | 'TRANSFER' | 'EASY_PAY') => {
+  const startPayment = async (method: 'CARD' | 'TRANSFER') => {
     setLoading(true);
     try {
       const toss = await loadTossPayments(TOSS_TEST_CLIENT_KEY);
