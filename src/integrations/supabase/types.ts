@@ -188,6 +188,13 @@ export type Database = {
             referencedRelation: "assets"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "deal_signals_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       loan_rates: {
@@ -298,6 +305,13 @@ export type Database = {
             referencedRelation: "assets"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "saved_assets_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       subscriptions: {
@@ -398,7 +412,135 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      assets_public: {
+        Row: {
+          address: string | null
+          asset_type: string | null
+          building_condition: string | null
+          building_coverage: number | null
+          commercial_density: string | null
+          created_at: string | null
+          current_building_coverage: number | null
+          current_floor_area: number | null
+          current_floor_area_ratio: number | null
+          distance_to_center: number | null
+          floor_area_ratio: number | null
+          gov_cooperation: boolean | null
+          grade: string | null
+          has_conversion_precedent: boolean | null
+          historical_value: string | null
+          id: string | null
+          idle_years: number | null
+          is_abandoned_school_budget: boolean | null
+          is_balanced_dev_budget: boolean | null
+          is_citizen_proposal: boolean | null
+          is_military_heritage_zone: boolean | null
+          is_private_negotiation: boolean | null
+          is_published: boolean | null
+          is_urban_facility_conflict: boolean | null
+          is_urban_regeneration_area: boolean | null
+          is_waterfront_environmental: boolean | null
+          land_area: number | null
+          land_value_per_sqm: number | null
+          latitude: number | null
+          legal_max_building_coverage: number | null
+          legal_max_floor_area_ratio: number | null
+          longitude: number | null
+          natural_scenery: string | null
+          ownership_type: string | null
+          population_trend: string | null
+          recommended_dev_direction: string | null
+          recommended_use_type: string | null
+          use_change_expansion: string | null
+          zoning: string | null
+          zoning_upgrade_gain: string | null
+        }
+        Insert: {
+          address?: string | null
+          asset_type?: string | null
+          building_condition?: string | null
+          building_coverage?: number | null
+          commercial_density?: string | null
+          created_at?: string | null
+          current_building_coverage?: number | null
+          current_floor_area?: number | null
+          current_floor_area_ratio?: number | null
+          distance_to_center?: number | null
+          floor_area_ratio?: number | null
+          gov_cooperation?: boolean | null
+          grade?: string | null
+          has_conversion_precedent?: boolean | null
+          historical_value?: string | null
+          id?: string | null
+          idle_years?: number | null
+          is_abandoned_school_budget?: boolean | null
+          is_balanced_dev_budget?: boolean | null
+          is_citizen_proposal?: boolean | null
+          is_military_heritage_zone?: boolean | null
+          is_private_negotiation?: boolean | null
+          is_published?: boolean | null
+          is_urban_facility_conflict?: boolean | null
+          is_urban_regeneration_area?: boolean | null
+          is_waterfront_environmental?: boolean | null
+          land_area?: number | null
+          land_value_per_sqm?: number | null
+          latitude?: number | null
+          legal_max_building_coverage?: number | null
+          legal_max_floor_area_ratio?: number | null
+          longitude?: number | null
+          natural_scenery?: string | null
+          ownership_type?: string | null
+          population_trend?: string | null
+          recommended_dev_direction?: string | null
+          recommended_use_type?: string | null
+          use_change_expansion?: string | null
+          zoning?: string | null
+          zoning_upgrade_gain?: string | null
+        }
+        Update: {
+          address?: string | null
+          asset_type?: string | null
+          building_condition?: string | null
+          building_coverage?: number | null
+          commercial_density?: string | null
+          created_at?: string | null
+          current_building_coverage?: number | null
+          current_floor_area?: number | null
+          current_floor_area_ratio?: number | null
+          distance_to_center?: number | null
+          floor_area_ratio?: number | null
+          gov_cooperation?: boolean | null
+          grade?: string | null
+          has_conversion_precedent?: boolean | null
+          historical_value?: string | null
+          id?: string | null
+          idle_years?: number | null
+          is_abandoned_school_budget?: boolean | null
+          is_balanced_dev_budget?: boolean | null
+          is_citizen_proposal?: boolean | null
+          is_military_heritage_zone?: boolean | null
+          is_private_negotiation?: boolean | null
+          is_published?: boolean | null
+          is_urban_facility_conflict?: boolean | null
+          is_urban_regeneration_area?: boolean | null
+          is_waterfront_environmental?: boolean | null
+          land_area?: number | null
+          land_value_per_sqm?: number | null
+          latitude?: number | null
+          legal_max_building_coverage?: number | null
+          legal_max_floor_area_ratio?: number | null
+          longitude?: number | null
+          natural_scenery?: string | null
+          ownership_type?: string | null
+          population_trend?: string | null
+          recommended_dev_direction?: string | null
+          recommended_use_type?: string | null
+          use_change_expansion?: string | null
+          zoning?: string | null
+          zoning_upgrade_gain?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_active_subscription: {
