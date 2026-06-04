@@ -21,25 +21,42 @@ Deno.serve(async (req) => {
       });
     }
 
-    const url = `https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(address)}`;
-    const res = await fetch(url, {
-      headers: {
-        'x-ncp-apigw-api-key-id': clientId,
-        'x-ncp-apigw-api-key': clientSecret,
-        Accept: 'application/json',
-      },
-    });
+    const baseAddress = address.trim();
+    const candidates = Array.from(new Set([
+      baseAddress,
+      baseAddress.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim(),
+      baseAddress.replace(/\s*\([^)]*\).*$/g, '').trim(),
+      baseAddress.replace(/([가-힣]+)도리/g, '$1리').replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim(),
+    ].filter(Boolean)));
 
-    if (!res.ok) {
-      const text = await res.text();
-      return new Response(JSON.stringify({ error: 'Naver API error', status: res.status, detail: text }), {
+    let first: any | null = null;
+    let lastError: { status: number; detail: string } | null = null;
+    for (const query of candidates) {
+      const url = `https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(query)}`;
+      const res = await fetch(url, {
+        headers: {
+          'x-ncp-apigw-api-key-id': clientId,
+          'x-ncp-apigw-api-key': clientSecret,
+          Accept: 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        lastError = { status: res.status, detail: await res.text() };
+        continue;
+      }
+
+      const data = await res.json();
+      first = data?.addresses?.[0] ?? null;
+      if (first) break;
+    }
+
+    if (lastError && !first) {
+      return new Response(JSON.stringify({ error: 'Naver API error', ...lastError }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-
-    const data = await res.json();
-    const first = data?.addresses?.[0];
     if (!first) {
       return new Response(JSON.stringify({ error: 'No result for address', address }), {
         status: 404,
