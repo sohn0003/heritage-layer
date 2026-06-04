@@ -149,14 +149,6 @@ const TossDemo = () => {
               >
                 계좌이체로 테스트 결제
               </Button>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => startPayment('EASY_PAY')}
-                disabled={loading}
-              >
-                간편결제로 테스트 결제
-              </Button>
             </div>
 
             <p className="text-[11px] leading-relaxed text-muted-foreground">
