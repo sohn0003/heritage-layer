@@ -37,4 +37,10 @@ export function getTossPlan(priceId: string): TossPlan | null {
   return PLANS[priceId] ?? null;
 }
 
-export const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY as string | undefined;
+// 토스페이먼츠 공식 테스트 클라이언트 키 (publishable, 코드에 노출 가능)
+// 라이브 키가 발급되면 VITE_TOSS_CLIENT_KEY 환경변수로 덮어쓰면 됩니다.
+const TOSS_TEST_CLIENT_KEY_FALLBACK = 'test_ck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
+
+const envKey = import.meta.env.VITE_TOSS_CLIENT_KEY as string | undefined;
+export const TOSS_CLIENT_KEY: string =
+  envKey && envKey.trim().length > 0 ? envKey : TOSS_TEST_CLIENT_KEY_FALLBACK;
