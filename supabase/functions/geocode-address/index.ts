@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
       baseAddress.replace(/([가-힣]+)도리/g, '$1리').replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim(),
     ].filter(Boolean)));
 
-    let first = null;
+    let first: any | null = null;
     let lastError: { status: number; detail: string } | null = null;
     for (const query of candidates) {
       const url = `https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(query)}`;
