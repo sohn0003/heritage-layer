@@ -37,10 +37,13 @@ export function getTossPlan(priceId: string): TossPlan | null {
   return PLANS[priceId] ?? null;
 }
 
-// 토스페이먼츠 공식 테스트 클라이언트 키 (publishable, 코드에 노출 가능)
+// 토스페이먼츠 자동결제(빌링) 공식 테스트 클라이언트 키 (publishable, 코드에 노출 가능)
 // 라이브 키가 발급되면 VITE_TOSS_CLIENT_KEY 환경변수로 덮어쓰면 됩니다.
-const TOSS_TEST_CLIENT_KEY_FALLBACK = 'test_ck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
+// 일반 결제 문서 키(test_ck_docs_...)는 requestBillingAuth에서 UNKNOWN 오류가 날 수 있어 빌링 전용 문서 키를 사용합니다.
+const TOSS_BILLING_TEST_CLIENT_KEY_FALLBACK = 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
 
 const envKey = import.meta.env.VITE_TOSS_CLIENT_KEY as string | undefined;
 export const TOSS_CLIENT_KEY: string =
-  envKey && envKey.trim().length > 0 ? envKey : TOSS_TEST_CLIENT_KEY_FALLBACK;
+  envKey && envKey.trim().length > 0 && !envKey.startsWith('test_ck_docs_')
+    ? envKey
+    : TOSS_BILLING_TEST_CLIENT_KEY_FALLBACK;
