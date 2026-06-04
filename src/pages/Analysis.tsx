@@ -520,8 +520,12 @@ const AnalysisPage = () => {
                           <span className="text-xs text-muted-foreground text-right truncate hidden sm:inline">{row.short}</span>
                         </div>
                       </AccordionTrigger>
-
+                      <AccordionContent className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                        {row.desc}
+                      </AccordionContent>
+                    </AccordionItem>
                   ))}
+
                 </Accordion>
               </CardContent>
             </Card>
