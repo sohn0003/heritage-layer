@@ -597,9 +597,8 @@ const HomePage = () => {
   useEffect(() => {
     (async () => {
       const { data } = await supabase
-        .from('assets')
-        .select('latitude,longitude,address')
-        .eq('is_published', true);
+        .from('assets_public')
+        .select('latitude,longitude,address');
       if (data) {
         setMarkers(
           data
