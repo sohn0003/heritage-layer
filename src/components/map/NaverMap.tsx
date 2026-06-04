@@ -67,8 +67,9 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
     markerInstances.current.forEach(m => m.setMap(null));
     markerInstances.current = [];
 
-    markers.forEach((m, idx) => {
-      if (!isValidKoreaCoordinate(m.lat, m.lng)) return;
+    const validMarkers = markers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
+
+    validMarkers.forEach((m, idx) => {
       const isFocused = focusedMarkerId && m.id === focusedMarkerId;
       const marker = new window.naver.maps.Marker({
         position: new window.naver.maps.LatLng(m.lat, m.lng),
@@ -91,7 +92,6 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
     });
 
     // Initial fit only — don't refit on every marker/focus change
-    const validMarkers = markers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
     if (!didInitialFit.current && validMarkers.length > 0) {
       if (validMarkers.length > 1) {
         const bounds = new window.naver.maps.LatLngBounds(
