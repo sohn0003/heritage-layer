@@ -572,7 +572,7 @@ const AnalysisPage = () => {
                         {/* 시나리오 헤더 */}
                         <div>
                           <h3 className="text-xl font-bold leading-tight">
-                            {scenario.rank}순위 · {scenario.concept}
+                            {scenario.rank}순위 · {scenario.concept.replace(/^\d+순위:\s*/, '')}
                           </h3>
                           <div className="mt-2 flex flex-wrap gap-2">
                             <Badge variant="secondary">{scenario.developmentDirectionLabel}</Badge>
