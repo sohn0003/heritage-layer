@@ -20,6 +20,7 @@ import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
 import { calculateScoringFields } from '@/lib/assetScoring';
 import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
 import GradeBadge from '@/components/common/GradeBadge';
+import { isValidKoreaCoordinate } from '@/lib/geo';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
 const populationTrends = [
@@ -310,7 +311,7 @@ const AdminPropertiesPage = () => {
     if (error || !data || (data as any).error) return null;
     const latitude = Number((data as any).latitude);
     const longitude = Number((data as any).longitude);
-    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+    if (!isValidKoreaCoordinate(latitude, longitude)) return null;
     return { latitude, longitude };
   };
 
@@ -328,7 +329,12 @@ const AdminPropertiesPage = () => {
     setBulkGeocoding(true);
     let ok = 0, fail = 0;
     for (const a of targets) {
-      const r = await geocodeAddress(String(a.address ?? '').trim());
+      const address = String(a.address ?? '').trim();
+      if (!address) {
+        fail++;
+        continue;
+      }
+      const r = await geocodeAddress(address);
       if (r) {
         const { error } = await supabase
           .from('assets')
