@@ -308,30 +308,39 @@ const AdminPropertiesPage = () => {
   const geocodeAddress = async (address: string): Promise<{ latitude: number; longitude: number } | null> => {
     const { data, error } = await supabase.functions.invoke('geocode-address', { body: { address } });
     if (error || !data || (data as any).error) return null;
-    return { latitude: (data as any).latitude, longitude: (data as any).longitude };
+    const latitude = Number((data as any).latitude);
+    const longitude = Number((data as any).longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+    return { latitude, longitude };
   };
 
 
   const [bulkGeocoding, setBulkGeocoding] = useState(false);
   const handleBulkGeocode = async () => {
-    const targets = assets.filter((a) => !a.latitude || !a.longitude);
+    const scopedAssets = selectedIds.size > 0 ? assets.filter((a) => selectedIds.has(a.id)) : assets;
+    const targets = scopedAssets.filter((a) => selectedIds.size > 0 || !a.latitude || !a.longitude);
     if (targets.length === 0) {
-      toast({ title: '좌표가 없는 자산이 없습니다' });
+      toast({ title: selectedIds.size > 0 ? '선택된 자산이 없습니다' : '좌표가 없는 자산이 없습니다' });
       return;
     }
-    if (!confirm(`${targets.length}건의 자산 좌표를 자동 변환하시겠습니까?`)) return;
+    const confirmLabel = selectedIds.size > 0 ? `선택한 ${targets.length}건` : `좌표가 없는 ${targets.length}건`;
+    if (!confirm(`${confirmLabel}의 자산 좌표를 자동 변환하시겠습니까?`)) return;
     setBulkGeocoding(true);
     let ok = 0, fail = 0;
     for (const a of targets) {
-      const r = await geocodeAddress(a.address);
+      const r = await geocodeAddress(String(a.address ?? '').trim());
       if (r) {
-        const { error } = await supabase.from('assets').update({ latitude: r.latitude, longitude: r.longitude }).eq('id', a.id);
+        const { error } = await supabase
+          .from('assets')
+          .update({ latitude: r.latitude, longitude: r.longitude })
+          .eq('id', a.id);
         if (error) fail++; else ok++;
       } else fail++;
       await new Promise((res) => setTimeout(res, 120));
     }
     setBulkGeocoding(false);
     toast({ title: `좌표 변환 완료 · 성공 ${ok}건 / 실패 ${fail}건` });
+    if (selectedIds.size > 0) setSelectedIds(new Set());
     fetchAssets();
   };
 
