@@ -974,11 +974,19 @@ const HomePage = () => {
             <p className="text-xs leading-relaxed text-muted-foreground">
               유휴 부동산을 새로운 기회로 잇는<br />Heritage Layer
             </p>
+            <div className="mt-3 space-y-1 text-xs leading-relaxed text-muted-foreground">
+              <p>(주)더레이어코퍼레이션</p>
+              <p>대표자 : 이혜지</p>
+              <p>사업자등록번호 : 354-87-02814</p>
+            </div>
           </div>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</p>
             <p className="flex items-center gap-2"><Mail className="h-4 w-4" /> contact@thelayercorp.com</p>
+            <p>담당자 : 손성식</p>
+            <p>연락처 : 010-5035-5901</p>
           </div>
+
           <div className="space-y-2 text-sm text-muted-foreground">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Service</p>
             <button onClick={() => navigate('/properties')} className="block hover:text-foreground">자산 탐색</button>
