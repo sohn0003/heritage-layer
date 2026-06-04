@@ -71,7 +71,7 @@ const Mypage = () => {
         // Fetch asset details for each saved asset
         const assetIds = saved.map(s => s.asset_id);
         const { data: assets } = await supabase
-          .from('assets')
+          .from('assets_public')
           .select('id, address, asset_type, grade')
           .in('id', assetIds);
 
