@@ -15,7 +15,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Download, Upload } from 'lucide-react';
+import { Plus, Pencil, Trash2, Download, Upload, MapPin } from 'lucide-react';
 import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
 import { calculateScoringFields } from '@/lib/assetScoring';
 import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
@@ -141,6 +141,7 @@ const AdminPropertiesPage = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkGeocoding, setBulkGeocoding] = useState(false);
   const [rescoring, setRescoring] = useState(false);
+  const [originalAddress, setOriginalAddress] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -154,7 +155,7 @@ const AdminPropertiesPage = () => {
     if (data) setAssets(data);
   };
 
-  const openCreate = () => { setForm(emptyForm); setEditId(null); setDialogOpen(true); };
+  const openCreate = () => { setForm(emptyForm); setOriginalAddress(''); setEditId(null); setDialogOpen(true); };
 
   const openEdit = (a: any) => {
     setForm({
@@ -196,6 +197,7 @@ const AdminPropertiesPage = () => {
       is_abandoned_school_budget: a.is_abandoned_school_budget || false,
       is_balanced_dev_budget: a.is_balanced_dev_budget || false,
     });
+    setOriginalAddress(a.address || '');
     setEditId(a.id);
     setDialogOpen(true);
   };
@@ -244,12 +246,17 @@ const AdminPropertiesPage = () => {
       is_balanced_dev_budget: form.is_balanced_dev_budget,
     };
 
-    // 좌표가 비어있으면 자동 지오코딩
-    if ((payload.latitude == null || payload.longitude == null) && payload.address?.trim()) {
+    // 주소가 바뀌었거나 좌표가 비어있으면 주소 기준으로 좌표를 다시 산출
+    const addressChanged = editId && payload.address.trim() !== originalAddress.trim();
+    if ((addressChanged || payload.latitude == null || payload.longitude == null) && payload.address?.trim()) {
       const r = await geocodeAddress(payload.address.trim());
       if (r) {
         payload.latitude = r.latitude;
         payload.longitude = r.longitude;
+      } else if (addressChanged) {
+        toast({ title: '좌표 변환 실패', description: '변경된 주소로 좌표를 찾지 못해 저장하지 않았습니다.', variant: 'destructive' });
+        setSaving(false);
+        return;
       }
     }
 
@@ -315,6 +322,21 @@ const AdminPropertiesPage = () => {
     const longitude = Number((data as any).longitude);
     if (!isValidKoreaCoordinate(latitude, longitude)) return null;
     return { latitude, longitude };
+  };
+
+  const handleGeocodeCurrentForm = async () => {
+    const address = form.address.trim();
+    if (!address) {
+      toast({ title: '주소를 먼저 입력해주세요', variant: 'destructive' });
+      return;
+    }
+    const r = await geocodeAddress(address);
+    if (!r) {
+      toast({ title: '좌표 변환 실패', description: '입력한 주소로 좌표를 찾지 못했습니다.', variant: 'destructive' });
+      return;
+    }
+    setF({ latitude: String(r.latitude), longitude: String(r.longitude) });
+    toast({ title: '주소 기준 좌표로 갱신되었습니다' });
   };
 
   const handleBulkGeocode = async () => {
@@ -564,8 +586,13 @@ const AdminPropertiesPage = () => {
                       <Label>경도</Label>
                       <Input type="number" step="any" value={form.longitude} onChange={(e) => setF({ longitude: e.target.value })} />
                     </div>
-                    <div className="col-span-2 text-xs text-muted-foreground">
-                      위/경도를 비워두면 저장 시 주소로부터 자동 추가됩니다.
+                    <div className="flex items-end">
+                      <Button type="button" variant="outline" className="w-full" onClick={handleGeocodeCurrentForm}>
+                        <MapPin className="mr-2 h-4 w-4" /> 주소 기준 좌표 변환
+                      </Button>
+                    </div>
+                    <div className="sm:col-span-3 text-xs text-muted-foreground">
+                      위/경도를 비워두거나 주소를 수정하면 저장 시 주소 기준 좌표로 자동 갱신됩니다.
                     </div>
                   </div>
                 </AccordionContent>

@@ -10,7 +10,7 @@ Deno.serve((_req) => {
     });
   }
 
-  return new Response(JSON.stringify({ ncpKeyId: clientId }), {
+  return new Response(JSON.stringify({ ncpClientId: clientId }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 });

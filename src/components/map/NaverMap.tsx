@@ -24,12 +24,12 @@ const loadNaverMaps = () => {
 
   naverMapsLoader = (async () => {
     const { data, error } = await supabase.functions.invoke('naver-map-config');
-    if (error || !data || !(data as any).ncpKeyId) throw new Error('네이버 지도 키를 불러오지 못했습니다.');
+    if (error || !data || !(data as any).ncpClientId) throw new Error('네이버 지도 키를 불러오지 못했습니다.');
 
     await new Promise<void>((resolve, reject) => {
       window.__initNaverMaps = () => resolve();
       const script = document.createElement('script');
-      script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent((data as any).ncpKeyId)}&callback=__initNaverMaps`;
+      script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${encodeURIComponent((data as any).ncpClientId)}&callback=__initNaverMaps`;
       script.async = true;
       script.onerror = () => reject(new Error('네이버 지도 로딩에 실패했습니다.'));
       document.head.appendChild(script);
