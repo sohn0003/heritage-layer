@@ -3,11 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { isValidKoreaCoordinate } from '@/lib/geo';
 
 interface NaverMapProps {
-  markers?: { lat: number; lng: number; title?: string; id?: string }[];
-  onMarkerClick?: (index: number) => void;
+  markers?: { lat: number; lng: number; title?: string; id?: string; address?: string }[];
+  onMarkerClick?: (index: number, marker?: { id?: string }) => void;
   focusedMarkerId?: string | null;
   className?: string;
 }
+
+type MapMarker = NonNullable<NaverMapProps['markers']>[number];
 
 declare global {
   interface Window {
@@ -44,25 +46,50 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markerInstances = useRef<any[]>([]);
+  const geocodeCache = useRef<Map<string, { lat: number; lng: number } | null>>(new Map());
   const didInitialFit = useRef(false);
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [resolvedMarkers, setResolvedMarkers] = useState<MapMarker[]>(markers);
 
   useEffect(() => {
     loadNaverMaps().then(() => setMapReady(true)).catch((e) => setMapError(e.message));
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    const resolveByAddress = async () => {
+      const next = await Promise.all(markers.map(async (m) => {
+        const address = m.address?.trim();
+        if (!address) return isValidKoreaCoordinate(m.lat, m.lng) ? m : null;
+        if (!geocodeCache.current.has(address)) {
+          try {
+            const { data, error } = await supabase.functions.invoke('geocode-address', { body: { address } });
+            const lat = Number((data as any)?.latitude);
+            const lng = Number((data as any)?.longitude);
+            geocodeCache.current.set(address, !error && isValidKoreaCoordinate(lat, lng) ? { lat, lng } : null);
+          } catch {
+            geocodeCache.current.set(address, null);
+          }
+        }
+        const resolved = geocodeCache.current.get(address);
+        if (resolved) return { ...m, lat: resolved.lat, lng: resolved.lng };
+        return isValidKoreaCoordinate(m.lat, m.lng) ? m : null;
+      }));
+      if (!cancelled) setResolvedMarkers(next.filter(Boolean) as MapMarker[]);
+    };
+    resolveByAddress();
+    return () => { cancelled = true; };
+  }, [markers]);
+
+  useEffect(() => {
     if (!mapReady || !mapRef.current || !window.naver?.maps || mapInstance.current) return;
 
-    const validMarkers = markers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
-    const center = validMarkers.length > 0
-      ? new window.naver.maps.LatLng(validMarkers[0].lat, validMarkers[0].lng)
-      : new window.naver.maps.LatLng(36.5, 127.5);
+    const center = new window.naver.maps.LatLng(36.5, 127.5);
 
     mapInstance.current = new window.naver.maps.Map(mapRef.current, {
       center,
-      zoom: validMarkers.length > 0 ? 12 : 7,
+      zoom: 7,
       zoomControl: true,
       zoomControlOptions: {
         position: window.naver.maps.Position.TOP_RIGHT,
@@ -84,7 +111,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       }
       didInitialFit.current = false;
     };
-  }, [mapReady, markers]);
+  }, [mapReady]);
 
   // Render markers
   useEffect(() => {
