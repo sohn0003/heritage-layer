@@ -3,11 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { isValidKoreaCoordinate } from '@/lib/geo';
 
 interface NaverMapProps {
-  markers?: { lat: number; lng: number; title?: string; id?: string }[];
-  onMarkerClick?: (index: number) => void;
+  markers?: { lat: number; lng: number; title?: string; id?: string; address?: string }[];
+  onMarkerClick?: (index: number, marker?: { id?: string }) => void;
   focusedMarkerId?: string | null;
   className?: string;
 }
+
+type MapMarker = NonNullable<NaverMapProps['markers']>[number];
 
 declare global {
   interface Window {
@@ -24,12 +26,13 @@ const loadNaverMaps = () => {
 
   naverMapsLoader = (async () => {
     const { data, error } = await supabase.functions.invoke('naver-map-config');
-    if (error || !data || !(data as any).ncpClientId) throw new Error('네이버 지도 키를 불러오지 못했습니다.');
+    const ncpKeyId = (data as any)?.ncpKeyId ?? (data as any)?.ncpClientId;
+    if (error || !data || !ncpKeyId) throw new Error('네이버 지도 키를 불러오지 못했습니다.');
 
     await new Promise<void>((resolve, reject) => {
       window.__initNaverMaps = () => resolve();
       const script = document.createElement('script');
-      script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${encodeURIComponent((data as any).ncpClientId)}&callback=__initNaverMaps`;
+      script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(ncpKeyId)}&callback=__initNaverMaps`;
       script.async = true;
       script.onerror = () => reject(new Error('네이버 지도 로딩에 실패했습니다.'));
       document.head.appendChild(script);
@@ -43,25 +46,50 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markerInstances = useRef<any[]>([]);
+  const geocodeCache = useRef<Map<string, { lat: number; lng: number } | null>>(new Map());
   const didInitialFit = useRef(false);
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [resolvedMarkers, setResolvedMarkers] = useState<MapMarker[]>(markers);
 
   useEffect(() => {
     loadNaverMaps().then(() => setMapReady(true)).catch((e) => setMapError(e.message));
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    const resolveByAddress = async () => {
+      const next = await Promise.all(markers.map(async (m) => {
+        const address = m.address?.trim();
+        if (!address) return isValidKoreaCoordinate(m.lat, m.lng) ? m : null;
+        if (!geocodeCache.current.has(address)) {
+          try {
+            const { data, error } = await supabase.functions.invoke('geocode-address', { body: { address } });
+            const lat = Number((data as any)?.latitude);
+            const lng = Number((data as any)?.longitude);
+            geocodeCache.current.set(address, !error && isValidKoreaCoordinate(lat, lng) ? { lat, lng } : null);
+          } catch {
+            geocodeCache.current.set(address, null);
+          }
+        }
+        const resolved = geocodeCache.current.get(address);
+        if (resolved) return { ...m, lat: resolved.lat, lng: resolved.lng };
+        return isValidKoreaCoordinate(m.lat, m.lng) ? m : null;
+      }));
+      if (!cancelled) setResolvedMarkers(next.filter(Boolean) as MapMarker[]);
+    };
+    resolveByAddress();
+    return () => { cancelled = true; };
+  }, [markers]);
+
+  useEffect(() => {
     if (!mapReady || !mapRef.current || !window.naver?.maps || mapInstance.current) return;
 
-    const validMarkers = markers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
-    const center = validMarkers.length > 0
-      ? new window.naver.maps.LatLng(validMarkers[0].lat, validMarkers[0].lng)
-      : new window.naver.maps.LatLng(36.5, 127.5);
+    const center = new window.naver.maps.LatLng(36.5, 127.5);
 
     mapInstance.current = new window.naver.maps.Map(mapRef.current, {
       center,
-      zoom: validMarkers.length > 0 ? 12 : 7,
+      zoom: 7,
       zoomControl: true,
       zoomControlOptions: {
         position: window.naver.maps.Position.TOP_RIGHT,
@@ -83,7 +111,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       }
       didInitialFit.current = false;
     };
-  }, [mapReady, markers]);
+  }, [mapReady]);
 
   // Render markers
   useEffect(() => {
@@ -92,7 +120,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
     markerInstances.current.forEach(m => m.setMap(null));
     markerInstances.current = [];
 
-    const validMarkers = markers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
+    const validMarkers = resolvedMarkers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
 
     validMarkers.forEach((m, idx) => {
       const isFocused = focusedMarkerId && m.id === focusedMarkerId;
@@ -110,7 +138,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       });
 
       if (onMarkerClick) {
-        window.naver.maps.Event.addListener(marker, 'click', () => onMarkerClick(idx));
+        window.naver.maps.Event.addListener(marker, 'click', () => onMarkerClick(idx, m));
       }
 
       markerInstances.current.push(marker);
@@ -136,12 +164,12 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       }
       didInitialFit.current = true;
     }
-  }, [markers, focusedMarkerId, onMarkerClick]);
+  }, [resolvedMarkers, focusedMarkerId, onMarkerClick]);
 
   // Pan/zoom to focused marker
   useEffect(() => {
     if (!mapInstance.current || !window.naver?.maps || !focusedMarkerId) return;
-    const target = markers.find(m => m.id === focusedMarkerId);
+    const target = resolvedMarkers.find(m => m.id === focusedMarkerId);
     if (!target || !isValidKoreaCoordinate(target.lat, target.lng)) return;
     const latlng = new window.naver.maps.LatLng(target.lat, target.lng);
     try {
@@ -151,7 +179,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       mapInstance.current.setCenter(latlng);
       mapInstance.current.setZoom(16);
     }
-  }, [focusedMarkerId, markers]);
+  }, [focusedMarkerId, resolvedMarkers]);
 
   if (mapError) {
     return <div className={className || 'flex h-full w-full items-center justify-center bg-muted text-sm text-muted-foreground'}>{mapError}</div>;
