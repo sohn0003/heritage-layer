@@ -586,8 +586,13 @@ const AdminPropertiesPage = () => {
                       <Label>경도</Label>
                       <Input type="number" step="any" value={form.longitude} onChange={(e) => setF({ longitude: e.target.value })} />
                     </div>
-                    <div className="col-span-2 text-xs text-muted-foreground">
-                      위/경도를 비워두면 저장 시 주소로부터 자동 추가됩니다.
+                    <div className="flex items-end">
+                      <Button type="button" variant="outline" className="w-full" onClick={handleGeocodeCurrentForm}>
+                        <MapPin className="mr-2 h-4 w-4" /> 주소 기준 좌표 변환
+                      </Button>
+                    </div>
+                    <div className="sm:col-span-3 text-xs text-muted-foreground">
+                      위/경도를 비워두거나 주소를 수정하면 저장 시 주소 기준 좌표로 자동 갱신됩니다.
                     </div>
                   </div>
                 </AccordionContent>
