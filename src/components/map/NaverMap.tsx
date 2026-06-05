@@ -120,7 +120,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
     markerInstances.current.forEach(m => m.setMap(null));
     markerInstances.current = [];
 
-    const validMarkers = markers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
+    const validMarkers = resolvedMarkers.filter((m) => isValidKoreaCoordinate(m.lat, m.lng));
 
     validMarkers.forEach((m, idx) => {
       const isFocused = focusedMarkerId && m.id === focusedMarkerId;
@@ -138,7 +138,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       });
 
       if (onMarkerClick) {
-        window.naver.maps.Event.addListener(marker, 'click', () => onMarkerClick(idx));
+        window.naver.maps.Event.addListener(marker, 'click', () => onMarkerClick(idx, m));
       }
 
       markerInstances.current.push(marker);
@@ -164,12 +164,12 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       }
       didInitialFit.current = true;
     }
-  }, [markers, focusedMarkerId, onMarkerClick]);
+  }, [resolvedMarkers, focusedMarkerId, onMarkerClick]);
 
   // Pan/zoom to focused marker
   useEffect(() => {
     if (!mapInstance.current || !window.naver?.maps || !focusedMarkerId) return;
-    const target = markers.find(m => m.id === focusedMarkerId);
+    const target = resolvedMarkers.find(m => m.id === focusedMarkerId);
     if (!target || !isValidKoreaCoordinate(target.lat, target.lng)) return;
     const latlng = new window.naver.maps.LatLng(target.lat, target.lng);
     try {
@@ -179,7 +179,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
       mapInstance.current.setCenter(latlng);
       mapInstance.current.setZoom(16);
     }
-  }, [focusedMarkerId, markers]);
+  }, [focusedMarkerId, resolvedMarkers]);
 
   if (mapError) {
     return <div className={className || 'flex h-full w-full items-center justify-center bg-muted text-sm text-muted-foreground'}>{mapError}</div>;
