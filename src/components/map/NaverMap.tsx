@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { isValidKoreaCoordinate } from '@/lib/geo';
 
 interface NaverMapProps {
   markers?: { lat: number; lng: number; title?: string; id?: string }[];
@@ -7,14 +8,6 @@ interface NaverMapProps {
   focusedMarkerId?: string | null;
   className?: string;
 }
-
-const isValidKoreaCoordinate = (lat: number, lng: number) =>
-  Number.isFinite(lat) &&
-  Number.isFinite(lng) &&
-  lat >= 30 &&
-  lat <= 45 &&
-  lng >= 120 &&
-  lng <= 135;
 
 declare global {
   interface Window {

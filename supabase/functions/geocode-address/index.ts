@@ -21,12 +21,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    const baseAddress = address.trim();
+    const baseAddress = address.trim().replace(/\s+/g, ' ');
+    const withoutParen = baseAddress.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+    const beforeParen = baseAddress.replace(/\s*\([^)]*\).*$/g, '').trim();
+    const normalizeDori = (value: string) =>
+      value.replace(/([가-힣]+)도리/g, '$1리').replace(/\s+/g, ' ').trim();
     const candidates = Array.from(new Set([
+      beforeParen,
+      withoutParen,
+      normalizeDori(beforeParen),
+      normalizeDori(withoutParen),
       baseAddress,
-      baseAddress.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim(),
-      baseAddress.replace(/\s*\([^)]*\).*$/g, '').trim(),
-      baseAddress.replace(/([가-힣]+)도리/g, '$1리').replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim(),
+      normalizeDori(baseAddress),
     ].filter(Boolean)));
 
     let first: any | null = null;

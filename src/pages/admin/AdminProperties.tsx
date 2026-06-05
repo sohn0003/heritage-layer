@@ -20,6 +20,7 @@ import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
 import { calculateScoringFields } from '@/lib/assetScoring';
 import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
 import GradeBadge from '@/components/common/GradeBadge';
+import { isValidKoreaCoordinate } from '@/lib/geo';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
 const populationTrends = [
@@ -138,6 +139,8 @@ const AdminPropertiesPage = () => {
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkGeocoding, setBulkGeocoding] = useState(false);
+  const [rescoring, setRescoring] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -310,15 +313,22 @@ const AdminPropertiesPage = () => {
     if (error || !data || (data as any).error) return null;
     const latitude = Number((data as any).latitude);
     const longitude = Number((data as any).longitude);
-    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+    if (!isValidKoreaCoordinate(latitude, longitude)) return null;
     return { latitude, longitude };
   };
 
-
-  const [bulkGeocoding, setBulkGeocoding] = useState(false);
   const handleBulkGeocode = async () => {
-    const scopedAssets = selectedIds.size > 0 ? assets.filter((a) => selectedIds.has(a.id)) : assets;
-    const targets = scopedAssets.filter((a) => selectedIds.size > 0 || !a.latitude || !a.longitude);
+    const ids = Array.from(selectedIds);
+    const query = supabase.from('assets').select('id,address,latitude,longitude');
+    const { data: freshAssets, error: fetchError } = ids.length > 0
+      ? await query.in('id', ids)
+      : await query;
+    if (fetchError) {
+      toast({ title: '자산 조회 실패', description: fetchError.message, variant: 'destructive' });
+      return;
+    }
+    const scopedAssets = freshAssets ?? [];
+    const targets = scopedAssets.filter((a) => selectedIds.size > 0 || !isValidKoreaCoordinate(Number(a.latitude), Number(a.longitude)));
     if (targets.length === 0) {
       toast({ title: selectedIds.size > 0 ? '선택된 자산이 없습니다' : '좌표가 없는 자산이 없습니다' });
       return;
@@ -328,7 +338,12 @@ const AdminPropertiesPage = () => {
     setBulkGeocoding(true);
     let ok = 0, fail = 0;
     for (const a of targets) {
-      const r = await geocodeAddress(String(a.address ?? '').trim());
+      const address = String(a.address ?? '').trim();
+      if (!address) {
+        fail++;
+        continue;
+      }
+      const r = await geocodeAddress(address);
       if (r) {
         const { error } = await supabase
           .from('assets')
@@ -351,7 +366,6 @@ const AdminPropertiesPage = () => {
 
   const setF = (patch: Partial<AssetForm>) => setForm((f) => ({ ...f, ...patch }));
 
-  const [rescoring, setRescoring] = useState(false);
   const handleBulkRescore = async () => {
     if (assets.length === 0) return;
     if (!confirm(`${assets.length}건의 자산 등급을 현재 알고리즘 기준으로 재계산하시겠습니까?`)) return;
