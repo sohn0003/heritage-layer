@@ -187,9 +187,10 @@ const Step3Graphic = () => {
           strokeDasharray="200" strokeDashoffset={inView ? 0 : 200}
           style={{ transition: 'stroke-dashoffset 1500ms ease-out 200ms' }}
         />
-        {[40, 80, 120].map((t, i) => {
-          const cx = 30 + t;
-          const cy = 170 - (t * 0.9);
+        {[0.25, 0.5, 0.75].map((t, i) => {
+          const mt = 1 - t;
+          const cx = mt * mt * 30 + 2 * mt * t * 100 + t * t * 170;
+          const cy = mt * mt * 170 + 2 * mt * t * 130 + t * t * 40;
           return (
             <circle
               key={i} cx={cx} cy={cy} r="4" fill="hsl(var(--accent))"
@@ -198,18 +199,20 @@ const Step3Graphic = () => {
           );
         })}
       </svg>
-      <div
-        className="absolute right-4 top-4 flex h-20 w-20 items-center justify-center rounded-2xl transition-all duration-700"
+      <Rocket
+        className="absolute h-12 w-12 transition-all duration-700"
         style={{
-          background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))',
-          boxShadow: '0 20px 40px -10px hsl(var(--primary) / 0.5)',
+          left: '85%',
+          top: '20%',
+          transform: inView
+            ? 'translate(-50%, -50%) rotate(-45deg)'
+            : 'translate(calc(-50% - 30px), calc(-50% + 30px)) rotate(-75deg)',
+          color: 'hsl(var(--primary))',
           opacity: inView ? 1 : 0,
-          transform: inView ? 'translate(0,0) rotate(0deg)' : 'translate(-30px,30px) rotate(-30deg)',
           transitionDelay: '1500ms',
+          filter: 'drop-shadow(0 6px 12px hsl(var(--primary) / 0.4))',
         }}
-      >
-        <Rocket className="h-8 w-8 text-white" />
-      </div>
+      />
     </div>
   );
 };
