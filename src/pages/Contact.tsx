@@ -15,6 +15,7 @@ import Seo from '@/components/common/Seo';
 const inquiryTypes = [
   { v: 'asset_report', l: '유휴자산 등록 의뢰' },
   { v: 'bridge_solution', l: 'Bridge Solution 의뢰' },
+  { v: 'platform_inquiry', l: '플랫폼 이용 관련 문의' },
 ];
 
 const ContactPage = () => {
