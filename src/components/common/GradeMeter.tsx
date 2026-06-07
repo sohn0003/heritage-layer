@@ -3,12 +3,14 @@ import { cn } from '@/lib/utils';
 
 // 자동차 계기판 스타일의 등급 게이지
 // 등급별 색상과 점수 위치를 시각화합니다
+// angle: 바늘 회전각 (0 = 정중앙 = B 위치, 음수 = 좌측, 양수 = 우측)
+// 5개 구간 중심: D=-72°, C=-36°, B=0°, A=+36°, S=+72°
 const GRADE_INFO: Record<string, { color: string; angle: number; label: string }> = {
-  S: { color: 'hsl(199, 70%, 50%)', angle: 162, label: '최우수' },  // 우측 상단
-  A: { color: 'hsl(150, 60%, 45%)', angle: 108, label: '우수' },
-  B: { color: 'hsl(40, 90%, 55%)', angle: 54, label: '양호' },
-  C: { color: 'hsl(25, 85%, 55%)', angle: 0, label: '보통' },        // 좌측 상단
-  D: { color: 'hsl(0, 75%, 55%)', angle: -54, label: '주의' },
+  S: { color: 'hsl(199, 70%, 50%)', angle: 72, label: '최우수' },
+  A: { color: 'hsl(150, 60%, 45%)', angle: 36, label: '우수' },
+  B: { color: 'hsl(40, 90%, 55%)', angle: 0, label: '양호' },
+  C: { color: 'hsl(25, 85%, 55%)', angle: -36, label: '보통' },
+  D: { color: 'hsl(0, 75%, 55%)', angle: -72, label: '주의' },
 };
 
 interface GradeMeterProps {
@@ -20,7 +22,7 @@ interface GradeMeterProps {
 
 const GradeMeter = ({ grade, totalScore, size = 180, className }: GradeMeterProps) => {
   const info = GRADE_INFO[grade] ?? GRADE_INFO.C;
-  const [needleAngle, setNeedleAngle] = useState(-108);
+  const [needleAngle, setNeedleAngle] = useState(-72);
 
   useEffect(() => {
     // 마운트 시 0(D 시작)에서 등급 위치까지 부드럽게 회전
@@ -61,9 +63,8 @@ const GradeMeter = ({ grade, totalScore, size = 180, className }: GradeMeterProp
     { start: 144, end: 180, color: GRADE_INFO.S.color },
   ];
 
-  // 바늘 각도: -90° (왼쪽) ~ +90° (오른쪽) 범위로 매핑
-  // info.angle: -108(D) ~ 162(S) — 0이 정중앙(B 영역)
-  const needleRotation = needleAngle * 0.6; // -65° ~ +97° 정도
+  // 바늘 각도: needleAngle 이 이미 0=중앙 기준이므로 그대로 사용
+  const needleRotation = needleAngle;
 
   return (
     <div className={cn('flex flex-col items-center', className)} style={{ width: size }}>
