@@ -25,11 +25,18 @@ const ContactPage = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [assetAddress, setAssetAddress] = useState('');
+  const [assetType, setAssetType] = useState('');
+  const [landArea, setLandArea] = useState('');
+  const [buildingArea, setBuildingArea] = useState('');
+  const [totalFloorArea, setTotalFloorArea] = useState('');
+  const [ownerType, setOwnerType] = useState('');
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
 
   const reset = () => {
     setName(''); setOrganization(''); setPhone(''); setEmail(''); setMessage('');
+    setAssetAddress(''); setAssetType(''); setLandArea(''); setBuildingArea(''); setTotalFloorArea(''); setOwnerType('');
     setType('asset_report');
   };
 
@@ -37,7 +44,10 @@ const ContactPage = () => {
     e.preventDefault();
     setLoading(true);
     const typeLabel = inquiryTypes.find((t) => t.v === type)?.l ?? type;
-    const finalMessage = `[${typeLabel}]\n${message}`;
+    const assetBlock = type === 'asset_report'
+      ? `\n[자산정보]\n- 주소: ${assetAddress}\n- 유형: ${assetType}\n- 대지면적: ${landArea}㎡\n- 건축면적: ${buildingArea ? buildingArea + '㎡' : '-'}\n- 연면적: ${totalFloorArea ? totalFloorArea + '㎡' : '-'}\n- 소유자: ${ownerType}\n`
+      : '';
+    const finalMessage = `[${typeLabel}]${assetBlock}\n${message}`;
     const { error } = await supabase.from('partner_inquiries').insert({
       name, organization: organization || '-', contact: `${phone} / ${email}`, message: finalMessage,
     });
@@ -122,6 +132,56 @@ const ContactPage = () => {
                   </div>
                 </div>
 
+                {type === 'asset_report' && (
+                  <div className="space-y-5 rounded-lg border bg-muted/30 p-4">
+                    <p className="text-sm font-semibold">자산 정보</p>
+                    <div className="space-y-2">
+                      <Label htmlFor="asset-address">유휴자산 주소 *</Label>
+                      <Input id="asset-address" value={assetAddress} onChange={(e) => setAssetAddress(e.target.value)} maxLength={200} required placeholder="예) 서울특별시 종로구 ..." />
+                    </div>
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="asset-type">유형 *</Label>
+                        <Select value={assetType} onValueChange={setAssetType}>
+                          <SelectTrigger id="asset-type"><SelectValue placeholder="유형 선택" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="토지">토지</SelectItem>
+                            <SelectItem value="단독주택">단독주택</SelectItem>
+                            <SelectItem value="상가/근린생활시설">상가/근린생활시설</SelectItem>
+                            <SelectItem value="공장/창고">공장/창고</SelectItem>
+                            <SelectItem value="업무시설">업무시설</SelectItem>
+                            <SelectItem value="기타">기타</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="owner-type">소유자 *</Label>
+                        <Select value={ownerType} onValueChange={setOwnerType}>
+                          <SelectTrigger id="owner-type"><SelectValue placeholder="소유자 구분" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="기관">기관</SelectItem>
+                            <SelectItem value="개인">개인</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid gap-5 sm:grid-cols-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="land-area">대지면적 (㎡) *</Label>
+                        <Input id="land-area" type="number" min="0" step="0.01" value={landArea} onChange={(e) => setLandArea(e.target.value)} required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="building-area">건축면적 (㎡)</Label>
+                        <Input id="building-area" type="number" min="0" step="0.01" value={buildingArea} onChange={(e) => setBuildingArea(e.target.value)} placeholder="선택" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="total-floor-area">연면적 (㎡)</Label>
+                        <Input id="total-floor-area" type="number" min="0" step="0.01" value={totalFloorArea} onChange={(e) => setTotalFloorArea(e.target.value)} placeholder="선택" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="message">문의 내용 *</Label>
                   <Textarea
@@ -131,7 +191,7 @@ const ContactPage = () => {
                     rows={6}
                     maxLength={2000}
                     required
-                    placeholder="제보하실 자산의 위치, 유형, 특이사항 등을 자유롭게 작성해주세요."
+                    placeholder="제보하실 자산의 특이사항을 자유롭게 작성해주세요."
                   />
                   <p className="text-right text-xs text-muted-foreground">{message.length}/2000</p>
                 </div>
