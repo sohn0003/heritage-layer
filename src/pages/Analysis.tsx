@@ -16,7 +16,7 @@ import { toast } from '@/hooks/use-toast';
 import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
 import {
   TrendingUp, FileText, BarChart3, Building2, School, Home, Factory, Building,
-  CheckCircle2, AlertTriangle, Sparkles, ShieldAlert,
+  CheckCircle2, AlertTriangle, Sparkles, ShieldAlert, Info,
 } from 'lucide-react';
 import Seo from '@/components/common/Seo';
 import GradeMeter from '@/components/common/GradeMeter';
