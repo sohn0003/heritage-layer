@@ -132,6 +132,56 @@ const ContactPage = () => {
                   </div>
                 </div>
 
+                {type === 'asset_report' && (
+                  <div className="space-y-5 rounded-lg border bg-muted/30 p-4">
+                    <p className="text-sm font-semibold">자산 정보</p>
+                    <div className="space-y-2">
+                      <Label htmlFor="asset-address">유휴자산 주소 *</Label>
+                      <Input id="asset-address" value={assetAddress} onChange={(e) => setAssetAddress(e.target.value)} maxLength={200} required placeholder="예) 서울특별시 종로구 ..." />
+                    </div>
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="asset-type">유형 *</Label>
+                        <Select value={assetType} onValueChange={setAssetType}>
+                          <SelectTrigger id="asset-type"><SelectValue placeholder="유형 선택" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="토지">토지</SelectItem>
+                            <SelectItem value="단독주택">단독주택</SelectItem>
+                            <SelectItem value="상가/근린생활시설">상가/근린생활시설</SelectItem>
+                            <SelectItem value="공장/창고">공장/창고</SelectItem>
+                            <SelectItem value="업무시설">업무시설</SelectItem>
+                            <SelectItem value="기타">기타</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="owner-type">소유자 *</Label>
+                        <Select value={ownerType} onValueChange={setOwnerType}>
+                          <SelectTrigger id="owner-type"><SelectValue placeholder="소유자 구분" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="기관">기관</SelectItem>
+                            <SelectItem value="개인">개인</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid gap-5 sm:grid-cols-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="land-area">대지면적 (㎡) *</Label>
+                        <Input id="land-area" type="number" min="0" step="0.01" value={landArea} onChange={(e) => setLandArea(e.target.value)} required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="building-area">건축면적 (㎡)</Label>
+                        <Input id="building-area" type="number" min="0" step="0.01" value={buildingArea} onChange={(e) => setBuildingArea(e.target.value)} placeholder="선택" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="total-floor-area">연면적 (㎡)</Label>
+                        <Input id="total-floor-area" type="number" min="0" step="0.01" value={totalFloorArea} onChange={(e) => setTotalFloorArea(e.target.value)} placeholder="선택" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="message">문의 내용 *</Label>
                   <Textarea
@@ -141,7 +191,7 @@ const ContactPage = () => {
                     rows={6}
                     maxLength={2000}
                     required
-                    placeholder="제보하실 자산의 위치, 유형, 특이사항 등을 자유롭게 작성해주세요."
+                    placeholder="제보하실 자산의 특이사항을 자유롭게 작성해주세요."
                   />
                   <p className="text-right text-xs text-muted-foreground">{message.length}/2000</p>
                 </div>
