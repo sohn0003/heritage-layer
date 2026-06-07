@@ -109,6 +109,17 @@ const AnalysisPage = () => {
   const scoringResult: ScoreResult | null = analysis?.scoring ?? null;
   const baseScenarios = analysis?.recommendation.scenarios;
 
+  const scoreReasons = useMemo(() => {
+    if (!asset || !scoringResult) return null;
+    try {
+      const input = buildScoringInput(asset);
+      return getScoreReasons(input, scoringResult.detail);
+    } catch (e) {
+      console.error('getScoreReasons 실패', e);
+      return null;
+    }
+  }, [asset, scoringResult]);
+
   // 시나리오별 슬라이더 값을 적용한 표시용 시나리오 — 오버라이드된 IRR/DSCR/자기자본 등 반영
   const displayScenarios = useMemo(() => {
     if (!asset || !baseScenarios) return baseScenarios;
