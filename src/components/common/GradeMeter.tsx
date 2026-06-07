@@ -22,7 +22,7 @@ interface GradeMeterProps {
 
 const GradeMeter = ({ grade, totalScore, size = 180, className }: GradeMeterProps) => {
   const info = GRADE_INFO[grade] ?? GRADE_INFO.C;
-  const [needleAngle, setNeedleAngle] = useState(-108);
+  const [needleAngle, setNeedleAngle] = useState(-72);
 
   useEffect(() => {
     // 마운트 시 0(D 시작)에서 등급 위치까지 부드럽게 회전
