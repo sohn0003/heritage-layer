@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import ProLockOverlay from '@/components/common/ProLockOverlay';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,7 +16,7 @@ import { toast } from '@/hooks/use-toast';
 import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
 import {
   TrendingUp, FileText, BarChart3, Building2, School, Home, Factory, Building,
-  CheckCircle2, AlertTriangle, Sparkles, ShieldAlert,
+  CheckCircle2, AlertTriangle, Sparkles, ShieldAlert, Info,
 } from 'lucide-react';
 import Seo from '@/components/common/Seo';
 import GradeMeter from '@/components/common/GradeMeter';
@@ -410,8 +410,8 @@ const AnalysisPage = () => {
                 <CardTitle className="text-lg">세부 항목 점수</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="mb-3 text-xs text-muted-foreground">각 항목을 클릭하면 산출 기준과 의미가 표시됩니다.</p>
-                <Accordion type="multiple" className="w-full">
+                <p className="mb-3 text-xs text-muted-foreground">각 항목의 i 아이콘을 클릭하면 산출 기준과 의미가 표시됩니다.</p>
+                <div className="w-full divide-y divide-border">
                   {[
                     {
                       label: 'A1. 용도지역',
@@ -510,23 +510,31 @@ const AnalysisPage = () => {
                       desc: '현재 용적률 ÷ 법정 최대 용적률. 사용률이 낮을수록 같은 대지에 더 많은 연면적을 올릴 수 있어 증축·재건축형 시나리오의 IRR이 유리해집니다.',
                     },
                   ].map((row) => (
-                    <AccordionItem key={row.label} value={row.label}>
-                      <AccordionTrigger className="hover:no-underline">
-                        <div className="flex w-full items-center justify-between gap-3 pr-2">
-                          <div className="flex items-baseline gap-2 min-w-0">
-                            <span className="text-sm font-medium text-foreground whitespace-nowrap">{row.label}</span>
-                            <span className="text-sm tabular-nums text-muted-foreground">{row.value}</span>
-                          </div>
-                          <span className="text-xs text-muted-foreground text-right truncate hidden sm:inline">{row.short}</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                        {row.desc}
-                      </AccordionContent>
-                    </AccordionItem>
+                    <div key={row.label} className="flex items-center justify-between gap-3 py-3">
+                      <div className="flex items-baseline gap-2 min-w-0">
+                        <span className="text-sm font-medium text-foreground whitespace-nowrap">{row.label}</span>
+                        <span className="text-sm tabular-nums text-muted-foreground">{row.value}</span>
+                      </div>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-xs text-muted-foreground text-right truncate hidden sm:inline">{row.short}</span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              aria-label={`${row.label} 설명 보기`}
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                            >
+                              <Info className="h-4 w-4" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent align="end" className="max-w-sm whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                            {row.desc}
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
                   ))}
-
-                </Accordion>
+                </div>
               </CardContent>
             </Card>
           </ProLockOverlay>
