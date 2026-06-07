@@ -1,26 +1,47 @@
-## 변경 내용 (src/pages/Analysis.tsx)
+## 목표
+세부 항목 점수의 각 행 가운데(현재 일반 설명이 들어가는 자리)에, 해당 자산이 이 점수를 받은 **자산별 한 줄 근거**를 표시합니다. 예) "용도지역의 활용 폭 평가" → "일반상업지역 — 활용 폭이 가장 넓음 (90점)".
 
-세부 항목 점수 섹션에서 Accordion 기반 드롭다운을 제거하고, 각 행 우측 끝에 정보(i) 아이콘 버튼을 배치합니다. 아이콘 클릭 시 Popover로 안내 문구를 표시합니다.
+## 제약
+- `src/algorithm/` 폴더는 수정하지 않습니다 (사용자가 직접 관리).
+- 알고리즘 출력(`ScoreResult.detail`)에는 점수만 있고 근거 텍스트가 없으므로, **UI 레이어에 별도 reason-derivation 헬퍼**를 만들어 동일 입력(`AssetInput`)으로 근거 문장을 생성합니다. (`scoring.ts`의 점수 구간/룩업 테이블을 그대로 미러링)
 
-### 구체 작업
-1. import 정리
-   - `Accordion`, `AccordionContent`, `AccordionItem`, `AccordionTrigger` 제거
-   - `Popover, PopoverTrigger, PopoverContent` (`@/components/ui/popover`) 추가
-   - `lucide-react`의 `Info` 아이콘 추가
+## 구현
 
-2. 안내 문구 ("각 항목을 클릭하면 산출 기준과 의미가 표시됩니다.") 문구를 "각 항목의 i 아이콘을 클릭하면 산출 기준과 의미가 표시됩니다." 로 수정
+### 1) 신규 파일 `src/lib/scoreReasons.ts`
+- `AssetInput`과 `ScoreResult['detail']`을 받아 각 행 key별 한 줄 문자열을 반환하는 `getScoreReasons(input, detail)` 함수.
+- 행별 로직 요약:
+  - **A1 용도지역**: zoning enum → 한글 라벨 + 활용 폭 코멘트
+    - 상업/준주거 → "활용 폭이 넓어 사업 유형 선택지가 많음"
+    - 2·3종 일반주거 → "주거 중심, 일반 임대·소규모 복합에 적합"
+    - 녹지/농림/자연환경보전 → "개발 제약이 커 기본 점수가 낮음"
+  - **A2 개발 여력**: 건폐율·용적률 사용률 + 추가 가능 연면적 ratio로 분기 (예: "용적률 사용률 32% — 약 2,150㎡ 추가 건축 여유")
+  - **A3 인허가 조정**: `is*` 플래그를 모아 "수의계약 가능(+15), 사유지(-5) 등 순효과 +10"처럼 가감 사유 나열
+  - **A4 종상향 조정**: `zoningUpgradeFloorAreaGain` + `useChangeExpansion` 라벨 ("종상향 시 용적률 50% 이상 추가 가능")
+  - **B1 인구·상권**: 인구 추이 + 상권 밀도 매트릭스 한국어 ("인구 감소·상권 두꺼움 — 외부 유입형 컨셉으로 보완 필요")
+  - **B2 교통 접근성**: 거리 기반 ("도심까지 1.2km — 도심 인접형")
+  - **B3 방치 기간**: 연수 기반 ("12년 방치 — 노후·민원 누적으로 -5")
+  - **C1 역사·건축**: enum 라벨 ("등록문화재·근대건축 유산 — 브랜딩 가치 우수")
+  - **C2 자연경관**: enum 라벨 ("산·강·바다 조망 — 숙박·웰니스에 강점")
+  - **D1 건물 상태**: enum 라벨 ("일부 보강 필요 — 리모델링 비용 중간")
+  - **D2 수익성**: 예비 ROI → 구간 ("예비 ROI 8.4% — 사업성 검토 대상")
+  - **D3 정부 지원**: 해당 예산 라벨 합산 ("도시재생 활성화 지역 +15")
+  - **추가 개발 가능 연면적**: "법정 최대 4,200㎡ − 현재 2,050㎡"
+  - **종상향 후 최대 연면적**: "현재 한도 4,200㎡ × 종상향 1.35배"
+  - **건폐율/용적률 사용률**: "현재 32% / 법정 최대 200%"
+- 모든 분기는 한국어 한 문장(40자 안팎)으로 통일.
 
-3. `.map((row) => ...)` 렌더링 구조를 다음과 같이 변경
-   - 외곽: `div` 행 (border-b, py-3, flex items-center justify-between)
-   - 좌측: 라벨 + 값 (기존과 동일)
-   - 중앙/우측: short 설명 텍스트 (기존과 동일, hidden sm:inline)
-   - 우측 끝: `Popover` — Trigger는 `Info` 아이콘 버튼 (h-4 w-4, text-muted-foreground hover:text-foreground), Content에 `row.desc` 를 `whitespace-pre-line text-sm leading-relaxed` 로 표시 (max-w-sm)
+### 2) `src/pages/Analysis.tsx` 수정
+- 상단에서 `buildScoringInput`, `getScoreReasons`를 import.
+- `scoringResult`와 `asset`이 있을 때 `useMemo`로 `reasons = getScoreReasons(buildScoringInput(asset), scoringResult.detail)` 계산.
+- 행 데이터 배열에 `key`(reasons 매핑용)를 추가하고, 행 렌더 시 가운데 텍스트를 기존 `row.short` 대신 `reasons[row.key] ?? row.short`로 표시.
+- 가운데 텍스트는 `truncate hidden sm:inline`을 그대로 유지하되, 더 의미있는 정보가 잘리지 않도록 `max-w-[60%]` 정도 폭 보장.
+- 안내 문구도 살짝 보정: "각 항목의 i 아이콘을 클릭하면 평가 기준·설명이 표시됩니다."
 
-4. 화살표(ChevronDown) 관련 동작/스타일 제거 — Accordion 제거로 자연스럽게 사라짐
+### 3) 검증
+- 빌드 통과 확인.
+- 프리뷰에서 한 자산을 열어 행마다 자산 고유 수치/플래그가 반영된 문장이 나오는지 확인.
 
-### 손대지 않는 것
-- 데이터(row 배열 자체)·점수 계산 로직
-- Pro 락(ProLockOverlay) 처리
-- 다른 섹션 UI
-
-빌드 검증으로 마무리합니다.
+## 기술 메모
+- `getScoreReasons`는 순수 함수, side-effect 없음, 별도 파일이라 algorithm/ 폴더 미수정.
+- enum→한국어 라벨 맵은 `scoreReasons.ts` 내부에 둠 (기존 매퍼와 중복되어도 UI 표시용으로 분리하여 변경 자유도 확보).
+- 향후 알고리즘이 자체 `reasons` 필드를 제공하면 헬퍼를 자연스럽게 대체 가능.
