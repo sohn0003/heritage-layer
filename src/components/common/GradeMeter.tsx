@@ -63,9 +63,8 @@ const GradeMeter = ({ grade, totalScore, size = 180, className }: GradeMeterProp
     { start: 144, end: 180, color: GRADE_INFO.S.color },
   ];
 
-  // 바늘 각도: -90° (왼쪽) ~ +90° (오른쪽) 범위로 매핑
-  // info.angle: -108(D) ~ 162(S) — 0이 정중앙(B 영역)
-  const needleRotation = needleAngle * 0.6; // -65° ~ +97° 정도
+  // 바늘 각도: needleAngle 이 이미 0=중앙 기준이므로 그대로 사용
+  const needleRotation = needleAngle;
 
   return (
     <div className={cn('flex flex-col items-center', className)} style={{ width: size }}>
