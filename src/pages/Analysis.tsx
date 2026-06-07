@@ -523,12 +523,14 @@ const AnalysisPage = () => {
                     },
                   ].map((row) => (
                     <div key={row.label} className="flex items-center justify-between gap-3 py-3">
-                      <div className="flex items-baseline gap-2 min-w-0">
+                      <div className="flex items-baseline gap-2 min-w-0 shrink-0">
                         <span className="text-sm font-medium text-foreground whitespace-nowrap">{row.label}</span>
                         <span className="text-sm tabular-nums text-muted-foreground">{row.value}</span>
                       </div>
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="text-xs text-muted-foreground text-right truncate hidden sm:inline">{row.short}</span>
+                      <div className="flex items-center gap-3 min-w-0 flex-1 justify-end">
+                        <span className="text-xs text-muted-foreground text-right truncate hidden sm:inline">
+                          {(row.key && scoreReasons?.[row.key as ScoreReasonKey]) || row.short}
+                        </span>
                         <Popover>
                           <PopoverTrigger asChild>
                             <button
