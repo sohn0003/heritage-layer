@@ -993,7 +993,7 @@ const HomePage = () => {
             <button onClick={() => navigate('/properties')} className="block hover:text-foreground">자산 탐색</button>
             <button onClick={() => navigate('/about')} className="block hover:text-foreground">회사 소개</button>
             <button onClick={() => navigate('/pricing')} className="block hover:text-foreground">요금 안내</button>
-            <button onClick={() => navigate('/checkout/toss/demo')} className="block hover:text-foreground">결제창 테스트</button>
+            <button onClick={() => navigate('/contact')} className="block hover:text-foreground">문의하기</button>
           </div>
         </div>
         <div className="mx-auto mt-10 max-w-5xl border-t pt-6 flex flex-col items-center gap-3 text-xs text-muted-foreground">
