@@ -14,7 +14,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
-import { buildScoringInput } from '@/lib/assetScoring';
 import { getScoreReasons, type ScoreReasonKey } from '@/lib/scoreReasons';
 import {
   TrendingUp, FileText, BarChart3, Building2, School, Home, Factory, Building,
