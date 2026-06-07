@@ -25,11 +25,18 @@ const ContactPage = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [assetAddress, setAssetAddress] = useState('');
+  const [assetType, setAssetType] = useState('');
+  const [landArea, setLandArea] = useState('');
+  const [buildingArea, setBuildingArea] = useState('');
+  const [totalFloorArea, setTotalFloorArea] = useState('');
+  const [ownerType, setOwnerType] = useState('');
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
 
   const reset = () => {
     setName(''); setOrganization(''); setPhone(''); setEmail(''); setMessage('');
+    setAssetAddress(''); setAssetType(''); setLandArea(''); setBuildingArea(''); setTotalFloorArea(''); setOwnerType('');
     setType('asset_report');
   };
 
@@ -37,7 +44,10 @@ const ContactPage = () => {
     e.preventDefault();
     setLoading(true);
     const typeLabel = inquiryTypes.find((t) => t.v === type)?.l ?? type;
-    const finalMessage = `[${typeLabel}]\n${message}`;
+    const assetBlock = type === 'asset_report'
+      ? `\n[자산정보]\n- 주소: ${assetAddress}\n- 유형: ${assetType}\n- 대지면적: ${landArea}㎡\n- 건축면적: ${buildingArea ? buildingArea + '㎡' : '-'}\n- 연면적: ${totalFloorArea ? totalFloorArea + '㎡' : '-'}\n- 소유자: ${ownerType}\n`
+      : '';
+    const finalMessage = `[${typeLabel}]${assetBlock}\n${message}`;
     const { error } = await supabase.from('partner_inquiries').insert({
       name, organization: organization || '-', contact: `${phone} / ${email}`, message: finalMessage,
     });
