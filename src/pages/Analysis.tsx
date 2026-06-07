@@ -538,15 +538,15 @@ const AnalysisPage = () => {
                       desc: '현재 용적률 ÷ 법정 최대 용적률. 사용률이 낮을수록 같은 대지에 더 많은 연면적을 올릴 수 있어 증축·재건축형 시나리오의 IRR이 유리해집니다.',
                     },
                   ].map((row) => (
-                    <div key={row.label} className="flex items-center justify-between gap-3 py-3">
+                    <div key={row.label} className="flex items-center gap-3 py-3">
                       <div className="flex items-baseline gap-2 min-w-0 shrink-0">
                         <span className="text-sm font-medium text-foreground whitespace-nowrap">{row.label}</span>
                         <span className="text-sm tabular-nums text-muted-foreground">{row.value}</span>
                       </div>
-                      <div className="flex items-center gap-3 min-w-0 flex-1 justify-end">
-                        <span className="text-xs text-muted-foreground text-right truncate hidden sm:inline">
-                          {(row.key && scoreReasons?.[row.key as ScoreReasonKey]) || row.short}
-                        </span>
+                      <span className="text-xs text-muted-foreground truncate hidden sm:inline flex-1 min-w-0">
+                        {(row.key && scoreReasons?.[row.key as ScoreReasonKey]) || row.short}
+                      </span>
+                      <div className="flex items-center shrink-0 ml-auto sm:ml-0">
                         <Popover>
                           <PopoverTrigger asChild>
                             <button
