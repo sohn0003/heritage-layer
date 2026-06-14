@@ -37,7 +37,6 @@ const levels: Level[] = [
     key: 'L2',
     name: 'Level 2',
     title: '착수 지원',
-    target: '중소 시행사 · 인허가/금융 역량 부족 투자자',
     role: '실제 인허가·금융 준비 단계까지 함께 갑니다',
     Icon: Wrench,
     highlight: true,
