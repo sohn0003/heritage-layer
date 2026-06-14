@@ -12,7 +12,6 @@ interface Level {
   key: 'L1' | 'L2' | 'L3';
   name: string;
   title: string;
-  target: string;
   role: string;
   Icon: React.ComponentType<{ className?: string }>;
   items: string[];
