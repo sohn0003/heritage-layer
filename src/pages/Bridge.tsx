@@ -163,7 +163,7 @@ const Bridge = () => {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {levels.map(({ key, name, title, target, role, Icon, items, highlight }) => (
+            {levels.map(({ key, name, title, role, Icon, items, highlight }) => (
               <Card
                 key={key}
                 className={`flex flex-col transition-all hover:-translate-y-1 hover:shadow-lg ${
