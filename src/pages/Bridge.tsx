@@ -12,7 +12,6 @@ interface Level {
   key: 'L1' | 'L2' | 'L3';
   name: string;
   title: string;
-  target: string;
   role: string;
   Icon: React.ComponentType<{ className?: string }>;
   items: string[];
@@ -24,7 +23,6 @@ const levels: Level[] = [
     key: 'L1',
     name: 'Level 1',
     title: '사업성 검토 자문',
-    target: '소형 투자자 · 첫 개발 도전자',
     role: '판단 지원 — 숫자 너머의 맥락을 더합니다',
     Icon: Compass,
     items: [
@@ -39,7 +37,6 @@ const levels: Level[] = [
     key: 'L2',
     name: 'Level 2',
     title: '착수 지원',
-    target: '중소 시행사 · 인허가/금융 역량 부족 투자자',
     role: '실제 인허가·금융 준비 단계까지 함께 갑니다',
     Icon: Wrench,
     highlight: true,
@@ -56,7 +53,6 @@ const levels: Level[] = [
     key: 'L3',
     name: 'Level 3',
     title: '전체 PM',
-    target: '패밀리 오피스 · 전체 위탁 원하는 기업·기관',
     role: '전 과정 책임 관리 — 시간 없는 자본을 위해',
     Icon: Crown,
     items: [
@@ -167,7 +163,7 @@ const Bridge = () => {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {levels.map(({ key, name, title, target, role, Icon, items, highlight }) => (
+            {levels.map(({ key, name, title, role, Icon, items, highlight }) => (
               <Card
                 key={key}
                 className={`flex flex-col transition-all hover:-translate-y-1 hover:shadow-lg ${
@@ -183,7 +179,7 @@ const Bridge = () => {
                   </p>
                   <CardTitle className="mt-1 text-xl">{title}</CardTitle>
                   <p className="mt-3 text-sm text-muted-foreground">{role}</p>
-                  <p className="mt-1 text-xs text-muted-foreground/80">타깃: {target}</p>
+                  
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col">
                   <ul className="space-y-2 text-sm">
