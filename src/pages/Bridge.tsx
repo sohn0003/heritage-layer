@@ -179,7 +179,7 @@ const Bridge = () => {
                   </p>
                   <CardTitle className="mt-1 text-xl">{title}</CardTitle>
                   <p className="mt-3 text-sm text-muted-foreground">{role}</p>
-                  <p className="mt-1 text-xs text-muted-foreground/80">타깃: {target}</p>
+                  
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col">
                   <ul className="space-y-2 text-sm">
