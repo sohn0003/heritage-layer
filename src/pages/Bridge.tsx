@@ -53,7 +53,6 @@ const levels: Level[] = [
     key: 'L3',
     name: 'Level 3',
     title: '전체 PM',
-    target: '패밀리 오피스 · 전체 위탁 원하는 기업·기관',
     role: '전 과정 책임 관리 — 시간 없는 자본을 위해',
     Icon: Crown,
     items: [
