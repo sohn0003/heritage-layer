@@ -23,7 +23,6 @@ const levels: Level[] = [
     key: 'L1',
     name: 'Level 1',
     title: '사업성 검토 자문',
-    target: '소형 투자자 · 첫 개발 도전자',
     role: '판단 지원 — 숫자 너머의 맥락을 더합니다',
     Icon: Compass,
     items: [
