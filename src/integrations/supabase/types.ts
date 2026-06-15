@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      asset_unlocks: {
+        Row: {
+          amount: number
+          asset_id: string
+          created_at: string
+          id: string
+          payment_id: string
+          payment_method: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          asset_id: string
+          created_at?: string
+          id?: string
+          payment_id: string
+          payment_method: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          asset_id?: string
+          created_at?: string
+          id?: string
+          payment_id?: string
+          payment_method?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       assets: {
         Row: {
           address: string
@@ -552,6 +585,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_asset_unlocked: {
+        Args: { _asset_id: string; _user_id: string }
         Returns: boolean
       }
     }
