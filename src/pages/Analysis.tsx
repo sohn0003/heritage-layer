@@ -419,7 +419,7 @@ const AnalysisPage = () => {
       {/* 세부 점수 항목 (Pro 전용 — Free는 모자이크) */}
       {scoringResult && (
         <div className="mb-8">
-          <ProLockOverlay locked={!isPro}>
+          <UnlockOverlay locked={!isPro} assetId={assetId} assetLabel={asset?.address}>
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">세부 항목 점수</CardTitle>
@@ -570,14 +570,14 @@ const AnalysisPage = () => {
                 </div>
               </CardContent>
             </Card>
-          </ProLockOverlay>
+          </UnlockOverlay>
         </div>
       )}
 
       {/* Pro Sections */}
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 (Pro) */}
-        <ProLockOverlay locked={!isPro}>
+        <UnlockOverlay locked={!isPro} assetId={assetId} assetLabel={asset?.address}>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -802,9 +802,9 @@ const AnalysisPage = () => {
               )}
             </CardContent>
           </Card>
-        </ProLockOverlay>
+        </UnlockOverlay>
 
-        <ProLockOverlay locked={!isPro}>
+        <UnlockOverlay locked={!isPro} assetId={assetId} assetLabel={asset?.address}>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -877,7 +877,7 @@ const AnalysisPage = () => {
               )}
             </CardContent>
           </Card>
-        </ProLockOverlay>
+        </UnlockOverlay>
       </div>
 
       {/* Bottom buttons */}
