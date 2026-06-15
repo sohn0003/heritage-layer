@@ -24,6 +24,8 @@ import TossCheckout from "@/pages/checkout/TossCheckout";
 import TossSuccess from "@/pages/checkout/TossSuccess";
 import TossFail from "@/pages/checkout/TossFail";
 import TossDemo from "@/pages/checkout/TossDemo";
+import TossUnlockCheckout from "@/pages/checkout/TossUnlockCheckout";
+import TossUnlockSuccess from "@/pages/checkout/TossUnlockSuccess";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +56,8 @@ const App = () => (
             <Route path="/checkout/toss/success" element={<TossSuccess />} />
             <Route path="/checkout/toss/fail" element={<TossFail />} />
             <Route path="/checkout/toss/demo" element={<TossDemo />} />
+            <Route path="/checkout/toss/unlock" element={<TossUnlockCheckout />} />
+            <Route path="/checkout/toss/unlock/success" element={<TossUnlockSuccess />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
