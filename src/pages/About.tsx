@@ -289,7 +289,7 @@ const AboutPage = () => {
             방치된 공간이 지역의 미래입니다
           </h1>
           <p className="leading-relaxed" style={{ color: 'hsl(0 0% 85%)' }}>
-            Heritage Layer는 데이터로 유휴 부동산의 가능성을 발견하고,
+            Heritage Layer는 데이터로 유휴 부동산의 가능성을 발견하고<br />
             지자체와 시행사를 연결해 실제 재생 사업으로 이어줍니다.
           </p>
         </div>
