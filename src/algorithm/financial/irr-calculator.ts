@@ -127,6 +127,7 @@ export interface ScenarioResult {
   irr: number;
   dscr: number;
   totalInvestmentPaybackYears: number; // 운영투자비 회수기간 (무차입 가정, 영업이익 기준 — 역산 기준값과 직접 비교용)
+  grossInvestmentPaybackYears: number; // 총 투자비 회수기간 (분양 매출 + 영업이익으로 총 투자비 회수, 보조금·대출 미고려)
   paybackYears: number;                // 자기자본 회수기간 (대출 원리금 상환 후, 레버리지 반영 실제값)
   roi: number;
   governmentSubsidy: number;
