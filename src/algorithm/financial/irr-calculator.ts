@@ -485,6 +485,14 @@ function computeScenario(input: IRRInput, scenario: ScenarioType): ScenarioResul
     ? Math.round((netOperatingInvestment / annualOperatingProfit) * 10) / 10
     : 0;
 
+  // 총 투자비 회수기간 — 분양 매출이 0년차에 들어오고, 이후 영업이익으로 잔여 총 투자비 회수 (보조금·대출 미고려)
+  const grossRemaining = Math.max(0, totalInvestment - presaleRecoveredAmount);
+  const grossInvestmentPaybackYears = grossRemaining === 0
+    ? 0
+    : annualOperatingProfit > 0
+      ? Math.round((grossRemaining / annualOperatingProfit) * 10) / 10
+      : 0;
+
   return {
     scenario, label: labelMap[scenario], usableFloorArea, useTypeBreakdown,
     constructionCostPerSqm: Math.round(constructionCostPerSqm),
@@ -494,7 +502,7 @@ function computeScenario(input: IRRInput, scenario: ScenarioType): ScenarioResul
     equityAmount, loanAmount, annualInterest, loanType,
     recommendedAnnualRevenue, annualRevenue, operatingMargin,
     annualOperatingCost, annualOperatingProfit, annualNetProfit,
-    irr, dscr, totalInvestmentPaybackYears, paybackYears, roi,
+    irr, dscr, totalInvestmentPaybackYears, grossInvestmentPaybackYears, paybackYears, roi,
     governmentSubsidy, netInvestmentAfterSubsidy,
   };
 }
