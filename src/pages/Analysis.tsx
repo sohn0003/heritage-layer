@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import UnlockOverlay from '@/components/common/UnlockOverlay';
 import { useAuth } from '@/contexts/AuthContext';
@@ -60,8 +61,11 @@ const AnalysisPage = () => {
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  // 탭(시나리오)별 자기자본 비율 오버라이드 — undefined면 추천값 사용
+  // 탭(시나리오)별 오버라이드 — undefined면 추천값/기본값 사용
   const [equityByRank, setEquityByRank] = useState<Record<number, number | undefined>>({});
+  const [presaleByRank, setPresaleByRank] = useState<Record<number, number>>({});       // 0~100 (%)
+  const [revenueByRank, setRevenueByRank] = useState<Record<number, number | undefined>>({}); // 원
+  const [marginByRank, setMarginByRank] = useState<Record<number, number | undefined>>({});   // 10~70 (%)
   const [activeTab, setActiveTab] = useState<'1' | '2' | '3'>('1');
 
   const algoConfig = useAlgorithmConfig();
@@ -79,9 +83,12 @@ const AnalysisPage = () => {
     fetchAsset();
   }, [assetId]);
 
-  // 자산 변경 시 슬라이더 오버라이드 초기화
+  // 자산 변경 시 오버라이드 초기화
   useEffect(() => {
     setEquityByRank({});
+    setPresaleByRank({});
+    setRevenueByRank({});
+    setMarginByRank({});
   }, [assetId]);
 
   // 기본 분석(오버라이드 없음) — 스코어링/추천 시나리오/추천 자기자본비율의 기준값
@@ -129,8 +136,13 @@ const AnalysisPage = () => {
     const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
     void preliminaryROI;
     return baseScenarios.map((base) => {
-      const override = equityByRank[base.rank];
-      if (override === undefined || override === base.recommendedEquityRatio) return base;
+      const eqOverride = equityByRank[base.rank];
+      const revOverride = revenueByRank[base.rank];
+      const marOverride = marginByRank[base.rank];
+      const eqChanged = eqOverride !== undefined && eqOverride !== base.recommendedEquityRatio;
+      const revChanged = revOverride !== undefined && revOverride > 0;
+      const marChanged = marOverride !== undefined;
+      if (!eqChanged && !revChanged && !marChanged) return base;
       try {
         const r = analyzeAsset({
           assetInput: assetInputBase,
@@ -138,7 +150,9 @@ const AnalysisPage = () => {
           loanRates: algoConfig.loanRates,
           projectYears: algoConfig.projectYears,
           residualValueRatio: algoConfig.residualValueRatio,
-          overrideEquityRatio: override,
+          overrideEquityRatio: eqChanged ? eqOverride : undefined,
+          overrideAnnualRevenue: revChanged ? revOverride : undefined,
+          overrideOperatingMargin: marChanged ? marOverride : undefined,
         });
         return r.recommendation.scenarios.find((x) => x.rank === base.rank) ?? base;
       } catch (e) {
@@ -150,6 +164,8 @@ const AnalysisPage = () => {
     asset,
     baseScenarios,
     equityByRank,
+    revenueByRank,
+    marginByRank,
     algoConfig.loanRates.pf,
     algoConfig.loanRates.collateral,
     algoConfig.projectYears,
@@ -725,6 +741,121 @@ const AnalysisPage = () => {
                             )}
                         </div>
 
+                        {/* 분양 비율 / 연간 매출 / 영업이익률 — 사용자 입력 */}
+                        {(() => {
+                          const PRESALE_ELIGIBLE = ['residential', 'mixed_use_residential', 'knowledge_industry', 'office', 'accommodation'];
+                          const hasPresale = scenario.useTypeMix.some((m: any) => PRESALE_ELIGIBLE.includes(m.useType));
+                          const presaleVal = presaleByRank[scenario.rank] ?? 0;
+                          const recommendedRevenue = scenario.irrResult.base.recommendedAnnualRevenue ?? 0;
+                          const revenueVal = revenueByRank[scenario.rank];
+                          const revenueDisplay = revenueVal !== undefined
+                            ? (revenueVal / 100_000_000).toString()
+                            : (recommendedRevenue / 100_000_000).toFixed(1);
+                          const marginVal = marginByRank[scenario.rank] ?? 40;
+                          return (
+                            <div className="space-y-5 rounded-lg border border-border/60 bg-muted/30 p-4">
+                              {hasPresale && (
+                                <div>
+                                  <div className="mb-2 flex items-baseline justify-between gap-2">
+                                    <Label className="text-sm font-semibold">분양 비율</Label>
+                                    <span className="text-sm font-bold text-primary tabular-nums">{presaleVal}%</span>
+                                  </div>
+                                  <Slider
+                                    value={[presaleVal]}
+                                    min={0}
+                                    max={100}
+                                    step={10}
+                                    onValueChange={(v) =>
+                                      setPresaleByRank((prev) => ({ ...prev, [scenario.rank]: v[0] }))
+                                    }
+                                  />
+                                  <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+                                    <span>0%</span><span>50%</span><span>100%</span>
+                                  </div>
+                                  <p className="mt-2 text-xs text-muted-foreground">
+                                    분양 가능 용도(주거·주상복합·지식산업센터·오피스·숙박)에 적용됩니다.
+                                  </p>
+                                </div>
+                              )}
+
+                              <div className="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                  <div className="mb-2 flex items-baseline justify-between gap-2">
+                                    <Label className="text-sm font-semibold">연간 매출 (억원)</Label>
+                                    <span className="text-xs text-muted-foreground">
+                                      권장: {(recommendedRevenue / 100_000_000).toFixed(1)}억
+                                    </span>
+                                  </div>
+                                  <Input
+                                    type="number"
+                                    inputMode="decimal"
+                                    step="0.1"
+                                    min={0}
+                                    value={revenueDisplay}
+                                    onChange={(e) => {
+                                      const raw = e.target.value;
+                                      if (raw === '') {
+                                        setRevenueByRank((prev) => {
+                                          const next = { ...prev }; delete next[scenario.rank]; return next;
+                                        });
+                                        return;
+                                      }
+                                      const eok = Number(raw);
+                                      if (!Number.isFinite(eok) || eok < 0) return;
+                                      setRevenueByRank((prev) => ({
+                                        ...prev,
+                                        [scenario.rank]: Math.round(eok * 100_000_000),
+                                      }));
+                                    }}
+                                  />
+                                  {revenueVal !== undefined && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setRevenueByRank((prev) => {
+                                          const next = { ...prev }; delete next[scenario.rank]; return next;
+                                        })
+                                      }
+                                      className="mt-1.5 text-xs text-primary underline-offset-2 hover:underline"
+                                    >
+                                      권장값으로 되돌리기
+                                    </button>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <div className="mb-2 flex items-baseline justify-between gap-2">
+                                    <Label className="text-sm font-semibold">영업이익률 (%)</Label>
+                                    <span className="text-xs text-muted-foreground">기본 40%</span>
+                                  </div>
+                                  <Input
+                                    type="number"
+                                    inputMode="decimal"
+                                    step="1"
+                                    min={10}
+                                    max={70}
+                                    value={marginVal}
+                                    onChange={(e) => {
+                                      const raw = e.target.value;
+                                      if (raw === '') {
+                                        setMarginByRank((prev) => {
+                                          const next = { ...prev }; delete next[scenario.rank]; return next;
+                                        });
+                                        return;
+                                      }
+                                      const v = Number(raw);
+                                      if (!Number.isFinite(v)) return;
+                                      const clamped = Math.max(10, Math.min(70, v));
+                                      setMarginByRank((prev) => ({ ...prev, [scenario.rank]: clamped }));
+                                    }}
+                                  />
+                                  <p className="mt-1.5 text-[10px] text-muted-foreground">범위: 10~70%</p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+
                         {/* 재무 지표: 보수적 / 기본 / 낙관적 3컬럼 */}
                         <div>
                           <div className="mb-3 flex items-center gap-2">
@@ -779,7 +910,11 @@ const AnalysisPage = () => {
                                     c: scenario.irrResult.conservative.dscr,
                                     b: scenario.irrResult.base.dscr,
                                     o: scenario.irrResult.optimistic.dscr },
-                                  { label: '투자회수기간 (년)', fmt: (v: number) => (v > 0 ? `${v}년` : '--'),
+                                  { label: '운영투자비 회수기간 (무차입 기준)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
+                                    c: scenario.irrResult.conservative.totalInvestmentPaybackYears,
+                                    b: scenario.irrResult.base.totalInvestmentPaybackYears,
+                                    o: scenario.irrResult.optimistic.totalInvestmentPaybackYears },
+                                  { label: '자기자본 회수기간 (대출상환 후 실제값)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
                                     c: scenario.irrResult.conservative.paybackYears,
                                     b: scenario.irrResult.base.paybackYears,
                                     o: scenario.irrResult.optimistic.paybackYears },

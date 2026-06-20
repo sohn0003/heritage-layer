@@ -27,6 +27,7 @@ import type {
   UseTypeMix,
   LoanRates,
   IRRResult,
+  RevenueAssumption,
 } from '../financial/irr-calculator';
 
 import { calculateIRRScenarios } from '../financial/irr-calculator';
@@ -575,6 +576,7 @@ export interface RecommendScenariosInput {
   landValuePerSqm: number;
   projectYears: number;
   residualValueRatio: number;
+  revenueAssumption: RevenueAssumption;
 }
 
 export function recommendScenarios(input: RecommendScenariosInput): RecommendationResult {
@@ -630,6 +632,7 @@ export function recommendScenarios(input: RecommendScenariosInput): Recommendati
       projectYears: input.projectYears,
       isGovernmentSupported: isGovSupported,
       residualValueRatio: input.residualValueRatio,
+      revenueAssumption: input.revenueAssumption,
     });
 
     const { concept, reasons, risks } = buildConcept(
