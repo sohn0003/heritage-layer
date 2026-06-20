@@ -1,64 +1,68 @@
-## 목표
-Free 고객이 상세분석에서 Pro 잠금 콘텐츠를 보려고 할 때, **건당 15,000원 결제** 또는 **Pro 구독** 중 선택할 수 있는 모달을 띄우고, 결제 완료 시 해당 자산 1건만 영구 열람 가능하도록 합니다.
+# Analysis 페이지 사용자 입력 확장 + 알고리즘 모듈 업데이트
 
-## 구현 계획
+## 1. 알고리즘 모듈 교체
 
-### 1. DB: 건별 결제 기록 테이블
-새 테이블 `asset_unlocks` 생성 (마이그레이션):
-- `user_id`, `asset_id` (unique pair)
-- `amount` (15000), `payment_method` ('toss' | 'paddle')
-- `payment_id` (토스 paymentKey / Paddle transaction id)
-- `status` ('paid'), `created_at`
-- RLS: 본인 행만 SELECT, service_role만 INSERT
-- GRANT 포함
+업로드된 v2 파일을 기존 모듈에 그대로 덮어쓰기.
 
-### 2. 권한 헬퍼 확장
-`src/lib/entitlements.ts` 또는 새 훅 `useAssetUnlock(assetId)`:
-- `hasProAccess(tier) || unlockedAssets.includes(assetId)` 으로 잠금 판정
-- Analysis 페이지에서 Pro 잠금 영역의 `locked` prop을 이 통합 판정으로 교체
+- `src/algorithm/financial/irr-calculator.ts` ← `user-uploads://irr-calculator-5.ts`
+- `src/algorithm/recommend/recommend-scenarios.ts` ← `user-uploads://recommend-scenarios-2.ts`
 
-### 3. UI: 결제 선택 모달
-`src/components/payments/UnlockReportModal.tsx` 신규:
-- 두 가지 옵션 카드
-  - **이 보고서만 보기 — 15,000원** (1회 결제, 해당 자산 영구 열람)
-  - **Pro 구독하기 — 월 39,000원** (모든 보고서 무제한 + 분석/관심자산 무제한 등)
-- "건별 결제" 선택 → 결제수단(토스/Paddle) 선택 → 각각 체크아웃 라우트로 이동
-- "Pro 구독" 선택 → `/pricing` 이동
+신규 노출 필드:
+- `AnalyzeAssetInput.overrideAnnualRevenue`, `overrideOperatingMargin`
+- `IRRResult.recommendedAnnualRevenue`, `totalInvestmentPaybackYears`, `paybackYears`
+- `UseTypeMix.presaleRatio` (분양 가능 용도에만 적용)
 
-### 4. 결제 흐름
-**토스 (단건 결제)**:
-- 새 라우트 `/checkout/toss/unlock?assetId=...` (`TossUnlockCheckout.tsx`)
-- 토스 일반결제 (빌링키 X) `requestPayment({ method: 'CARD', amount: 15000, orderId, orderName })`
-- 성공 시 `/checkout/toss/unlock/success` → edge function `toss-confirm-unlock` 호출
-  - 토스 `/v1/payments/confirm` 으로 승인
-  - 성공하면 `asset_unlocks` insert (service_role)
-- 실패 시 기존 `/checkout/toss/fail` 재사용
+## 2. Analysis 페이지 (`src/pages/Analysis.tsx`) UI 추가
 
-**Paddle (단건 결제)**:
-- `create_product`로 `report_unlock` 상품 + `report_unlock_one` 가격 (₩15,000 또는 USD 환산) 1회성 생성
-- 체크아웃 시 `customData: { type: 'asset_unlock', assetId, userId }`
-- `payments-webhook`의 `transaction.completed` 핸들러에서 `customData.type === 'asset_unlock'`이면 `asset_unlocks` insert
+각 시나리오 탭 안의 "자기자본 비율 슬라이더" 옆에 새 입력 블록을 둠. 시나리오별로 독립 상태 관리.
 
-### 5. Analysis 페이지 통합
-`src/pages/Analysis.tsx`:
-- `useAssetUnlock(assetId)`로 잠금 여부 판정
-- `ProLockOverlay` 대신 새 `UnlockOverlay` 사용 — 클릭 시 `UnlockReportModal` open
-- Pro 구독자/이미 결제한 자산이면 잠금 해제
+### 2-1. 상태
+시나리오 rank 별로 보관:
+```ts
+const [presaleByRank, setPresaleByRank]   = useState<Record<number, number>>({});      // 0~100, 10 단위
+const [revenueByRank, setRevenueByRank]   = useState<Record<number, number | undefined>>({});
+const [marginByRank,  setMarginByRank]    = useState<Record<number, number>>({});      // 10~70, 기본 40
+```
+자산 변경 시 초기화.
 
-### 6. 기술 메모
-- 통화: 토스는 KRW 정수 단위. Paddle은 KRW 직접 지원 안 하므로 USD ≈ $11.50 (15,000원) 또는 KRW 지원 시 그대로 — 일단 토스만 우선, Paddle은 환산가 또는 추후 옵션으로 표시.
-- 보안: 잠금 해제 판정은 서버 RPC `is_asset_unlocked(uid, asset_id)`도 추가하면 좋지만, 1차에서는 클라이언트 쿼리 + RLS로 충분 (민감 데이터 SELECT 자체는 별도 컬럼 가드 필요시 후속).
-- 환불 정책: Refund 페이지에 "건별 보고서 결제는 열람 전 24시간 내 환불 가능" 등 한 문장 추가 권장 (후속).
+### 2-2. 입력 컴포넌트
 
-## 작업 순서
-1. 마이그레이션: `asset_unlocks` 테이블
-2. 훅: `useAssetUnlock`
-3. 모달: `UnlockReportModal`
-4. 토스 단건 결제 라우트 + edge function `toss-confirm-unlock`
-5. Paddle 상품 생성 + 웹훅 분기
-6. Analysis 페이지 잠금 로직 교체
-7. App.tsx 라우트 등록
+**(a) 분양 비율 슬라이더** — `useTypeMix`에 분양 가능 용도(`residential`, `mixed_use_residential`, `knowledge_industry`, `office`, `accommodation`)가 1개 이상 포함된 시나리오에서만 표시. 0~100%, step 10. 기본값 0.
 
-## 확인 필요
-- **Paddle도 함께 지원**할까요, 아니면 **토스 단건 결제만** 먼저 붙일까요? (Paddle KRW 미지원이라 USD 환산이 됩니다)
-- 가격은 **15,000원 고정 / 자산 1건 영구 열람**으로 진행해도 될까요?
+**(b) 연간 매출 입력** — `<Input type="number">`. 단위: 억원으로 표시(내부는 원). 초기값 = `scenario.irrResult.base.recommendedAnnualRevenue`. 빈 값/0이면 override 미적용(권장값 자동 사용). "권장값으로 되돌리기" 버튼.
+
+**(c) 영업이익률 입력** — `<Input type="number">` 또는 슬라이더, 10~70%, 기본 40. 범위 외 값은 clamp.
+
+### 2-3. 재계산 (`displayScenarios` 확장)
+
+기존 `analyzeAsset` 호출에 override 필드 추가:
+```ts
+analyzeAsset({
+  ...,
+  overrideEquityRatio:    equityByRank[base.rank],
+  overrideAnnualRevenue:  revenueByRank[base.rank],     // 원 단위
+  overrideOperatingMargin: marginByRank[base.rank],
+  // presale: useTypeMix 깊은 복사 후 분양 가능 용도에 presaleRatio 주입
+});
+```
+`useTypeMix`에 슬라이더 값 주입은 `analyzeAsset` 호출 전 별도 매핑(현재는 추천 엔진이 mix를 결정 → presale을 IRR 단계에 반영하려면 추천 엔진 내부 사용 mix에 적용해야 함). 가장 간단한 방법: `recommend-scenarios.ts`가 mix를 결정해 IRR을 계산하므로, Analysis 단에서 분양율 적용을 위해 `analyzeAsset`에 `overridePresaleRatio?: number` 같은 옵션을 추가하면 좋겠지만, 업로드 본 알고리즘에는 해당 옵션이 없음 → **현 구현 범위 내에서는 분양율 슬라이더 UI는 노출하되, "분양 시나리오 적용"은 백엔드 알고리즘에서 추후 지원**으로 가거나, IRR 단계 후 표시값(연간매출/회수기간) 보정을 위해 단순 비율 가공만 적용.
+
+→ **권장**: 분양율 슬라이더는 사용자 입력 UI까지만 추가하고, `presale*` 알고리즘 반영은 알고리즘 본인이 직접 작성하는 영역(`algorithm/`)에 후속 패치. 본 작업에서는 슬라이더 값을 state로만 보관·표시.
+
+(원치 않으시면, recommend-scenarios.ts에 `overridePresaleRatio` 옵션을 추가하는 식으로 확장 가능 — 알고리즘 폴더는 사용자 영역이므로 사전 확인 필요.)
+
+### 2-4. 회수기간 표시 분리
+
+기존 단일 "투자회수기간 (년)" 행을 두 행으로 분리:
+- `운영투자비 회수기간 (무차입 기준)` → `totalInvestmentPaybackYears`
+- `자기자본 회수기간 (대출상환 후 실제값)` → `paybackYears`
+
+보수/기본/낙관 3컬럼 모두 표시. 값 0 또는 비유한일 때 `--`.
+
+## 3. 확인 사항
+
+1. **분양 비율 슬라이더의 실제 알고리즘 반영을 이번에 함께 처리할까요?** algorithm 폴더는 사용자 직접 작성 영역이라 원칙적으로 건드리지 않습니다. 두 옵션:
+   - A. UI만 추가(state 보관·표시). 알고리즘 반영은 추후 직접 작성.
+   - B. `analyzeAsset`/`recommend-scenarios`에 `overridePresaleRatio` 옵션을 새로 추가(알고리즘 파일도 함께 수정).
+
+2. **연간 매출 입력 단위**: 억원(권장, 사용성 우수) vs 원. 어느 쪽을 표시할까요?

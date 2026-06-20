@@ -49,7 +49,19 @@ export type ScenarioType = 'conservative' | 'base' | 'optimistic';
 
 export interface UseTypeMix {
   useType: AssetUseType;
-  ratio: number;  // 면적 비율 (%) — 전체 합계 100이어야 함
+  ratio: number;          // 면적 비율 (%) — 전체 합계 100이어야 함
+  presaleRatio?: number;  // 분양 비율 (%) — 분양 가능 용도에만 적용. 기본값 0 (전체 운영)
+}
+
+// ────────────────────────────────────────────────────────────
+// 매출 산정 방식 — 회수기간 역산 + 사용자 조정
+// ────────────────────────────────────────────────────────────
+
+export interface RevenueAssumption {
+  targetPaybackYears: number;        // 권장 매출 역산 기준 회수기간 (기본 10)
+  targetOperatingMargin: number;     // 기본 영업이익률 (기본 0.40 = 40%)
+  overrideAnnualRevenue?: number;    // 사용자 입력 매출 (미입력 시 권장값 자동 적용)
+  overrideOperatingMargin?: number;  // 사용자 입력 영업이익률 (미입력 시 기본값 적용)
 }
 
 // ────────────────────────────────────────────────────────────
@@ -74,6 +86,7 @@ export interface IRRInput {
   projectYears: number;
   isGovernmentSupported: boolean;
   residualValueRatio: number;
+  revenueAssumption: RevenueAssumption;   // 매출 산정 방식 (역산 + 사용자 조정)
 }
 
 // ────────────────────────────────────────────────────────────
@@ -83,8 +96,9 @@ export interface IRRInput {
 export interface UseTypeBreakdownItem {
   useType: AssetUseType;
   ratio: number;
-  floorArea: number;
-  annualRevenue: number;
+  floorArea: number;           // 운영 면적 (분양분 제외, m²)
+  presaleFloorArea: number;    // 분양 면적 (m²)
+  annualRevenue: number;       // 운영 면적에 배분된 연간 매출
 }
 
 export interface ScenarioResult {
@@ -97,17 +111,23 @@ export interface ScenarioResult {
   landAcquisitionCost: number;
   softCost: number;
   totalInvestment: number;
+  presaleAreaRatio: number;          // 전체 면적 중 분양 처리 비율 (0~1)
+  presaleRecoveredAmount: number;    // 분양으로 회수되는 투자비
+  netOperatingInvestment: number;    // 분양·보조금 차감 후 실제 운영 조달 투자비
   equityAmount: number;
   loanAmount: number;
   annualInterest: number;
   loanType: string;
-  annualRevenue: number;
+  recommendedAnnualRevenue: number;  // 회수기간 10년·영업이익률 40% 기준 역산 권장 매출
+  annualRevenue: number;             // 적용된 연간 매출 (권장값 또는 사용자 입력)
+  operatingMargin: number;           // 적용된 영업이익률
   annualOperatingCost: number;
   annualOperatingProfit: number;
   annualNetProfit: number;
   irr: number;
   dscr: number;
-  paybackYears: number;
+  totalInvestmentPaybackYears: number; // 운영투자비 회수기간 (무차입 가정, 영업이익 기준 — 역산 기준값과 직접 비교용)
+  paybackYears: number;                // 자기자본 회수기간 (대출 원리금 상환 후, 레버리지 반영 실제값)
   roi: number;
   governmentSubsidy: number;
   netInvestmentAfterSubsidy: number;
@@ -135,23 +155,26 @@ export interface IRRResult {
 // ────────────────────────────────────────────────────────────
 
 // 공사비 단가 (원/m²) — 리모델링 기준, 지방·유휴자산 현실 반영
+// 공사비 단가 (원/m²) — 리모델링 기준, 2026년 시장 현실 반영
+// 평당 300만~500만원 기준으로 환산 (1평 = 3.3058m²)
+// 신축(멸실 후 신축)은 CONDITION_MULTIPLIER ×2.0 적용 시 평당 약 600만~1,000만원 수준
 const CONSTRUCTION_COST_BASE: Record<AssetUseType, number> = {
-  accommodation:            650_000,   // 농촌·지방 펜션·호텔 리모델링
-  cultural_complex:         600_000,
-  education:                550_000,
-  senior_welfare:           650_000,
-  retail_fnb:               500_000,
-  shared_residence:         650_000,
-  logistics:                350_000,
-  knowledge_industry:       800_000,
-  wellness:                 750_000,
-  public_complex:           600_000,
-  residential:              750_000,
-  mixed_use_residential:    850_000,
-  office:                   750_000,
-  retail_shopping:          650_000,
-  medical:                  900_000,
-  religious_cultural:       600_000,
+  accommodation:          1_210_000,   // 평당 400만원
+  cultural_complex:       1_180_000,   // 평당 390만원
+  education:               1_120_000,   // 평당 370만원
+  senior_welfare:          1_240_000,   // 평당 410만원
+  retail_fnb:               970_000,   // 평당 320만원
+  shared_residence:       1_210_000,   // 평당 400만원
+  logistics:                910_000,   // 평당 300만원
+  knowledge_industry:     1_420_000,   // 평당 470만원
+  wellness:                1_390_000,   // 평당 460만원
+  public_complex:          1_150_000,   // 평당 380만원
+  residential:             1_360_000,   // 평당 450만원
+  mixed_use_residential:  1_450_000,   // 평당 480만원
+  office:                  1_330_000,   // 평당 440만원
+  retail_shopping:        1_210_000,   // 평당 400만원
+  medical:                1_510_000,   // 평당 500만원
+  religious_cultural:      1_150_000,   // 평당 380만원
 };
 
 const CONDITION_MULTIPLIER: Record<BuildingCondition, number> = {
@@ -165,45 +188,6 @@ const SCENARIO_COST_MULTIPLIER: Record<ScenarioType, number> = {
   conservative: 1.15,
   base:         1.0,
   optimistic:   0.90,
-};
-
-// 연간 매출 단가 (원/m²) — 지방 현실 기준 (도심은 1.2~1.5배 가능)
-const REVENUE_PER_SQM: Record<AssetUseType, number> = {
-  accommodation:          220_000,   // 지방 펜션·호텔 객실 매출
-  cultural_complex:       120_000,
-  education:              150_000,
-  senior_welfare:         180_000,
-  retail_fnb:             200_000,
-  shared_residence:       170_000,   // 공유주거: 상향 (도심 소형 임대)
-  logistics:               80_000,
-  knowledge_industry:     160_000,
-  wellness:               250_000,
-  public_complex:         100_000,
-  residential:            150_000,   // 임대주택: 상향
-  mixed_use_residential:  180_000,   // 주상복합: 상향
-  office:                 170_000,
-  retail_shopping:        180_000,
-  medical:                200_000,
-  religious_cultural:      80_000,
-};
-
-const OPERATING_COST_RATIO: Record<AssetUseType, number> = {
-  accommodation:          55,
-  cultural_complex:       60,
-  education:              50,
-  senior_welfare:         65,
-  retail_fnb:             45,
-  shared_residence:       30,
-  logistics:              25,
-  knowledge_industry:     35,
-  wellness:               58,
-  public_complex:         60,
-  residential:            25,
-  mixed_use_residential:  38,
-  office:                 40,
-  retail_shopping:        50,
-  medical:                60,
-  religious_cultural:     55,
 };
 
 const SCENARIO_REVENUE_MULTIPLIER: Record<ScenarioType, number> = {
@@ -238,6 +222,12 @@ const USE_TYPE_LABEL: Record<AssetUseType, string> = {
   religious_cultural:    '종교·문화시설',
 };
 
+// 분양 가능 용도 — 주거용·지식산업센터·오피스(오피스텔)·주상복합·숙박(리조트 분양형)
+// 해당 용도는 면적의 일부 또는 전부를 분양 처리할 수 있음 (presaleRatio 설정 시)
+const PRESALE_ELIGIBLE_TYPES: AssetUseType[] = [
+  'residential', 'mixed_use_residential', 'knowledge_industry', 'office', 'accommodation',
+];
+
 // ────────────────────────────────────────────────────────────
 // 유틸리티 함수
 // ────────────────────────────────────────────────────────────
@@ -268,24 +258,65 @@ function calcWeightedCostPerSqm(mix: UseTypeMix[]): number {
   return mix.reduce((s, m) => s + CONSTRUCTION_COST_BASE[m.useType] * (m.ratio / 100), 0);
 }
 
-function calcMixedRevenue(
+// 운영 면적 / 분양 면적 배분 (용도별 분양비율 반영)
+// 매출은 더 이상 m²당 단가가 아니라 회수기간 역산 방식으로 산출하므로
+// 이 함수는 면적 배분만 담당한다.
+function calcAreaBreakdown(
   mix: UseTypeMix[],
-  totalArea: number,
-  scenarioMult: number
-): { total: number; breakdown: UseTypeBreakdownItem[] } {
-  let total = 0;
-  const breakdown: UseTypeBreakdownItem[] = [];
+  totalArea: number
+): {
+  operatingArea: number;
+  presaleArea: number;
+  breakdown: { useType: AssetUseType; ratio: number; floorArea: number; presaleFloorArea: number }[];
+} {
+  let operatingArea = 0;
+  let presaleArea = 0;
+  const breakdown: { useType: AssetUseType; ratio: number; floorArea: number; presaleFloorArea: number }[] = [];
+
   for (const m of mix) {
-    const area = totalArea * (m.ratio / 100);
-    const revenue = Math.round(area * REVENUE_PER_SQM[m.useType] * scenarioMult);
-    total += revenue;
-    breakdown.push({ useType: m.useType, ratio: m.ratio, floorArea: Math.round(area), annualRevenue: revenue });
+    const fullArea = totalArea * (m.ratio / 100);
+    const presaleR = PRESALE_ELIGIBLE_TYPES.includes(m.useType) ? (m.presaleRatio ?? 0) / 100 : 0;
+    const opArea = fullArea * (1 - presaleR);
+    const psArea = fullArea - opArea;
+    operatingArea += opArea;
+    presaleArea += psArea;
+    breakdown.push({
+      useType: m.useType, ratio: m.ratio,
+      floorArea: Math.round(opArea), presaleFloorArea: Math.round(psArea),
+    });
   }
-  return { total, breakdown };
+  return { operatingArea, presaleArea, breakdown };
 }
 
-function calcWeightedOpCostRatio(mix: UseTypeMix[]): number {
-  return mix.reduce((s, m) => s + OPERATING_COST_RATIO[m.useType] * (m.ratio / 100), 0);
+// ── 레거시: 시장 단가 기반 매출 산출 (estimatePreliminaryROI 전용) ──
+// 스코어링 Block D 등급 차별화를 위해 시장 단가 기준 ROI를 유지한다.
+// 회수기간 역산 방식을 쓰면 모든 자산의 ROI가 1/targetPaybackYears로
+// 수렴해버려 등급 차별화가 사라지므로, 등급 산출용 계산에는
+// 기존 시장 단가 테이블을 그대로 사용한다.
+const LEGACY_REVENUE_PER_SQM: Record<AssetUseType, number> = {
+  accommodation: 220_000, cultural_complex: 120_000, education: 150_000,
+  senior_welfare: 180_000, retail_fnb: 200_000, shared_residence: 170_000,
+  logistics: 80_000, knowledge_industry: 160_000, wellness: 250_000,
+  public_complex: 100_000, residential: 150_000, mixed_use_residential: 180_000,
+  office: 170_000, retail_shopping: 180_000, medical: 200_000, religious_cultural: 80_000,
+};
+
+const LEGACY_OPERATING_COST_RATIO: Record<AssetUseType, number> = {
+  accommodation: 55, cultural_complex: 60, education: 50, senior_welfare: 65,
+  retail_fnb: 45, shared_residence: 30, logistics: 25, knowledge_industry: 35,
+  wellness: 58, public_complex: 60, residential: 25, mixed_use_residential: 38,
+  office: 40, retail_shopping: 50, medical: 60, religious_cultural: 55,
+};
+
+function calcLegacyMarketRevenue(mix: UseTypeMix[], totalArea: number): number {
+  return mix.reduce((sum, m) => {
+    const area = totalArea * (m.ratio / 100);
+    return sum + area * LEGACY_REVENUE_PER_SQM[m.useType];
+  }, 0);
+}
+
+function calcLegacyWeightedOpCostRatio(mix: UseTypeMix[]): number {
+  return mix.reduce((s, m) => s + LEGACY_OPERATING_COST_RATIO[m.useType] * (m.ratio / 100), 0);
 }
 
 function calculateIRR(cashFlows: number[]): number {
@@ -346,7 +377,7 @@ function buildUseTypeSummary(mix: UseTypeMix[]): string {
 
 function computeScenario(input: IRRInput, scenario: ScenarioType): ScenarioResult {
   const { scoringResult, buildingCondition, useTypeMix,
-          landArea, legalMaxFloorAreaRatio, zoningUpgradeGain } = input;
+          landArea, legalMaxFloorAreaRatio, zoningUpgradeGain, revenueAssumption } = input;
   const { grade } = scoringResult;
   const labelMap = { conservative: '보수적', base: '기본', optimistic: '낙관적' };
 
@@ -354,6 +385,7 @@ function computeScenario(input: IRRInput, scenario: ScenarioType): ScenarioResul
     landArea, legalMaxFloorAreaRatio, zoningUpgradeGain, scenario
   );
 
+  // ── 공사비 ──
   const baseCostPerSqm = calcWeightedCostPerSqm(useTypeMix);
   const constructionCostPerSqm =
     baseCostPerSqm * CONDITION_MULTIPLIER[buildingCondition] * SCENARIO_COST_MULTIPLIER[scenario];
@@ -362,22 +394,51 @@ function computeScenario(input: IRRInput, scenario: ScenarioType): ScenarioResul
   const softCost = Math.round(totalConstructionCost * 0.15);
   const totalInvestment = totalConstructionCost + landAcquisitionCost + softCost;
 
+  // ── 면적 배분 (운영분 / 분양분) ──
+  const { operatingArea, presaleArea, breakdown: areaBreakdown } =
+    calcAreaBreakdown(useTypeMix, usableFloorArea);
+  const presaleAreaRatio = usableFloorArea > 0 ? presaleArea / usableFloorArea : 0;
+
+  // 분양분 투자비 회수: 총 투자비 중 분양 면적 비율에 해당하는 금액은
+  // 분양 매출로 즉시 회수된 것으로 간주 (대출·자기자본 조달 대상에서 제외)
+  const presaleRecoveredAmount = Math.round(totalInvestment * presaleAreaRatio);
+
   const governmentSubsidy = estimateSubsidy(totalInvestment, input.isGovernmentSupported, grade);
   const netInvestmentAfterSubsidy = totalInvestment - governmentSubsidy;
+  const netOperatingInvestment = Math.max(0, netInvestmentAfterSubsidy - presaleRecoveredAmount);
 
-  // 자기자본 = 보조금 차감 후 실투자비 기준
-  const equityAmount = Math.round(netInvestmentAfterSubsidy * (input.equityRatio / 100));
-  const loanAmount = netInvestmentAfterSubsidy - equityAmount;
+  // 자기자본 = 분양회수·보조금 차감 후 실제 운영 조달 투자비 기준
+  const equityAmount = Math.round(netOperatingInvestment * (input.equityRatio / 100));
+  const loanAmount = netOperatingInvestment - equityAmount;
   const loanType = grade === 'S' || grade === 'A' ? 'PF' : '담보';
   const interestRate = loanType === 'PF' ? input.loanRates.pf : input.loanRates.collateral;
   const annualInterest = Math.round(loanAmount * (interestRate / 100));
 
-  const { total: annualRevenue, breakdown: useTypeBreakdown } =
-    calcMixedRevenue(useTypeMix, usableFloorArea, SCENARIO_REVENUE_MULTIPLIER[scenario]);
+  // ── 매출: 회수기간 역산 권장값 + 사용자 조정 ──
+  // 권장 연매출 = 운영투자비 ÷ (목표 회수기간 × 목표 영업이익률)
+  const { targetPaybackYears, targetOperatingMargin, overrideAnnualRevenue, overrideOperatingMargin } =
+    revenueAssumption;
 
-  const weightedOpCostRatio = calcWeightedOpCostRatio(useTypeMix);
-  const annualOperatingCost = Math.round(annualRevenue * (weightedOpCostRatio / 100));
-  const annualOperatingProfit = annualRevenue - annualOperatingCost;
+  const recommendedAnnualRevenue =
+    targetPaybackYears > 0 && targetOperatingMargin > 0
+      ? Math.round(netOperatingInvestment / (targetPaybackYears * targetOperatingMargin))
+      : 0;
+
+  const baseAnnualRevenue = overrideAnnualRevenue ?? recommendedAnnualRevenue;
+  const annualRevenue = Math.round(baseAnnualRevenue * SCENARIO_REVENUE_MULTIPLIER[scenario]);
+
+  const operatingMargin = overrideOperatingMargin ?? targetOperatingMargin;
+  const annualOperatingProfit = Math.round(annualRevenue * operatingMargin);
+  const annualOperatingCost = annualRevenue - annualOperatingProfit;
+
+  // 용도별 매출 배분 (운영 면적 비율 기준)
+  const useTypeBreakdown: UseTypeBreakdownItem[] = areaBreakdown.map(b => ({
+    useType: b.useType,
+    ratio: b.ratio,
+    floorArea: b.floorArea,
+    presaleFloorArea: b.presaleFloorArea,
+    annualRevenue: operatingArea > 0 ? Math.round(annualRevenue * (b.floorArea / operatingArea)) : 0,
+  }));
 
   // ── Equity IRR: 원리금 균등 상환 기준 연간 부채상환액 산출 ──
   const annualDebtService = loanAmount > 0
@@ -392,23 +453,48 @@ function computeScenario(input: IRRInput, scenario: ScenarioType): ScenarioResul
     : 0;
   const annualNetProfit = annualOperatingProfit - annualDebtService;
 
-  // 초기 지출 = 자기자본만 / 만기 시 대출 완전 상환 → 잔존가치에서 차감 불필요
-  const cashFlows = [-equityAmount, ...Array(input.projectYears).fill(annualNetProfit)];
-  cashFlows[cashFlows.length - 1] += Math.round(netInvestmentAfterSubsidy * input.residualValueRatio);
+  // 초기 지출 = 자기자본만 (분양분은 이미 netOperatingInvestment에서 차감됨)
+  // 100% 분양 등으로 운영 조달 투자비가 0이면 자기자본 IRR 개념이 적용되지 않음
+  const isFullyPresaleFunded = netOperatingInvestment <= 0;
 
-  const irr = calculateIRR(cashFlows);
-  const dscr = calculateDSCR(annualOperatingProfit, loanAmount, interestRate, input.projectYears);
-  const paybackYears = annualNetProfit > 0
-    ? Math.round((equityAmount / annualNetProfit) * 10) / 10 : 999;
-  const roi = Math.round((annualOperatingProfit / netInvestmentAfterSubsidy) * 100 * 10) / 10;
+  let irr: number;
+  let dscr: number;
+  let paybackYears: number;
+  let roi: number;
+
+  if (isFullyPresaleFunded) {
+    // 전액 분양 회수 — 자기자본 투입 없음. IRR·회수기간 개념 해당 없음
+    irr = 0;
+    dscr = 99;
+    paybackYears = 0;
+    roi = 0;
+  } else {
+    const cashFlows = [-equityAmount, ...Array(input.projectYears).fill(annualNetProfit)];
+    cashFlows[cashFlows.length - 1] += Math.round(netOperatingInvestment * input.residualValueRatio);
+
+    irr = calculateIRR(cashFlows);
+    dscr = calculateDSCR(annualOperatingProfit, loanAmount, interestRate, input.projectYears);
+    paybackYears = annualNetProfit > 0
+      ? Math.round((equityAmount / annualNetProfit) * 10) / 10 : 999;
+    roi = Math.round((annualOperatingProfit / netOperatingInvestment) * 100 * 10) / 10;
+  }
+
+  // 운영투자비 회수기간 (무차입 가정) — 역산 기준값과 직접 비교 가능
+  const totalInvestmentPaybackYears = annualOperatingProfit > 0 && netOperatingInvestment > 0
+    ? Math.round((netOperatingInvestment / annualOperatingProfit) * 10) / 10
+    : 0;
 
   return {
     scenario, label: labelMap[scenario], usableFloorArea, useTypeBreakdown,
     constructionCostPerSqm: Math.round(constructionCostPerSqm),
     totalConstructionCost, landAcquisitionCost, softCost, totalInvestment,
+    presaleAreaRatio: Math.round(presaleAreaRatio * 1000) / 1000,
+    presaleRecoveredAmount, netOperatingInvestment,
     equityAmount, loanAmount, annualInterest, loanType,
-    annualRevenue, annualOperatingCost, annualOperatingProfit, annualNetProfit,
-    irr, dscr, paybackYears, roi, governmentSubsidy, netInvestmentAfterSubsidy,
+    recommendedAnnualRevenue, annualRevenue, operatingMargin,
+    annualOperatingCost, annualOperatingProfit, annualNetProfit,
+    irr, dscr, totalInvestmentPaybackYears, paybackYears, roi,
+    governmentSubsidy, netInvestmentAfterSubsidy,
   };
 }
 
@@ -478,8 +564,11 @@ export function estimatePreliminaryROI(input: PreliminaryROIInput): number {
   const softCost = Math.round(constructionCost * 0.15);
   const totalInvestment = constructionCost + landCost + softCost;
 
-  const { total: annualRevenue } = calcMixedRevenue(input.useTypeMix, usableFloorArea, 1.0);
-  const weightedOpCost = calcWeightedOpCostRatio(input.useTypeMix);
+  // 등급 차별화를 위해 시장 단가 기준(레거시) 매출로 계산
+  // 회수기간 역산 방식을 쓰면 ROI가 항상 1/targetPaybackYears로 수렴해
+  // 자산별 등급 차별화가 불가능해지므로 여기서는 시장 단가를 유지한다.
+  const annualRevenue = calcLegacyMarketRevenue(input.useTypeMix, usableFloorArea);
+  const weightedOpCost = calcLegacyWeightedOpCostRatio(input.useTypeMix);
   const annualOperatingProfit = Math.round(annualRevenue * (1 - weightedOpCost / 100));
 
   if (totalInvestment === 0) return 0;
@@ -504,6 +593,8 @@ export interface AnalyzeAssetInput {
   residualValueRatio: number;
   // 슬라이더로 조절 가능 — undefined 시 추천값 자동 사용
   overrideEquityRatio?: number;
+  overrideAnnualRevenue?: number;     // 매출 직접 입력 (미입력 시 회수기간 역산 권장값)
+  overrideOperatingMargin?: number;   // 영업이익률 직접 입력 (미입력 시 40%)
 }
 
 export interface AnalyzeAssetResult {
@@ -512,10 +603,13 @@ export interface AnalyzeAssetResult {
   recommendation: RecommendationResult;   // 1/2/3순위 시나리오 포함
 }
 
+const DEFAULT_TARGET_PAYBACK_YEARS = 10;
+const DEFAULT_TARGET_OPERATING_MARGIN = 0.40;
+
 export function analyzeAsset(input: AnalyzeAssetInput): AnalyzeAssetResult {
   const ai = input.assetInput;
 
-  // Step 1: 예비 ROI 추정 (상위 2개 용도 평균으로 proxy)
+  // Step 1: 예비 ROI 추정 (상위 2개 용도 평균으로 proxy, 시장 단가 기준)
   // 이 단계에서는 용도 추천 전이므로 일반 숙박+복합문화 기준 사용
   const preliminaryROI = estimatePreliminaryROI({
     useTypeMix: [{ useType: 'accommodation', ratio: 60 }, { useType: 'cultural_complex', ratio: 40 }],
@@ -534,6 +628,13 @@ export function analyzeAsset(input: AnalyzeAssetInput): AnalyzeAssetResult {
   const scoring = calculateScore({ ...ai, preliminaryROI });
 
   // Step 3: 시나리오 추천 + IRR 계산 (recommendScenarios 내부에서 처리)
+  const revenueAssumption: RevenueAssumption = {
+    targetPaybackYears: DEFAULT_TARGET_PAYBACK_YEARS,
+    targetOperatingMargin: DEFAULT_TARGET_OPERATING_MARGIN,
+    overrideAnnualRevenue: input.overrideAnnualRevenue,
+    overrideOperatingMargin: input.overrideOperatingMargin,
+  };
+
   const recommendation = recommendScenarios({
     assetInput: ai,
     scoringResult: scoring,
@@ -541,9 +642,10 @@ export function analyzeAsset(input: AnalyzeAssetInput): AnalyzeAssetResult {
     landValuePerSqm: input.landValuePerSqm,
     projectYears: input.projectYears,
     residualValueRatio: input.residualValueRatio,
+    revenueAssumption,
   });
 
-  // Step 4: 자기자본 비율 오버라이드 (슬라이더 조절 시)
+  // Step 4: 자기자본 비율 오버라이드 (슬라이더 조절 시) — 매출·영업이익률 오버라이드도 함께 반영
   if (input.overrideEquityRatio !== undefined) {
     for (const scenario of recommendation.scenarios) {
       scenario.irrResult = calculateIRRScenarios({
@@ -561,6 +663,7 @@ export function analyzeAsset(input: AnalyzeAssetInput): AnalyzeAssetResult {
         isGovernmentSupported:
           ai.isUrbanRegenerationArea || ai.isAbandonedSchoolBudget || ai.isBalancedDevelopmentBudget,
         residualValueRatio: input.residualValueRatio,
+        revenueAssumption,
       });
     }
   }
