@@ -152,7 +152,7 @@ const AnalysisPage = () => {
           residualValueRatio: algoConfig.residualValueRatio,
           overrideEquityRatio: eqChanged ? eqOverride : undefined,
           overrideAnnualRevenue: revChanged ? revOverride : undefined,
-          overrideOperatingMargin: marChanged ? marOverride : undefined,
+          overrideOperatingMargin: marChanged ? (marOverride as number) / 100 : undefined,
         });
         return r.recommendation.scenarios.find((x) => x.rank === base.rank) ?? base;
       } catch (e) {
