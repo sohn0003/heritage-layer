@@ -793,6 +793,47 @@ const AnalysisPage = () => {
                                       </p>
                                     </div>
                                   </div>
+                                  {(() => {
+                                    const currentPyeong = currentPresaleArea / 3.305785;
+                                    const pricePerPyeong = presalePriceByRank[scenario.rank] ?? 0; // 천만원
+                                    const presaleRevenue = currentPyeong * pricePerPyeong; // 천만원 단위
+                                    return (
+                                      <div className="mt-3 grid grid-cols-2 gap-2 rounded-md border border-border/50 bg-background/60 p-3 text-xs">
+                                        <div>
+                                          <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
+                                          <Input
+                                            type="number"
+                                            inputMode="decimal"
+                                            step="0.1"
+                                            min={0}
+                                            value={presalePriceByRank[scenario.rank] ?? ''}
+                                            onChange={(e) => {
+                                              const raw = e.target.value;
+                                              setPresalePriceByRank((prev) => {
+                                                const next = { ...prev };
+                                                if (raw === '') delete next[scenario.rank];
+                                                else next[scenario.rank] = Math.max(0, Number(raw));
+                                                return next;
+                                              });
+                                            }}
+                                            placeholder="예: 5 (=5천만원/평)"
+                                            className="mt-1 h-8 text-sm"
+                                          />
+                                        </div>
+                                        <div>
+                                          <p className="text-muted-foreground">분양매출</p>
+                                          <p className="mt-2 text-sm font-semibold tabular-nums text-primary">
+                                            {presaleRevenue >= 10000
+                                              ? `${(presaleRevenue / 10000).toLocaleString(undefined, { maximumFractionDigits: 2 })} 조`
+                                              : `${presaleRevenue.toLocaleString(undefined, { maximumFractionDigits: 1 })} 천만원`}
+                                          </p>
+                                          <p className="mt-0.5 text-[10px] text-muted-foreground tabular-nums">
+                                            ≈ {(presaleRevenue / 10).toLocaleString(undefined, { maximumFractionDigits: 1 })} 억원 · {currentPyeong.toLocaleString(undefined, { maximumFractionDigits: 1 })} 평
+                                          </p>
+                                        </div>
+                                      </div>
+                                    );
+                                  })()}
                                   <p className="mt-2 text-xs text-muted-foreground">
                                     분양 가능 용도(주거·주상복합·지식산업센터·오피스·숙박)에 적용됩니다.
                                   </p>
