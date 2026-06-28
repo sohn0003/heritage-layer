@@ -744,8 +744,14 @@ const AnalysisPage = () => {
                         {/* 분양 비율 / 연간 매출 / 영업이익률 — 사용자 입력 */}
                         {(() => {
                           const PRESALE_ELIGIBLE = ['residential', 'mixed_use_residential', 'knowledge_industry', 'office', 'accommodation'];
-                          const hasPresale = scenario.useTypeMix.some((m: any) => PRESALE_ELIGIBLE.includes(m.useType));
+                          const eligibleRatioSum = scenario.useTypeMix
+                            .filter((m: any) => PRESALE_ELIGIBLE.includes(m.useType))
+                            .reduce((sum: number, m: any) => sum + (m.ratio ?? 0), 0);
+                          const hasPresale = eligibleRatioSum > 0;
                           const presaleVal = presaleByRank[scenario.rank] ?? 0;
+                          const usableArea = scenario.irrResult.base.usableFloorArea ?? 0;
+                          const maxPresaleArea = Math.round(usableArea * (eligibleRatioSum / 100));
+                          const currentPresaleArea = Math.round(maxPresaleArea * (presaleVal / 100));
                           const recommendedRevenue = scenario.irrResult.base.recommendedAnnualRevenue ?? 0;
                           const revenueVal = revenueByRank[scenario.rank];
                           const revenueDisplay = revenueVal !== undefined
@@ -771,6 +777,20 @@ const AnalysisPage = () => {
                                   />
                                   <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
                                     <span>0%</span><span>50%</span><span>100%</span>
+                                  </div>
+                                  <div className="mt-3 grid grid-cols-2 gap-2 rounded-md border border-border/50 bg-background/60 p-3 text-xs">
+                                    <div>
+                                      <p className="text-muted-foreground">최대 분양가능 면적</p>
+                                      <p className="mt-0.5 text-sm font-semibold tabular-nums">
+                                        {maxPresaleArea.toLocaleString()} ㎡
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-muted-foreground">현재 분양면적</p>
+                                      <p className="mt-0.5 text-sm font-semibold tabular-nums text-primary">
+                                        {currentPresaleArea.toLocaleString()} ㎡
+                                      </p>
+                                    </div>
                                   </div>
                                   <p className="mt-2 text-xs text-muted-foreground">
                                     분양 가능 용도(주거·주상복합·지식산업센터·오피스·숙박)에 적용됩니다.
