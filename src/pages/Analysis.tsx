@@ -809,7 +809,8 @@ const AnalysisPage = () => {
                             .reduce((sum: number, m: any) => sum + (m.ratio ?? 0), 0);
                           const hasPresale = eligibleRatioSum > 0;
                           const presaleVal = presaleByRank[scenario.rank] ?? 0;
-                          const usableArea = scenario.irrResult.base.usableFloorArea ?? 0;
+                          const maxUsableArea = scenario.irrResult.base.usableFloorArea ?? 0;
+                          const usableArea = usedFloorAreaByRank[scenario.rank] ?? maxUsableArea;
                           const maxPresaleArea = Math.round(usableArea * (eligibleRatioSum / 100));
                           const currentPresaleArea = Math.round(maxPresaleArea * (presaleVal / 100));
                           const recommendedRevenue = scenario.irrResult.base.recommendedAnnualRevenue ?? 0;
