@@ -701,7 +701,63 @@ const AnalysisPage = () => {
                           </CardContent>
                         </Card>
 
+                        {/* 사용 연면적 입력 (탭별 개별) */}
+                        {(() => {
+                          const maxAllowed = Math.round(scenario.irrResult.base.usableFloorArea ?? 0);
+                          const usedVal = usedFloorAreaByRank[scenario.rank] ?? maxAllowed;
+                          return (
+                            <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
+                              <div className="mb-2 flex items-baseline justify-between gap-2">
+                                <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
+                                <span className="text-xs text-muted-foreground">
+                                  최대 허용: <span className="font-semibold text-foreground tabular-nums">{maxAllowed.toLocaleString()}</span> ㎡
+                                </span>
+                              </div>
+                              <Input
+                                type="number"
+                                inputMode="numeric"
+                                min={0}
+                                max={maxAllowed}
+                                step={10}
+                                value={usedVal}
+                                onChange={(e) => {
+                                  const raw = e.target.value;
+                                  if (raw === '') {
+                                    setUsedFloorAreaByRank((prev) => {
+                                      const next = { ...prev }; delete next[scenario.rank]; return next;
+                                    });
+                                    return;
+                                  }
+                                  const v = Number(raw);
+                                  if (!Number.isFinite(v) || v < 0) return;
+                                  const clamped = Math.min(maxAllowed, Math.max(0, Math.round(v)));
+                                  setUsedFloorAreaByRank((prev) => ({ ...prev, [scenario.rank]: clamped }));
+                                }}
+                                className="h-9 text-sm"
+                              />
+                              <p className="mt-1.5 text-xs text-muted-foreground">
+                                실제 사용할 연면적을 입력하면 하단 재무 시나리오 비교표가 비례하여 갱신됩니다.
+                              </p>
+                              {usedFloorAreaByRank[scenario.rank] !== undefined &&
+                                usedFloorAreaByRank[scenario.rank] !== maxAllowed && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setUsedFloorAreaByRank((prev) => {
+                                        const next = { ...prev }; delete next[scenario.rank]; return next;
+                                      })
+                                    }
+                                    className="mt-2 text-xs text-primary underline-offset-2 hover:underline"
+                                  >
+                                    최대값({maxAllowed.toLocaleString()}㎡)으로 되돌리기
+                                  </button>
+                                )}
+                            </div>
+                          );
+                        })()}
+
                         {/* 자기자본 비율 슬라이더 (탭별 개별) */}
+
                         <div>
                           <div className="mb-2 flex items-baseline justify-between gap-2">
                             <Label className="text-sm font-semibold">내 자기자본 비율</Label>
