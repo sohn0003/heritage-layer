@@ -823,12 +823,10 @@ const AnalysisPage = () => {
                                         <div>
                                           <p className="text-muted-foreground">분양매출</p>
                                           <p className="mt-2 text-sm font-semibold tabular-nums text-primary">
-                                            {presaleRevenue >= 10000
-                                              ? `${(presaleRevenue / 10000).toLocaleString(undefined, { maximumFractionDigits: 2 })} 조`
-                                              : `${presaleRevenue.toLocaleString(undefined, { maximumFractionDigits: 1 })} 천만원`}
+                                            {(presaleRevenue / 10).toLocaleString(undefined, { maximumFractionDigits: 1 })} 억원
                                           </p>
                                           <p className="mt-0.5 text-[10px] text-muted-foreground tabular-nums">
-                                            ≈ {(presaleRevenue / 10).toLocaleString(undefined, { maximumFractionDigits: 1 })} 억원 · {currentPyeong.toLocaleString(undefined, { maximumFractionDigits: 1 })} 평
+                                            ≈ {currentPyeong.toLocaleString(undefined, { maximumFractionDigits: 1 })} 평
                                           </p>
                                         </div>
                                       </div>
