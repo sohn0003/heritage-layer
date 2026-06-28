@@ -91,6 +91,8 @@ const AnalysisPage = () => {
     setPresaleByRank({});
     setRevenueByRank({});
     setMarginByRank({});
+    setPresalePriceByRank({});
+    setUsedFloorAreaByRank({});
   }, [assetId]);
 
   // 기본 분석(오버라이드 없음) — 스코어링/추천 시나리오/추천 자기자본비율의 기준값
