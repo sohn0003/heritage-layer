@@ -945,31 +945,37 @@ const AnalysisPage = () => {
 
                                 <div>
                                   <div className="mb-2 flex items-baseline justify-between gap-2">
-                                    <Label className="text-sm font-semibold">영업이익률 (%)</Label>
-                                    <span className="text-xs text-muted-foreground">기본 40%</span>
+                                    <Label className="text-sm font-semibold">영업이익률</Label>
+                                    <div className="flex items-baseline gap-3">
+                                      <span className="text-xs text-muted-foreground">기본 40%</span>
+                                      <span className="text-sm font-bold text-primary tabular-nums">{marginVal}%</span>
+                                    </div>
                                   </div>
-                                  <Input
-                                    type="number"
-                                    inputMode="decimal"
-                                    step="1"
+                                  <Slider
+                                    value={[marginVal]}
                                     min={10}
                                     max={70}
-                                    value={marginVal}
-                                    onChange={(e) => {
-                                      const raw = e.target.value;
-                                      if (raw === '') {
+                                    step={1}
+                                    onValueChange={(v) =>
+                                      setMarginByRank((prev) => ({ ...prev, [scenario.rank]: v[0] }))
+                                    }
+                                  />
+                                  <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+                                    <span>10%</span><span>40%</span><span>70%</span>
+                                  </div>
+                                  {marginByRank[scenario.rank] !== undefined && marginByRank[scenario.rank] !== 40 && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
                                         setMarginByRank((prev) => {
                                           const next = { ...prev }; delete next[scenario.rank]; return next;
-                                        });
-                                        return;
+                                        })
                                       }
-                                      const v = Number(raw);
-                                      if (!Number.isFinite(v)) return;
-                                      const clamped = Math.max(10, Math.min(70, v));
-                                      setMarginByRank((prev) => ({ ...prev, [scenario.rank]: clamped }));
-                                    }}
-                                  />
-                                  <p className="mt-1.5 text-[10px] text-muted-foreground">범위: 10~70%</p>
+                                      className="mt-2 text-xs text-primary underline-offset-2 hover:underline"
+                                    >
+                                      기본값(40%)으로 되돌리기
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>
