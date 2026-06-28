@@ -66,6 +66,7 @@ const AnalysisPage = () => {
   const [presaleByRank, setPresaleByRank] = useState<Record<number, number>>({});       // 0~100 (%)
   const [revenueByRank, setRevenueByRank] = useState<Record<number, number | undefined>>({}); // 원
   const [marginByRank, setMarginByRank] = useState<Record<number, number | undefined>>({});   // 10~70 (%)
+  const [presalePriceByRank, setPresalePriceByRank] = useState<Record<number, number | undefined>>({}); // 평당 분양가격(천만원 단위)
   const [activeTab, setActiveTab] = useState<'1' | '2' | '3'>('1');
 
   const algoConfig = useAlgorithmConfig();
