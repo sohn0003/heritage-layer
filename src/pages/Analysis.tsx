@@ -67,6 +67,7 @@ const AnalysisPage = () => {
   const [revenueByRank, setRevenueByRank] = useState<Record<number, number | undefined>>({}); // 원
   const [marginByRank, setMarginByRank] = useState<Record<number, number | undefined>>({});   // 10~70 (%)
   const [presalePriceByRank, setPresalePriceByRank] = useState<Record<number, number | undefined>>({}); // 평당 분양가격(천만원 단위)
+  const [usedFloorAreaByRank, setUsedFloorAreaByRank] = useState<Record<number, number | undefined>>({}); // 사용 연면적(㎡) — 미입력 시 최대 허용 연면적
   const [activeTab, setActiveTab] = useState<'1' | '2' | '3'>('1');
 
   const algoConfig = useAlgorithmConfig();
@@ -90,6 +91,8 @@ const AnalysisPage = () => {
     setPresaleByRank({});
     setRevenueByRank({});
     setMarginByRank({});
+    setPresalePriceByRank({});
+    setUsedFloorAreaByRank({});
   }, [assetId]);
 
   // 기본 분석(오버라이드 없음) — 스코어링/추천 시나리오/추천 자기자본비율의 기준값
@@ -698,7 +701,63 @@ const AnalysisPage = () => {
                           </CardContent>
                         </Card>
 
+                        {/* 사용 연면적 입력 (탭별 개별) */}
+                        {(() => {
+                          const maxAllowed = Math.round(scenario.irrResult.base.usableFloorArea ?? 0);
+                          const usedVal = usedFloorAreaByRank[scenario.rank] ?? maxAllowed;
+                          return (
+                            <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
+                              <div className="mb-2 flex items-baseline justify-between gap-2">
+                                <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
+                                <span className="text-xs text-muted-foreground">
+                                  최대 허용: <span className="font-semibold text-foreground tabular-nums">{maxAllowed.toLocaleString()}</span> ㎡
+                                </span>
+                              </div>
+                              <Input
+                                type="number"
+                                inputMode="numeric"
+                                min={0}
+                                max={maxAllowed}
+                                step={10}
+                                value={usedVal}
+                                onChange={(e) => {
+                                  const raw = e.target.value;
+                                  if (raw === '') {
+                                    setUsedFloorAreaByRank((prev) => {
+                                      const next = { ...prev }; delete next[scenario.rank]; return next;
+                                    });
+                                    return;
+                                  }
+                                  const v = Number(raw);
+                                  if (!Number.isFinite(v) || v < 0) return;
+                                  const clamped = Math.min(maxAllowed, Math.max(0, Math.round(v)));
+                                  setUsedFloorAreaByRank((prev) => ({ ...prev, [scenario.rank]: clamped }));
+                                }}
+                                className="h-9 text-sm"
+                              />
+                              <p className="mt-1.5 text-xs text-muted-foreground">
+                                실제 사용할 연면적을 입력하면 하단 재무 시나리오 비교표가 비례하여 갱신됩니다.
+                              </p>
+                              {usedFloorAreaByRank[scenario.rank] !== undefined &&
+                                usedFloorAreaByRank[scenario.rank] !== maxAllowed && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setUsedFloorAreaByRank((prev) => {
+                                        const next = { ...prev }; delete next[scenario.rank]; return next;
+                                      })
+                                    }
+                                    className="mt-2 text-xs text-primary underline-offset-2 hover:underline"
+                                  >
+                                    최대값({maxAllowed.toLocaleString()}㎡)으로 되돌리기
+                                  </button>
+                                )}
+                            </div>
+                          );
+                        })()}
+
                         {/* 자기자본 비율 슬라이더 (탭별 개별) */}
+
                         <div>
                           <div className="mb-2 flex items-baseline justify-between gap-2">
                             <Label className="text-sm font-semibold">내 자기자본 비율</Label>
@@ -750,7 +809,8 @@ const AnalysisPage = () => {
                             .reduce((sum: number, m: any) => sum + (m.ratio ?? 0), 0);
                           const hasPresale = eligibleRatioSum > 0;
                           const presaleVal = presaleByRank[scenario.rank] ?? 0;
-                          const usableArea = scenario.irrResult.base.usableFloorArea ?? 0;
+                          const maxUsableArea = scenario.irrResult.base.usableFloorArea ?? 0;
+                          const usableArea = usedFloorAreaByRank[scenario.rank] ?? maxUsableArea;
                           const maxPresaleArea = Math.round(usableArea * (eligibleRatioSum / 100));
                           const currentPresaleArea = Math.round(maxPresaleArea * (presaleVal / 100));
                           const recommendedRevenue = scenario.irrResult.base.recommendedAnnualRevenue ?? 0;
@@ -942,12 +1002,40 @@ const AnalysisPage = () => {
                                     .filter((m: any) => PRESALE_ELIGIBLE.includes(m.useType))
                                     .reduce((sum: number, m: any) => sum + (m.ratio ?? 0), 0);
                                   const presaleVal = presaleByRank[scenario.rank] ?? 0;
-                                  const usableArea = scenario.irrResult.base.usableFloorArea ?? 0;
-                                  const maxPresaleArea = usableArea * (eligibleRatioSum / 100);
+                                  const maxUsableArea = scenario.irrResult.base.usableFloorArea ?? 0;
+                                  const usedInput = usedFloorAreaByRank[scenario.rank] ?? maxUsableArea;
+
+                                  // 사용 연면적에 비례해 각 시나리오 컬럼(보수/기본/낙관) 값을 스케일링
+                                  // — 토지비는 면적과 무관(고정), 건축비·매출·이익·자기자본·대출 등은 면적에 비례
+                                  const scaleLevel = (lv: any) => {
+                                    const lvMax = lv.usableFloorArea ?? 0;
+                                    const usedArea = lvMax > 0 ? Math.min(usedInput, lvMax) : 0;
+                                    const k = lvMax > 0 ? usedArea / lvMax : 0;
+                                    const land = lv.landAcquisitionCost ?? 0;
+                                    const totalInv = land + ((lv.totalInvestment ?? 0) - land) * k;
+                                    return {
+                                      usableFloorArea: usedArea,
+                                      totalInvestment: totalInv,
+                                      equityAmount: (lv.equityAmount ?? 0) * k,
+                                      loanAmount: (lv.loanAmount ?? 0) * k,
+                                      annualRevenue: (lv.annualRevenue ?? 0) * k,
+                                      annualOperatingProfit: (lv.annualOperatingProfit ?? 0) * k,
+                                      irr: lv.irr,            // 모든 CF가 동일 k로 스케일 → IRR 불변
+                                      dscr: lv.dscr,          // OP·부채 둘 다 k로 스케일 → 비율 불변
+                                      paybackYears: lv.paybackYears,
+                                      totalInvestmentPaybackYears: lv.totalInvestmentPaybackYears,
+                                    };
+                                  };
+                                  const cs = scaleLevel(scenario.irrResult.conservative);
+                                  const bs = scaleLevel(scenario.irrResult.base);
+                                  const os = scaleLevel(scenario.irrResult.optimistic);
+
+                                  // 분양매출 (면적 스케일 반영: presale 면적도 사용 연면적 기반)
+                                  const usableAreaForPresale = usedInput;
+                                  const maxPresaleArea = usableAreaForPresale * (eligibleRatioSum / 100);
                                   const currentPresaleArea = maxPresaleArea * (presaleVal / 100);
                                   const currentPyeong = currentPresaleArea / 3.305785;
                                   const pricePerPyeong = presalePriceByRank[scenario.rank] ?? 0; // 천만원
-                                  // 분양매출 (원 단위) = 평수 × 평당가격(천만원) × 10,000,000
                                   const presaleRevenueWon = currentPyeong * pricePerPyeong * 10_000_000;
                                   const recoverPayback = (totalInvestment: number, annualOp: number) => {
                                     if (!Number.isFinite(totalInvestment) || !Number.isFinite(annualOp)) return 0;
@@ -958,52 +1046,31 @@ const AnalysisPage = () => {
                                   };
                                   const rows = [
                                   { label: '사용 연면적 (㎡)', fmt: (v: number) => formatNumber(v),
-                                    c: scenario.irrResult.conservative.usableFloorArea,
-                                    b: scenario.irrResult.base.usableFloorArea,
-                                    o: scenario.irrResult.optimistic.usableFloorArea },
+                                    c: cs.usableFloorArea, b: bs.usableFloorArea, o: os.usableFloorArea },
                                   { label: '총 투자비', fmt: (v: number) => toEokwon(v),
-                                    c: scenario.irrResult.conservative.totalInvestment,
-                                    b: scenario.irrResult.base.totalInvestment,
-                                    o: scenario.irrResult.optimistic.totalInvestment },
+                                    c: cs.totalInvestment, b: bs.totalInvestment, o: os.totalInvestment },
                                   { label: '자기자본', fmt: (v: number) => toEokwon(v),
-                                    c: scenario.irrResult.conservative.equityAmount,
-                                    b: scenario.irrResult.base.equityAmount,
-                                    o: scenario.irrResult.optimistic.equityAmount },
+                                    c: cs.equityAmount, b: bs.equityAmount, o: os.equityAmount },
                                   { label: '대출금액', fmt: (v: number) => toEokwon(v),
-                                    c: scenario.irrResult.conservative.loanAmount,
-                                    b: scenario.irrResult.base.loanAmount,
-                                    o: scenario.irrResult.optimistic.loanAmount },
+                                    c: cs.loanAmount, b: bs.loanAmount, o: os.loanAmount },
                                   { label: '연간 매출', fmt: (v: number) => toEokwon(v),
-                                    c: scenario.irrResult.conservative.annualRevenue,
-                                    b: scenario.irrResult.base.annualRevenue,
-                                    o: scenario.irrResult.optimistic.annualRevenue },
+                                    c: cs.annualRevenue, b: bs.annualRevenue, o: os.annualRevenue },
                                   { label: '연간 영업이익', fmt: (v: number) => toEokwon(v),
-                                    c: scenario.irrResult.conservative.annualOperatingProfit,
-                                    b: scenario.irrResult.base.annualOperatingProfit,
-                                    o: scenario.irrResult.optimistic.annualOperatingProfit },
+                                    c: cs.annualOperatingProfit, b: bs.annualOperatingProfit, o: os.annualOperatingProfit },
                                   { label: '분양매출', fmt: (_v: number) => toEokwon(presaleRevenueWon),
                                     c: presaleRevenueWon, b: presaleRevenueWon, o: presaleRevenueWon },
                                   { label: 'IRR', fmt: (v: number) => formatPercent(v),
-                                    c: scenario.irrResult.conservative.irr,
-                                    b: scenario.irrResult.base.irr,
-                                    o: scenario.irrResult.optimistic.irr,
-                                    highlight: true },
+                                    c: cs.irr, b: bs.irr, o: os.irr, highlight: true },
                                   { label: 'DSCR', fmt: (v: number) => (Number.isFinite(v) ? v.toFixed(2) : '--'),
-                                    c: scenario.irrResult.conservative.dscr,
-                                    b: scenario.irrResult.base.dscr,
-                                    o: scenario.irrResult.optimistic.dscr },
+                                    c: cs.dscr, b: bs.dscr, o: os.dscr },
                                   { label: '총 투자비 회수기간 (분양 + 영업이익)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
-                                    c: recoverPayback(scenario.irrResult.conservative.totalInvestment, scenario.irrResult.conservative.annualOperatingProfit),
-                                    b: recoverPayback(scenario.irrResult.base.totalInvestment, scenario.irrResult.base.annualOperatingProfit),
-                                    o: recoverPayback(scenario.irrResult.optimistic.totalInvestment, scenario.irrResult.optimistic.annualOperatingProfit) },
+                                    c: recoverPayback(cs.totalInvestment, cs.annualOperatingProfit),
+                                    b: recoverPayback(bs.totalInvestment, bs.annualOperatingProfit),
+                                    o: recoverPayback(os.totalInvestment, os.annualOperatingProfit) },
                                   { label: '운영투자비 회수기간 (무차입 기준)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
-                                    c: scenario.irrResult.conservative.totalInvestmentPaybackYears,
-                                    b: scenario.irrResult.base.totalInvestmentPaybackYears,
-                                    o: scenario.irrResult.optimistic.totalInvestmentPaybackYears },
+                                    c: cs.totalInvestmentPaybackYears, b: bs.totalInvestmentPaybackYears, o: os.totalInvestmentPaybackYears },
                                   { label: '자기자본 회수기간 (대출상환 후 실제값)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
-                                    c: scenario.irrResult.conservative.paybackYears,
-                                    b: scenario.irrResult.base.paybackYears,
-                                    o: scenario.irrResult.optimistic.paybackYears },
+                                    c: cs.paybackYears, b: bs.paybackYears, o: os.paybackYears },
                                   ];
                                   return rows.map((row) => (
                                   <TableRow key={row.label}>
