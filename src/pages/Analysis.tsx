@@ -936,7 +936,27 @@ const AnalysisPage = () => {
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {[
+                                {(() => {
+                                  const PRESALE_ELIGIBLE = ['residential', 'mixed_use_residential', 'knowledge_industry', 'office', 'accommodation'];
+                                  const eligibleRatioSum = scenario.useTypeMix
+                                    .filter((m: any) => PRESALE_ELIGIBLE.includes(m.useType))
+                                    .reduce((sum: number, m: any) => sum + (m.ratio ?? 0), 0);
+                                  const presaleVal = presaleByRank[scenario.rank] ?? 0;
+                                  const usableArea = scenario.irrResult.base.usableFloorArea ?? 0;
+                                  const maxPresaleArea = usableArea * (eligibleRatioSum / 100);
+                                  const currentPresaleArea = maxPresaleArea * (presaleVal / 100);
+                                  const currentPyeong = currentPresaleArea / 3.305785;
+                                  const pricePerPyeong = presalePriceByRank[scenario.rank] ?? 0; // 천만원
+                                  // 분양매출 (원 단위) = 평수 × 평당가격(천만원) × 10,000,000
+                                  const presaleRevenueWon = currentPyeong * pricePerPyeong * 10_000_000;
+                                  const recoverPayback = (totalInvestment: number, annualOp: number) => {
+                                    if (!Number.isFinite(totalInvestment) || !Number.isFinite(annualOp)) return 0;
+                                    const remaining = Math.max(0, totalInvestment - presaleRevenueWon);
+                                    if (remaining === 0) return 0;
+                                    if (annualOp <= 0) return 0;
+                                    return Math.round((remaining / annualOp) * 10) / 10;
+                                  };
+                                  const rows = [
                                   { label: '사용 연면적 (㎡)', fmt: (v: number) => formatNumber(v),
                                     c: scenario.irrResult.conservative.usableFloorArea,
                                     b: scenario.irrResult.base.usableFloorArea,
@@ -961,6 +981,8 @@ const AnalysisPage = () => {
                                     c: scenario.irrResult.conservative.annualOperatingProfit,
                                     b: scenario.irrResult.base.annualOperatingProfit,
                                     o: scenario.irrResult.optimistic.annualOperatingProfit },
+                                  { label: '분양매출', fmt: (_v: number) => toEokwon(presaleRevenueWon),
+                                    c: presaleRevenueWon, b: presaleRevenueWon, o: presaleRevenueWon },
                                   { label: 'IRR', fmt: (v: number) => formatPercent(v),
                                     c: scenario.irrResult.conservative.irr,
                                     b: scenario.irrResult.base.irr,
@@ -971,9 +993,9 @@ const AnalysisPage = () => {
                                     b: scenario.irrResult.base.dscr,
                                     o: scenario.irrResult.optimistic.dscr },
                                   { label: '총 투자비 회수기간 (분양 + 영업이익)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
-                                    c: scenario.irrResult.conservative.grossInvestmentPaybackYears,
-                                    b: scenario.irrResult.base.grossInvestmentPaybackYears,
-                                    o: scenario.irrResult.optimistic.grossInvestmentPaybackYears },
+                                    c: recoverPayback(scenario.irrResult.conservative.totalInvestment, scenario.irrResult.conservative.annualOperatingProfit),
+                                    b: recoverPayback(scenario.irrResult.base.totalInvestment, scenario.irrResult.base.annualOperatingProfit),
+                                    o: recoverPayback(scenario.irrResult.optimistic.totalInvestment, scenario.irrResult.optimistic.annualOperatingProfit) },
                                   { label: '운영투자비 회수기간 (무차입 기준)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
                                     c: scenario.irrResult.conservative.totalInvestmentPaybackYears,
                                     b: scenario.irrResult.base.totalInvestmentPaybackYears,
@@ -982,14 +1004,16 @@ const AnalysisPage = () => {
                                     c: scenario.irrResult.conservative.paybackYears,
                                     b: scenario.irrResult.base.paybackYears,
                                     o: scenario.irrResult.optimistic.paybackYears },
-                                ].map((row) => (
+                                  ];
+                                  return rows.map((row) => (
                                   <TableRow key={row.label}>
                                     <TableCell className="font-medium">{row.label}</TableCell>
                                     <TableCell className="text-right tabular-nums text-muted-foreground">{row.fmt(row.c)}</TableCell>
                                     <TableCell className={`text-right tabular-nums ${row.highlight ? 'font-bold text-primary' : ''}`}>{row.fmt(row.b)}</TableCell>
                                     <TableCell className="text-right tabular-nums text-muted-foreground">{row.fmt(row.o)}</TableCell>
                                   </TableRow>
-                                ))}
+                                  ));
+                                })()}
                               </TableBody>
                             </Table>
                           </div>
