@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { usePaddleCheckout } from '@/hooks/usePaddleCheckout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, X, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import AuthModal from '@/components/common/AuthModal';
 import Seo from '@/components/common/Seo';
-import PaymentMethodModal from '@/components/payments/PaymentMethodModal';
 
 type TierKey = 'free' | 'pro' | 'enterprise';
 type EnterpriseBilling = 'monthly' | 'yearly';
