@@ -45,12 +45,9 @@ const renderCell = (v: boolean | string) => {
 const Pricing = () => {
   const navigate = useNavigate();
   const { user, subscriptionTier } = useAuth();
-  const { openCheckout, loading } = usePaddleCheckout();
+  const loading = false;
   const [entBilling, setEntBilling] = useState<EnterpriseBilling>('monthly');
   const [authOpen, setAuthOpen] = useState(false);
-  const [methodModalOpen, setMethodModalOpen] = useState(false);
-  const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
-  const [pendingPlanLabel, setPendingPlanLabel] = useState<string>('');
   const currentTier: TierKey = subscriptionTier;
 
   const openPaymentMethodModal = (priceId: string, _planLabel: string) => {
