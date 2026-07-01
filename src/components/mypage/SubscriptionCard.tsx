@@ -61,21 +61,28 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
     fetchSub();
   }, [user, refreshKey]);
 
-  const openPortal = async () => {
+  const cancelTossSubscription = async () => {
+    if (!confirm('토스페이먼츠 구독을 해지하시겠습니까? 즉시 해지되며, 다음 결제는 진행되지 않습니다.')) {
+      return;
+    }
     setPortalLoading(true);
     try {
-      if (sub?.provider === 'toss') {
-        if (!confirm('토스페이먼츠 구독을 해지하시겠습니까? 즉시 해지되며, 다음 결제는 진행되지 않습니다.')) {
-          return;
-        }
-        const { data, error } = await supabase.functions.invoke('toss-cancel-subscription');
-        if (error || data?.error) {
-          throw new Error(data?.error ?? error?.message ?? '구독 해지에 실패했습니다.');
-        }
-        toast.success('구독이 해지되었습니다.');
-        window.location.reload();
-        return;
+      const { data, error } = await supabase.functions.invoke('toss-cancel-subscription');
+      if (error || data?.error) {
+        throw new Error(data?.error ?? error?.message ?? '구독 해지에 실패했습니다.');
       }
+      toast.success('구독이 해지되었습니다.');
+      window.location.reload();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '오류가 발생했습니다.');
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  const openPaddlePortal = async () => {
+    setPortalLoading(true);
+    try {
       const { data, error } = await supabase.functions.invoke('paddle-customer-portal');
       if (error || !data?.url) {
         throw new Error(error?.message || '구독 관리 페이지를 열 수 없습니다.');
@@ -86,6 +93,11 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
     } finally {
       setPortalLoading(false);
     }
+  };
+
+  const changeTossCard = () => {
+    if (!sub) return;
+    navigate(`/checkout/toss?priceId=${encodeURIComponent(sub.price_id)}&mode=update`);
   };
 
   const isFree = subscriptionTier === 'free';
