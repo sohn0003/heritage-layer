@@ -362,6 +362,8 @@ export type Database = {
           provider: string
           status: string
           toss_billing_key: string | null
+          toss_card_company: string | null
+          toss_card_number: string | null
           toss_customer_key: string | null
           updated_at: string | null
           user_id: string
@@ -380,6 +382,8 @@ export type Database = {
           provider?: string
           status?: string
           toss_billing_key?: string | null
+          toss_card_company?: string | null
+          toss_card_number?: string | null
           toss_customer_key?: string | null
           updated_at?: string | null
           user_id: string
@@ -398,6 +402,8 @@ export type Database = {
           provider?: string
           status?: string
           toss_billing_key?: string | null
+          toss_card_company?: string | null
+          toss_card_number?: string | null
           toss_customer_key?: string | null
           updated_at?: string | null
           user_id?: string
