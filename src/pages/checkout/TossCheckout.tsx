@@ -74,7 +74,7 @@ const TossCheckout = () => {
 
   return (
     <div className="min-h-screen px-4 pb-20 pt-24">
-      <Seo title="토스페이먼츠 결제 — Heritage Layer" description="토스페이먼츠로 구독 결제를 진행합니다." path="/checkout/toss" />
+      <Seo title={isUpdate ? '결제 카드 변경 — Heritage Layer' : '토스페이먼츠 결제 — Heritage Layer'} description="토스페이먼츠 카드 등록을 진행합니다." path="/checkout/toss" />
       <div className="mx-auto max-w-md">
         <Card>
           <CardHeader>
