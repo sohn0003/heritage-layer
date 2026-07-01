@@ -24,6 +24,7 @@ const TossSuccess = () => {
     const authKey = params.get('authKey');
     const customerKey = params.get('customerKey');
     const priceId = params.get('priceId');
+    const mode = params.get('mode') ?? undefined;
 
     if (!authKey || !customerKey || !priceId) {
       setError('필수 파라미터가 누락되었습니다.');
@@ -33,7 +34,7 @@ const TossSuccess = () => {
 
     (async () => {
       const { data, error: invokeErr } = await supabase.functions.invoke('toss-issue-billing-key', {
-        body: { authKey, customerKey, priceId },
+        body: { authKey, customerKey, priceId, mode },
       });
       if (invokeErr || data?.error) {
         setError(data?.error ?? invokeErr?.message ?? '결제 처리에 실패했습니다.');
@@ -44,6 +45,8 @@ const TossSuccess = () => {
       setStatus('success');
     })();
   }, [params, refreshTier]);
+
+  const isUpdate = params.get('mode') === 'update';
 
   return (
     <div className="min-h-screen px-4 pb-20 pt-24">
