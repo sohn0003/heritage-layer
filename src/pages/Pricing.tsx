@@ -55,35 +55,14 @@ const Pricing = () => {
   const [pendingPlanLabel, setPendingPlanLabel] = useState<string>('');
   const currentTier: TierKey = subscriptionTier;
 
-  const openPaymentMethodModal = (priceId: string, planLabel: string) => {
+  const openPaymentMethodModal = (priceId: string, _planLabel: string) => {
     if (!user) {
       toast.info('구독을 시작하려면 먼저 로그인해 주세요.');
       setAuthOpen(true);
       return;
     }
-    setPendingPriceId(priceId);
-    setPendingPlanLabel(planLabel);
-    setMethodModalOpen(true);
-  };
-
-  const startPaddleCheckout = async () => {
-    if (!pendingPriceId || !user) return;
-    try {
-      await openCheckout({
-        priceId: pendingPriceId,
-        customerEmail: user.email,
-        customData: { userId: user.id },
-        successUrl: `${window.location.origin}/mypage?checkout=success`,
-      });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : '결제 창을 열 수 없습니다.';
-      toast.error(msg);
-    }
-  };
-
-  const startTossCheckout = () => {
-    if (!pendingPriceId) return;
-    navigate(`/checkout/toss?priceId=${encodeURIComponent(pendingPriceId)}`);
+    // Paddle 제거 — 토스페이먼츠로 바로 이동
+    navigate(`/checkout/toss?priceId=${encodeURIComponent(priceId)}`);
   };
 
   const tiers: Array<{
