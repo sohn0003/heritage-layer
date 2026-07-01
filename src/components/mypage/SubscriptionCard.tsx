@@ -140,18 +140,55 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
                 구독이 기간 종료 시 해지될 예정입니다. 만료일까지는 계속 이용할 수 있습니다.
               </p>
             )}
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={openPortal}
-              disabled={portalLoading}
-            >
-              {portalLoading ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />열기 중...</>
-              ) : (
-                <>구독 관리 (취소 · 결제수단 변경) <ExternalLink className="ml-2 h-4 w-4" /></>
-              )}
-            </Button>
+
+            {sub.provider === 'toss' && (sub.toss_card_company || sub.toss_card_number) && (
+              <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2">
+                <div className="mb-1 text-xs text-muted-foreground">등록된 결제 카드</div>
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                  <span>{sub.toss_card_company ?? '카드'}</span>
+                  {sub.toss_card_number && (
+                    <span className="text-muted-foreground">· {sub.toss_card_number}</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {sub.provider === 'toss' ? (
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <Button
+                  variant="outline"
+                  onClick={changeTossCard}
+                  disabled={portalLoading || sub.status === 'canceled'}
+                >
+                  결제 카드 변경
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={cancelTossSubscription}
+                  disabled={portalLoading || sub.status === 'canceled'}
+                >
+                  {portalLoading ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />처리 중...</>
+                  ) : (
+                    '구독 해지'
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={openPaddlePortal}
+                disabled={portalLoading}
+              >
+                {portalLoading ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />열기 중...</>
+                ) : (
+                  <>구독 관리 (취소 · 결제수단 변경) <ExternalLink className="ml-2 h-4 w-4" /></>
+                )}
+              </Button>
+            )}
           </>
         ) : isFree ? (
           <>
