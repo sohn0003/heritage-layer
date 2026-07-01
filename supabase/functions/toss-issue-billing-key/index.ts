@@ -54,7 +54,8 @@ Deno.serve(async (req) => {
     const userEmail = claimsData.claims.email as string | undefined;
 
     const body = await req.json();
-    const { authKey, customerKey, priceId } = body ?? {};
+    const { authKey, customerKey, priceId, mode } = body ?? {};
+    const isUpdate = mode === 'update';
     if (!authKey || !customerKey || !priceId) {
       return new Response(JSON.stringify({ error: 'authKey, customerKey, priceId 필수' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
