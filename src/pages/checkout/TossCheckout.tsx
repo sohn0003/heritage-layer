@@ -78,11 +78,13 @@ const TossCheckout = () => {
       <div className="mx-auto max-w-md">
         <Card>
           <CardHeader>
-            <CardTitle>토스페이먼츠 카드 등록</CardTitle>
+            <CardTitle>{isUpdate ? '결제 카드 변경' : '토스페이먼츠 카드 등록'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <p className="text-muted-foreground">
-              {plan?.orderName} · 월 결제 {plan ? plan.amount.toLocaleString() : 0}원
+              {isUpdate
+                ? `${plan?.orderName} · 새 결제수단으로 교체합니다. (즉시 청구 없음)`
+                : `${plan?.orderName} · 월 결제 ${plan ? plan.amount.toLocaleString() : 0}원`}
             </p>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
