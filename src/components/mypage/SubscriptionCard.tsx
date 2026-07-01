@@ -19,6 +19,8 @@ interface SubscriptionRow {
   cancel_at_period_end: boolean | null;
   paddle_customer_id: string | null;
   provider: string;
+  toss_card_company: string | null;
+  toss_card_number: string | null;
 }
 
 interface Props {
