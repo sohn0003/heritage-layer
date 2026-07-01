@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { usePaddleCheckout } from '@/hooks/usePaddleCheckout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, X, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import AuthModal from '@/components/common/AuthModal';
 import Seo from '@/components/common/Seo';
-import PaymentMethodModal from '@/components/payments/PaymentMethodModal';
 
 type TierKey = 'free' | 'pro' | 'enterprise';
 type EnterpriseBilling = 'monthly' | 'yearly';
@@ -47,43 +45,19 @@ const renderCell = (v: boolean | string) => {
 const Pricing = () => {
   const navigate = useNavigate();
   const { user, subscriptionTier } = useAuth();
-  const { openCheckout, loading } = usePaddleCheckout();
+  const loading = false;
   const [entBilling, setEntBilling] = useState<EnterpriseBilling>('monthly');
   const [authOpen, setAuthOpen] = useState(false);
-  const [methodModalOpen, setMethodModalOpen] = useState(false);
-  const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
-  const [pendingPlanLabel, setPendingPlanLabel] = useState<string>('');
   const currentTier: TierKey = subscriptionTier;
 
-  const openPaymentMethodModal = (priceId: string, planLabel: string) => {
+  const openPaymentMethodModal = (priceId: string, _planLabel: string) => {
     if (!user) {
       toast.info('구독을 시작하려면 먼저 로그인해 주세요.');
       setAuthOpen(true);
       return;
     }
-    setPendingPriceId(priceId);
-    setPendingPlanLabel(planLabel);
-    setMethodModalOpen(true);
-  };
-
-  const startPaddleCheckout = async () => {
-    if (!pendingPriceId || !user) return;
-    try {
-      await openCheckout({
-        priceId: pendingPriceId,
-        customerEmail: user.email,
-        customData: { userId: user.id },
-        successUrl: `${window.location.origin}/mypage?checkout=success`,
-      });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : '결제 창을 열 수 없습니다.';
-      toast.error(msg);
-    }
-  };
-
-  const startTossCheckout = () => {
-    if (!pendingPriceId) return;
-    navigate(`/checkout/toss?priceId=${encodeURIComponent(pendingPriceId)}`);
+    // Paddle 제거 — 토스페이먼츠로 바로 이동
+    navigate(`/checkout/toss?priceId=${encodeURIComponent(priceId)}`);
   };
 
   const tiers: Array<{
@@ -270,13 +244,6 @@ const Pricing = () => {
         </div>
       </div>
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
-      <PaymentMethodModal
-        open={methodModalOpen}
-        onOpenChange={setMethodModalOpen}
-        planLabel={pendingPlanLabel}
-        onSelectPaddle={startPaddleCheckout}
-        onSelectToss={startTossCheckout}
-      />
     </div>
   );
 };
