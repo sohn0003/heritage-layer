@@ -17,6 +17,8 @@ const TossCheckout = () => {
   const startedRef = useRef(false);
 
   const priceId = params.get('priceId') ?? '';
+  const mode = params.get('mode') ?? '';
+  const isUpdate = mode === 'update';
   const plan = useMemo(() => getTossPlan(priceId), [priceId]);
 
   useEffect(() => {
@@ -46,9 +48,11 @@ const TossCheckout = () => {
       try {
         const toss = await loadTossPayments(TOSS_CLIENT_KEY);
         const payment = toss.payment({ customerKey });
+        const successParams = new URLSearchParams({ priceId });
+        if (isUpdate) successParams.set('mode', 'update');
         await payment.requestBillingAuth({
           method: 'CARD',
-          successUrl: `${origin}/checkout/toss/success?priceId=${encodeURIComponent(priceId)}`,
+          successUrl: `${origin}/checkout/toss/success?${successParams.toString()}`,
           failUrl: `${origin}/checkout/toss/fail`,
           customerEmail: user.email,
         });
@@ -70,15 +74,17 @@ const TossCheckout = () => {
 
   return (
     <div className="min-h-screen px-4 pb-20 pt-24">
-      <Seo title="토스페이먼츠 결제 — Heritage Layer" description="토스페이먼츠로 구독 결제를 진행합니다." path="/checkout/toss" />
+      <Seo title={isUpdate ? '결제 카드 변경 — Heritage Layer' : '토스페이먼츠 결제 — Heritage Layer'} description="토스페이먼츠 카드 등록을 진행합니다." path="/checkout/toss" />
       <div className="mx-auto max-w-md">
         <Card>
           <CardHeader>
-            <CardTitle>토스페이먼츠 카드 등록</CardTitle>
+            <CardTitle>{isUpdate ? '결제 카드 변경' : '토스페이먼츠 카드 등록'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <p className="text-muted-foreground">
-              {plan?.orderName} · 월 결제 {plan ? plan.amount.toLocaleString() : 0}원
+              {isUpdate
+                ? `${plan?.orderName} · 새 결제수단으로 교체합니다. (즉시 청구 없음)`
+                : `${plan?.orderName} · 월 결제 ${plan ? plan.amount.toLocaleString() : 0}원`}
             </p>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />

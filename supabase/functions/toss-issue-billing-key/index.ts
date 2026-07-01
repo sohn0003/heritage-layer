@@ -54,7 +54,8 @@ Deno.serve(async (req) => {
     const userEmail = claimsData.claims.email as string | undefined;
 
     const body = await req.json();
-    const { authKey, customerKey, priceId } = body ?? {};
+    const { authKey, customerKey, priceId, mode } = body ?? {};
+    const isUpdate = mode === 'update';
     if (!authKey || !customerKey || !priceId) {
       return new Response(JSON.stringify({ error: 'authKey, customerKey, priceId 필수' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -81,6 +82,56 @@ Deno.serve(async (req) => {
       });
     }
     const billingKey = issueData.billingKey as string;
+    const cardCompany = (issueData?.card?.company ?? issueData?.cardCompany ?? null) as string | null;
+    const cardNumber = (issueData?.card?.number ?? issueData?.cardNumber ?? null) as string | null;
+
+    const admin = createClient(supabaseUrl, serviceKey);
+
+    // 카드 변경(mode='update')이면 기존 활성 구독의 빌링키/카드정보만 갱신
+    if (isUpdate) {
+      const { data: existing, error: existErr } = await admin
+        .from('subscriptions')
+        .select('id, toss_billing_key')
+        .eq('user_id', userId)
+        .eq('provider', 'toss')
+        .in('status', ['active', 'trialing', 'past_due'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (existErr) throw existErr;
+      if (!existing) {
+        return new Response(JSON.stringify({ error: '갱신할 활성 구독이 없습니다.' }), {
+          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // 기존 빌링키 삭제 (실패해도 진행)
+      if (existing.toss_billing_key && existing.toss_billing_key !== billingKey) {
+        try {
+          await fetch(`${TOSS_API}/billing/${existing.toss_billing_key}`, {
+            method: 'DELETE',
+            headers: { Authorization: basicAuth(tossSecret) },
+          });
+        } catch (e) {
+          console.warn('기존 빌링키 삭제 실패(무시):', e);
+        }
+      }
+
+      const { error: updErr } = await admin
+        .from('subscriptions')
+        .update({
+          toss_billing_key: billingKey,
+          toss_customer_key: customerKey,
+          toss_card_company: cardCompany,
+          toss_card_number: cardNumber,
+        })
+        .eq('id', existing.id);
+      if (updErr) throw updErr;
+
+      return new Response(JSON.stringify({ ok: true, subscriptionId: existing.id, mode: 'update' }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // 2) 첫 결제 승인
     const orderId = `hl_${userId.slice(0, 8)}_${Date.now()}`;
@@ -104,7 +155,6 @@ Deno.serve(async (req) => {
     }
 
     // 3) subscriptions 저장 + profiles.subscription_tier 갱신
-    const admin = createClient(supabaseUrl, serviceKey);
     const now = new Date();
     const periodEnd = new Date(now.getTime() + plan.intervalDays * 24 * 60 * 60 * 1000);
 
@@ -121,6 +171,8 @@ Deno.serve(async (req) => {
         current_period_end: periodEnd.toISOString(),
         toss_billing_key: billingKey,
         toss_customer_key: customerKey,
+        toss_card_company: cardCompany,
+        toss_card_number: cardNumber,
       })
       .select('id')
       .single();

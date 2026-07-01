@@ -24,6 +24,7 @@ const TossSuccess = () => {
     const authKey = params.get('authKey');
     const customerKey = params.get('customerKey');
     const priceId = params.get('priceId');
+    const mode = params.get('mode') ?? undefined;
 
     if (!authKey || !customerKey || !priceId) {
       setError('필수 파라미터가 누락되었습니다.');
@@ -33,7 +34,7 @@ const TossSuccess = () => {
 
     (async () => {
       const { data, error: invokeErr } = await supabase.functions.invoke('toss-issue-billing-key', {
-        body: { authKey, customerKey, priceId },
+        body: { authKey, customerKey, priceId, mode },
       });
       if (invokeErr || data?.error) {
         setError(data?.error ?? invokeErr?.message ?? '결제 처리에 실패했습니다.');
@@ -45,6 +46,8 @@ const TossSuccess = () => {
     })();
   }, [params, refreshTier]);
 
+  const isUpdate = params.get('mode') === 'update';
+
   return (
     <div className="min-h-screen px-4 pb-20 pt-24">
       <Seo title="결제 완료 — Heritage Layer" description="토스페이먼츠 구독 결제가 완료되었습니다." path="/checkout/toss/success" />
@@ -52,23 +55,23 @@ const TossSuccess = () => {
         <Card>
           <CardHeader>
             <CardTitle>
-              {status === 'processing' && '결제 처리 중'}
-              {status === 'success' && '구독이 시작되었습니다'}
-              {status === 'failed' && '결제 실패'}
+              {status === 'processing' && (isUpdate ? '카드 변경 처리 중' : '결제 처리 중')}
+              {status === 'success' && (isUpdate ? '결제 카드가 변경되었습니다' : '구독이 시작되었습니다')}
+              {status === 'failed' && (isUpdate ? '카드 변경 실패' : '결제 실패')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             {status === 'processing' && (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                토스 빌링키 발급 및 첫 결제 승인 중...
+                {isUpdate ? '새 결제수단으로 교체 중...' : '토스 빌링키 발급 및 첫 결제 승인 중...'}
               </div>
             )}
             {status === 'success' && (
               <>
                 <div className="flex items-center gap-2 text-green-600">
                   <CheckCircle2 className="h-5 w-5" />
-                  결제가 정상적으로 완료되었습니다.
+                  {isUpdate ? '결제 카드가 정상적으로 변경되었습니다.' : '결제가 정상적으로 완료되었습니다.'}
                 </div>
                 <Button className="w-full" onClick={() => navigate('/mypage')}>마이페이지로 이동</Button>
               </>

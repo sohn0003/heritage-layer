@@ -1,0 +1,1 @@
+ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS toss_card_company text, ADD COLUMN IF NOT EXISTS toss_card_number text;

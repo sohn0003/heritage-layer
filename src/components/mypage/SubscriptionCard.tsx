@@ -19,6 +19,8 @@ interface SubscriptionRow {
   cancel_at_period_end: boolean | null;
   paddle_customer_id: string | null;
   provider: string;
+  toss_card_company: string | null;
+  toss_card_number: string | null;
 }
 
 interface Props {
@@ -47,7 +49,7 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
       setLoading(true);
       const { data } = await supabase
         .from('subscriptions')
-        .select('id, status, product_id, price_id, current_period_end, cancel_at_period_end, paddle_customer_id, provider')
+        .select('id, status, product_id, price_id, current_period_end, cancel_at_period_end, paddle_customer_id, provider, toss_card_company, toss_card_number')
         .eq('user_id', user.id)
         .eq('environment', env)
         .order('created_at', { ascending: false })
@@ -59,21 +61,28 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
     fetchSub();
   }, [user, refreshKey]);
 
-  const openPortal = async () => {
+  const cancelTossSubscription = async () => {
+    if (!confirm('토스페이먼츠 구독을 해지하시겠습니까? 즉시 해지되며, 다음 결제는 진행되지 않습니다.')) {
+      return;
+    }
     setPortalLoading(true);
     try {
-      if (sub?.provider === 'toss') {
-        if (!confirm('토스페이먼츠 구독을 해지하시겠습니까? 즉시 해지되며, 다음 결제는 진행되지 않습니다.')) {
-          return;
-        }
-        const { data, error } = await supabase.functions.invoke('toss-cancel-subscription');
-        if (error || data?.error) {
-          throw new Error(data?.error ?? error?.message ?? '구독 해지에 실패했습니다.');
-        }
-        toast.success('구독이 해지되었습니다.');
-        window.location.reload();
-        return;
+      const { data, error } = await supabase.functions.invoke('toss-cancel-subscription');
+      if (error || data?.error) {
+        throw new Error(data?.error ?? error?.message ?? '구독 해지에 실패했습니다.');
       }
+      toast.success('구독이 해지되었습니다.');
+      window.location.reload();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '오류가 발생했습니다.');
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  const openPaddlePortal = async () => {
+    setPortalLoading(true);
+    try {
       const { data, error } = await supabase.functions.invoke('paddle-customer-portal');
       if (error || !data?.url) {
         throw new Error(error?.message || '구독 관리 페이지를 열 수 없습니다.');
@@ -84,6 +93,11 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
     } finally {
       setPortalLoading(false);
     }
+  };
+
+  const changeTossCard = () => {
+    if (!sub) return;
+    navigate(`/checkout/toss?priceId=${encodeURIComponent(sub.price_id)}&mode=update`);
   };
 
   const isFree = subscriptionTier === 'free';
@@ -126,18 +140,55 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
                 구독이 기간 종료 시 해지될 예정입니다. 만료일까지는 계속 이용할 수 있습니다.
               </p>
             )}
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={openPortal}
-              disabled={portalLoading}
-            >
-              {portalLoading ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />열기 중...</>
-              ) : (
-                <>구독 관리 (취소 · 결제수단 변경) <ExternalLink className="ml-2 h-4 w-4" /></>
-              )}
-            </Button>
+
+            {sub.provider === 'toss' && (sub.toss_card_company || sub.toss_card_number) && (
+              <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2">
+                <div className="mb-1 text-xs text-muted-foreground">등록된 결제 카드</div>
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                  <span>{sub.toss_card_company ?? '카드'}</span>
+                  {sub.toss_card_number && (
+                    <span className="text-muted-foreground">· {sub.toss_card_number}</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {sub.provider === 'toss' ? (
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <Button
+                  variant="outline"
+                  onClick={changeTossCard}
+                  disabled={portalLoading || sub.status === 'canceled'}
+                >
+                  결제 카드 변경
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={cancelTossSubscription}
+                  disabled={portalLoading || sub.status === 'canceled'}
+                >
+                  {portalLoading ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />처리 중...</>
+                  ) : (
+                    '구독 해지'
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={openPaddlePortal}
+                disabled={portalLoading}
+              >
+                {portalLoading ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />열기 중...</>
+                ) : (
+                  <>구독 관리 (취소 · 결제수단 변경) <ExternalLink className="ml-2 h-4 w-4" /></>
+                )}
+              </Button>
+            )}
           </>
         ) : isFree ? (
           <>
