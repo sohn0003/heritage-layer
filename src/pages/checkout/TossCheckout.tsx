@@ -17,6 +17,8 @@ const TossCheckout = () => {
   const startedRef = useRef(false);
 
   const priceId = params.get('priceId') ?? '';
+  const mode = params.get('mode') ?? '';
+  const isUpdate = mode === 'update';
   const plan = useMemo(() => getTossPlan(priceId), [priceId]);
 
   useEffect(() => {
@@ -46,9 +48,11 @@ const TossCheckout = () => {
       try {
         const toss = await loadTossPayments(TOSS_CLIENT_KEY);
         const payment = toss.payment({ customerKey });
+        const successParams = new URLSearchParams({ priceId });
+        if (isUpdate) successParams.set('mode', 'update');
         await payment.requestBillingAuth({
           method: 'CARD',
-          successUrl: `${origin}/checkout/toss/success?priceId=${encodeURIComponent(priceId)}`,
+          successUrl: `${origin}/checkout/toss/success?${successParams.toString()}`,
           failUrl: `${origin}/checkout/toss/fail`,
           customerEmail: user.email,
         });
