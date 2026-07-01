@@ -49,7 +49,7 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
       setLoading(true);
       const { data } = await supabase
         .from('subscriptions')
-        .select('id, status, product_id, price_id, current_period_end, cancel_at_period_end, paddle_customer_id, provider')
+        .select('id, status, product_id, price_id, current_period_end, cancel_at_period_end, paddle_customer_id, provider, toss_card_company, toss_card_number')
         .eq('user_id', user.id)
         .eq('environment', env)
         .order('created_at', { ascending: false })
