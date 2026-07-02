@@ -162,7 +162,7 @@ const AnalysisPage = () => {
       try {
         const r = analyzeAsset({
           assetInput: assetInputBase,
-          landValuePerSqm: asset.land_value_per_sqm ?? 4_500_000,
+          landValuePerSqm: effectiveLandValuePerSqm,
           loanRates: algoConfig.loanRates,
           projectYears: algoConfig.projectYears,
           residualValueRatio: algoConfig.residualValueRatio,
