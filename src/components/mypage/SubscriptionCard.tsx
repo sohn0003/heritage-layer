@@ -141,16 +141,23 @@ const SubscriptionCard = ({ refreshKey }: Props) => {
               </p>
             )}
 
-            {sub.provider === 'toss' && (sub.toss_card_company || sub.toss_card_number) && (
+            {sub.provider === 'toss' && (
               <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2">
                 <div className="mb-1 text-xs text-muted-foreground">등록된 결제 카드</div>
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  <span>{sub.toss_card_company ?? '카드'}</span>
-                  {sub.toss_card_number && (
-                    <span className="text-muted-foreground">· {sub.toss_card_number}</span>
-                  )}
-                </div>
+                {sub.toss_card_company || sub.toss_card_number ? (
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    <span>{sub.toss_card_company ?? '카드'}</span>
+                    {sub.toss_card_number && (
+                      <span className="text-muted-foreground">· {sub.toss_card_number}</span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CreditCard className="h-4 w-4" />
+                    <span>카드 정보가 등록되어 있지 않습니다. "결제 카드 변경"으로 재등록해 주세요.</span>
+                  </div>
+                )}
               </div>
             )}
 

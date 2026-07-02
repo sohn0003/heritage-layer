@@ -82,7 +82,25 @@ Deno.serve(async (req) => {
       });
     }
     const billingKey = issueData.billingKey as string;
-    const cardCompany = (issueData?.card?.company ?? issueData?.cardCompany ?? null) as string | null;
+    // Toss 카드사 코드 → 한글 이름 매핑 (주요 카드사만)
+    const ISSUER_MAP: Record<string, string> = {
+      '11': 'BC카드', '14': '광주카드', '16': '전북카드', '21': '개별가맹점', '31': 'BC(글로벌)',
+      '32': 'BC', '33': '수협카드', '34': '수협', '35': '산업카드', '36': '씨티카드',
+      '37': 'NH농협카드', '38': '하이플러스카드', '39': '경남은행', '40': '수협은행', '41': '우체국카드',
+      '42': '새마을금고', '43': '신협체크', '44': 'KDB산업은행', '45': '저축은행',
+      '46': '신한카드', '47': '카카오뱅크', '48': '토스뱅크',
+      '51': '삼성카드', '52': '조흥카드', '54': '한미카드', '55': '신한카드',
+      '56': '현대카드', '57': 'NH농협카드', '61': '롯데카드', '62': '산림조합',
+      '63': '기업BC카드', '64': '기업카드', '66': '우리카드', '71': '롯데카드',
+      '72': 'KB국민카드', '75': '롯데카드', '76': '하나(외환)카드', '77': 'KB국민카드',
+      '78': '단위농협', '81': '하나카드', '83': '우리카드', '87': '신협', '88': '신한카드', '89': '현대카드',
+    };
+    const mapIssuer = (code: string | null | undefined) =>
+      code ? (ISSUER_MAP[code] ?? `카드사(${code})`) : null;
+    const cardCompany = (issueData?.card?.company
+      ?? mapIssuer(issueData?.card?.issuerCode)
+      ?? issueData?.cardCompany
+      ?? null) as string | null;
     const cardNumber = (issueData?.card?.number ?? issueData?.cardNumber ?? null) as string | null;
 
     const admin = createClient(supabaseUrl, serviceKey);
@@ -158,6 +176,10 @@ Deno.serve(async (req) => {
     const now = new Date();
     const periodEnd = new Date(now.getTime() + plan.intervalDays * 24 * 60 * 60 * 1000);
 
+    // 결제 승인 응답에서 카드사/카드번호를 우선 추출 (한글 카드사명 제공)
+    const chargeCardCompany = (chargeData?.card?.company ?? null) as string | null;
+    const chargeCardNumber = (chargeData?.card?.number ?? null) as string | null;
+
     const { data: subRow, error: insertErr } = await admin
       .from('subscriptions')
       .insert({
@@ -171,8 +193,8 @@ Deno.serve(async (req) => {
         current_period_end: periodEnd.toISOString(),
         toss_billing_key: billingKey,
         toss_customer_key: customerKey,
-        toss_card_company: cardCompany,
-        toss_card_number: cardNumber,
+        toss_card_company: chargeCardCompany ?? cardCompany,
+        toss_card_number: chargeCardNumber ?? cardNumber,
       })
       .select('id')
       .single();
