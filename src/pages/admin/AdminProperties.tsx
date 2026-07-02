@@ -633,12 +633,12 @@ const AdminPropertiesPage = () => {
                       <Input type="number" value={form.land_value_per_sqm} onChange={(e) => setF({ land_value_per_sqm: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <Label>예상 매도가 - 토지 (원)</Label>
-                      <Input type="number" placeholder="매도자 희망 토지 총액" value={form.asking_land_price} onChange={(e) => setF({ asking_land_price: e.target.value })} />
+                      <Label>예상 매도가 - 토지 (억원)</Label>
+                      <Input type="number" step="0.01" placeholder="예: 12.35" value={form.asking_land_price} onChange={(e) => setF({ asking_land_price: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <Label>예상 매도가 - 건물 (원)</Label>
-                      <Input type="number" placeholder="매도자 희망 건물 총액" value={form.asking_building_price} onChange={(e) => setF({ asking_building_price: e.target.value })} />
+                      <Label>예상 매도가 - 건물 (억원)</Label>
+                      <Input type="number" step="0.01" placeholder="예: 8.50" value={form.asking_building_price} onChange={(e) => setF({ asking_building_price: e.target.value })} />
                     </div>
                     <div className="rounded-md border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground sm:col-span-2">
                       💡 전환 용도는 알고리즘이 자산 분석 후 1/2/3순위로 자동 추천합니다. 관리자는 입력할 필요가 없습니다.
