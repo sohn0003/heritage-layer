@@ -64,7 +64,14 @@ export const exportAssetsToExcel = async () => {
   const allCols = [...ASSET_COLUMNS, ...ASSET_READONLY_COLUMNS];
   const rows = (data || []).map((a: any) => {
     const r: Record<string, any> = {};
-    allCols.forEach(c => { r[c.label] = a[c.key] ?? ''; });
+    allCols.forEach(c => {
+      const v = a[c.key];
+      if (v != null && c.scale && c.type === 'number') {
+        r[c.label] = Number((v / c.scale).toFixed(2));
+      } else {
+        r[c.label] = v ?? '';
+      }
+    });
     return r;
   });
   const ws = XLSX.utils.json_to_sheet(rows, { header: allCols.map(c => c.label) });
