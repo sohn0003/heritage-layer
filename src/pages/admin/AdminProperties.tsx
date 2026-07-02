@@ -230,8 +230,8 @@ const AdminPropertiesPage = () => {
       legal_max_floor_area_ratio: num(form.legal_max_floor_area_ratio),
       current_floor_area: num(form.current_floor_area),
       land_value_per_sqm: num(form.land_value_per_sqm),
-      asking_land_price: num(form.asking_land_price),
-      asking_building_price: num(form.asking_building_price),
+      asking_land_price: form.asking_land_price === '' ? null : Math.round(Number(form.asking_land_price) * 1_0000_0000),
+      asking_building_price: form.asking_building_price === '' ? null : Math.round(Number(form.asking_building_price) * 1_0000_0000),
       
       population_trend: str(form.population_trend),
       commercial_density: str(form.commercial_density),
