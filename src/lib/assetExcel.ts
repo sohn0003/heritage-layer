@@ -4,7 +4,7 @@ import { calculateScoringFields, loadAlgorithmConfig } from '@/lib/assetScoring'
 
 // 컬럼 정의: DB 키 ↔ 한글 헤더 ↔ 타입
 type ColType = 'string' | 'number' | 'boolean';
-interface ColDef { key: string; label: string; type: ColType; }
+interface ColDef { key: string; label: string; type: ColType; scale?: number; }
 
 // 편집 가능한 컬럼만 (등급/점수 등 자동 계산 필드 제외)
 export const ASSET_COLUMNS: ColDef[] = [
