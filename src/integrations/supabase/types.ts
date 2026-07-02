@@ -51,6 +51,8 @@ export type Database = {
         Row: {
           address: string
           admin_memo: string | null
+          asking_building_price: number | null
+          asking_land_price: number | null
           asset_type: string
           building_condition: string | null
           building_coverage: number | null
@@ -98,6 +100,8 @@ export type Database = {
         Insert: {
           address: string
           admin_memo?: string | null
+          asking_building_price?: number | null
+          asking_land_price?: number | null
           asset_type: string
           building_condition?: string | null
           building_coverage?: number | null
@@ -145,6 +149,8 @@ export type Database = {
         Update: {
           address?: string
           admin_memo?: string | null
+          asking_building_price?: number | null
+          asking_land_price?: number | null
           asset_type?: string
           building_condition?: string | null
           building_coverage?: number | null
