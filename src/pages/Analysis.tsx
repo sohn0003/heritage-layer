@@ -391,40 +391,19 @@ const AnalysisPage = () => {
             <div className="rounded-md border bg-muted/20 p-4">
               <p className="text-xs text-muted-foreground">토지 매도가 (매도자 희망)</p>
               <p className="mt-1 text-xl font-semibold">
-                {askingLandPrice
-                  ? `${askingLandPrice.toLocaleString()}원`
-                  : <span className="text-muted-foreground">매도자 미제시</span>}
+                {((askingLandPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
               </p>
-              {askingLandPrice && asset.land_area ? (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  단가 환산 {Math.round(askingLandPrice / asset.land_area).toLocaleString()}원/㎡
-                  {asset.land_value_per_sqm ? ` · 공시지가 대비 ${((askingLandPrice / asset.land_area) / asset.land_value_per_sqm * 100).toFixed(0)}%` : ''}
-                </p>
-              ) : (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  공시지가({(asset.land_value_per_sqm ?? 0).toLocaleString()}원/㎡) 기준으로 시나리오 산정
-                </p>
-              )}
             </div>
             <div className="rounded-md border bg-muted/20 p-4">
               <p className="text-xs text-muted-foreground">건물 매도가 (매도자 희망)</p>
               <p className="mt-1 text-xl font-semibold">
-                {askingBuildingPrice
-                  ? `${askingBuildingPrice.toLocaleString()}원`
-                  : <span className="text-muted-foreground">매도자 미제시</span>}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                건물 가격은 재무 시나리오의 별도 취득비 항목으로 반영되지 않으며, 참고용 표시입니다.
+                {((askingBuildingPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
               </p>
             </div>
           </div>
-          {(askingLandPrice || askingBuildingPrice) && (
-            <div className="mt-3 rounded-md border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-              합계 매도 희망가: <span className="font-semibold text-foreground">
-                {((askingLandPrice ?? 0) + (askingBuildingPrice ?? 0)).toLocaleString()}원
-              </span>
-            </div>
-          )}
+          <p className="mt-3 text-xs text-muted-foreground">
+            * 가격이 없는 경우 매도자 미제시, 공시지가 기준 적용
+          </p>
         </CardContent>
       </Card>
 
