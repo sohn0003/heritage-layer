@@ -176,6 +176,10 @@ Deno.serve(async (req) => {
     const now = new Date();
     const periodEnd = new Date(now.getTime() + plan.intervalDays * 24 * 60 * 60 * 1000);
 
+    // 결제 승인 응답에서 카드사/카드번호를 우선 추출 (한글 카드사명 제공)
+    const chargeCardCompany = (chargeData?.card?.company ?? null) as string | null;
+    const chargeCardNumber = (chargeData?.card?.number ?? null) as string | null;
+
     const { data: subRow, error: insertErr } = await admin
       .from('subscriptions')
       .insert({
@@ -189,8 +193,8 @@ Deno.serve(async (req) => {
         current_period_end: periodEnd.toISOString(),
         toss_billing_key: billingKey,
         toss_customer_key: customerKey,
-        toss_card_company: cardCompany,
-        toss_card_number: cardNumber,
+        toss_card_company: chargeCardCompany ?? cardCompany,
+        toss_card_number: chargeCardNumber ?? cardNumber,
       })
       .select('id')
       .single();
