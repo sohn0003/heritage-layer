@@ -95,6 +95,17 @@ const AnalysisPage = () => {
     setUsedFloorAreaByRank({});
   }, [assetId]);
 
+  // 매도자 희망가 → 토지 취득단가 우선 적용 (없으면 공시지가 폴백)
+  const askingLandPrice = (asset as unknown as { asking_land_price?: number | null })?.asking_land_price ?? null;
+  const askingBuildingPrice = (asset as unknown as { asking_building_price?: number | null })?.asking_building_price ?? null;
+  const effectiveLandValuePerSqm = useMemo(() => {
+    if (!asset) return 4_500_000;
+    if (askingLandPrice && asset.land_area && asset.land_area > 0) {
+      return askingLandPrice / asset.land_area;
+    }
+    return asset.land_value_per_sqm ?? 4_500_000;
+  }, [asset, askingLandPrice]);
+
   // 기본 분석(오버라이드 없음) — 스코어링/추천 시나리오/추천 자기자본비율의 기준값
   const analysis: AnalyzeAssetResult | null = useMemo(() => {
     if (!asset) return null;
@@ -103,7 +114,7 @@ const AnalysisPage = () => {
     try {
       return analyzeAsset({
         assetInput: assetInputBase,
-        landValuePerSqm: asset.land_value_per_sqm ?? 4_500_000,
+        landValuePerSqm: effectiveLandValuePerSqm,
         loanRates: algoConfig.loanRates,
         projectYears: algoConfig.projectYears,
         residualValueRatio: algoConfig.residualValueRatio,
@@ -114,6 +125,7 @@ const AnalysisPage = () => {
     }
   }, [
     asset,
+    effectiveLandValuePerSqm,
     algoConfig.loanRates.pf,
     algoConfig.loanRates.collateral,
     algoConfig.projectYears,
@@ -150,7 +162,7 @@ const AnalysisPage = () => {
       try {
         const r = analyzeAsset({
           assetInput: assetInputBase,
-          landValuePerSqm: asset.land_value_per_sqm ?? 4_500_000,
+          landValuePerSqm: effectiveLandValuePerSqm,
           loanRates: algoConfig.loanRates,
           projectYears: algoConfig.projectYears,
           residualValueRatio: algoConfig.residualValueRatio,
@@ -368,6 +380,53 @@ const AnalysisPage = () => {
           </Card>
         ))}
       </div>
+
+      {/* 예상 자산 매도가 (Free) */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="text-lg">예상 자산 매도가</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-md border bg-muted/20 p-4">
+              <p className="text-xs text-muted-foreground">토지 매도가 (매도자 희망)</p>
+              <p className="mt-1 text-xl font-semibold">
+                {askingLandPrice
+                  ? `${askingLandPrice.toLocaleString()}원`
+                  : <span className="text-muted-foreground">매도자 미제시</span>}
+              </p>
+              {askingLandPrice && asset.land_area ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  단가 환산 {Math.round(askingLandPrice / asset.land_area).toLocaleString()}원/㎡
+                  {asset.land_value_per_sqm ? ` · 공시지가 대비 ${((askingLandPrice / asset.land_area) / asset.land_value_per_sqm * 100).toFixed(0)}%` : ''}
+                </p>
+              ) : (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  공시지가({(asset.land_value_per_sqm ?? 0).toLocaleString()}원/㎡) 기준으로 시나리오 산정
+                </p>
+              )}
+            </div>
+            <div className="rounded-md border bg-muted/20 p-4">
+              <p className="text-xs text-muted-foreground">건물 매도가 (매도자 희망)</p>
+              <p className="mt-1 text-xl font-semibold">
+                {askingBuildingPrice
+                  ? `${askingBuildingPrice.toLocaleString()}원`
+                  : <span className="text-muted-foreground">매도자 미제시</span>}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                건물 가격은 재무 시나리오의 별도 취득비 항목으로 반영되지 않으며, 참고용 표시입니다.
+              </p>
+            </div>
+          </div>
+          {(askingLandPrice || askingBuildingPrice) && (
+            <div className="mt-3 rounded-md border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+              합계 매도 희망가: <span className="font-semibold text-foreground">
+                {((askingLandPrice ?? 0) + (askingBuildingPrice ?? 0)).toLocaleString()}원
+              </span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* COSMO-P 블록별 스코어 (Free) */}
       {scoringResult && (

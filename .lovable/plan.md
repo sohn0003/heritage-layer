@@ -1,68 +1,57 @@
-# Analysis 페이지 사용자 입력 확장 + 알고리즘 모듈 업데이트
+# 예상 자산 매도가(토지 / 건물) 표시 및 재무 반영
 
-## 1. 알고리즘 모듈 교체
+## 목표
+- Analysis 페이지의 COSMO-P 블록별 점수 카드 **바로 위**에 "예상 자산 매도가" 카드를 신설
+- 카드 안에는 **토지 매도가**와 **건물 매도가** 두 항목을 각각 표시
+- 관리자 페이지와 엑셀 업로드에서 두 값을 입력·수정할 수 있게 확장
+- 매도가가 입력된 경우 재무 시나리오의 총 투자비에서 **토지 취득가**를 매도가 기준으로 대체하고, 매도가에 값이 없으면 기존 공시지가 × 대지면적 로직으로 폴백
 
-업로드된 v2 파일을 기존 모듈에 그대로 덮어쓰기.
+## 기술 상세
 
-- `src/algorithm/financial/irr-calculator.ts` ← `user-uploads://irr-calculator-5.ts`
-- `src/algorithm/recommend/recommend-scenarios.ts` ← `user-uploads://recommend-scenarios-2.ts`
+### 1) 데이터베이스 (마이그레이션)
+`public.assets` 테이블에 두 컬럼 추가 (nullable, 원 단위 정수):
+- `asking_land_price` bigint (매도자 희망 토지 가격, 원)
+- `asking_building_price` bigint (매도자 희망 건물 가격, 원)
 
-신규 노출 필드:
-- `AnalyzeAssetInput.overrideAnnualRevenue`, `overrideOperatingMargin`
-- `IRRResult.recommendedAnnualRevenue`, `totalInvestmentPaybackYears`, `paybackYears`
-- `UseTypeMix.presaleRatio` (분양 가능 용도에만 적용)
+컬럼만 추가하는 ALTER이므로 신규 GRANT/RLS 변경은 불필요.
 
-## 2. Analysis 페이지 (`src/pages/Analysis.tsx`) UI 추가
+### 2) 관리자 페이지 (`src/pages/admin/AdminProperties.tsx`)
+- `PropertyForm` 타입, `initialForm`, `handleEdit`(row → form 매핑), `save`(form → payload)에 두 필드 추가
+- 공시지가 입력 칸 근처(자산 정보 섹션)에 "예상 매도가 - 토지(원)", "예상 매도가 - 건물(원)" `Input type="number"` 두 개 추가
 
-각 시나리오 탭 안의 "자기자본 비율 슬라이더" 옆에 새 입력 블록을 둠. 시나리오별로 독립 상태 관리.
+### 3) 엑셀 업로드 (`src/lib/assetExcel.ts`)
+`ASSET_EXCEL_COLUMNS`에 두 항목 추가:
+- `{ key: 'asking_land_price', label: '예상매도가-토지(원)', type: 'number' }`
+- `{ key: 'asking_building_price', label: '예상매도가-건물(원)', type: 'number' }`
 
-### 2-1. 상태
-시나리오 rank 별로 보관:
-```ts
-const [presaleByRank, setPresaleByRank]   = useState<Record<number, number>>({});      // 0~100, 10 단위
-const [revenueByRank, setRevenueByRank]   = useState<Record<number, number | undefined>>({});
-const [marginByRank,  setMarginByRank]    = useState<Record<number, number>>({});      // 10~70, 기본 40
+### 4) Analysis 페이지 (`src/pages/Analysis.tsx`)
+**UI**: 372번 라인 "COSMO-P 블록별 점수" `Card` 위에 신규 카드 삽입.
 ```
-자산 변경 시 초기화.
-
-### 2-2. 입력 컴포넌트
-
-**(a) 분양 비율 슬라이더** — `useTypeMix`에 분양 가능 용도(`residential`, `mixed_use_residential`, `knowledge_industry`, `office`, `accommodation`)가 1개 이상 포함된 시나리오에서만 표시. 0~100%, step 10. 기본값 0.
-
-**(b) 연간 매출 입력** — `<Input type="number">`. 단위: 억원으로 표시(내부는 원). 초기값 = `scenario.irrResult.base.recommendedAnnualRevenue`. 빈 값/0이면 override 미적용(권장값 자동 사용). "권장값으로 되돌리기" 버튼.
-
-**(c) 영업이익률 입력** — `<Input type="number">` 또는 슬라이더, 10~70%, 기본 40. 범위 외 값은 clamp.
-
-### 2-3. 재계산 (`displayScenarios` 확장)
-
-기존 `analyzeAsset` 호출에 override 필드 추가:
-```ts
-analyzeAsset({
-  ...,
-  overrideEquityRatio:    equityByRank[base.rank],
-  overrideAnnualRevenue:  revenueByRank[base.rank],     // 원 단위
-  overrideOperatingMargin: marginByRank[base.rank],
-  // presale: useTypeMix 깊은 복사 후 분양 가능 용도에 presaleRatio 주입
-});
+[예상 자산 매도가]
+  토지 매도가 : xxx,xxx,xxx원  (혹은 "매도자 미제시")
+  건물 매도가 : xxx,xxx,xxx원
+  합계        : xxx,xxx,xxx원
 ```
-`useTypeMix`에 슬라이더 값 주입은 `analyzeAsset` 호출 전 별도 매핑(현재는 추천 엔진이 mix를 결정 → presale을 IRR 단계에 반영하려면 추천 엔진 내부 사용 mix에 적용해야 함). 가장 간단한 방법: `recommend-scenarios.ts`가 mix를 결정해 IRR을 계산하므로, Analysis 단에서 분양율 적용을 위해 `analyzeAsset`에 `overridePresaleRatio?: number` 같은 옵션을 추가하면 좋겠지만, 업로드 본 알고리즘에는 해당 옵션이 없음 → **현 구현 범위 내에서는 분양율 슬라이더 UI는 노출하되, "분양 시나리오 적용"은 백엔드 알고리즘에서 추후 지원**으로 가거나, IRR 단계 후 표시값(연간매출/회수기간) 보정을 위해 단순 비율 가공만 적용.
+- 카드 스타일은 기존 `Card + CardHeader + CardContent` 패턴 유지, `grid sm:grid-cols-2` 로 두 칸 배치
+- 값이 null인 경우 "매도자 미제시"로 표시
 
-→ **권장**: 분양율 슬라이더는 사용자 입력 UI까지만 추가하고, `presale*` 알고리즘 반영은 알고리즘 본인이 직접 작성하는 영역(`algorithm/`)에 후속 패치. 본 작업에서는 슬라이더 값을 state로만 보관·표시.
+**재무 반영**: `Analysis.tsx`에서 `runFinancialAnalysis`/시나리오 계산에 넘기는 `landValuePerSqm` 산출 시 매도가 우선 사용:
+```
+effectiveLandValuePerSqm =
+  asking_land_price && land_area
+    ? asking_land_price / land_area
+    : asset.land_value_per_sqm ?? 4_500_000
+```
+- 두 군데(106, 153번 라인)에 동일 적용
+- 건물 매도가는 별도 취득가 항목이 없으므로 `irr-calculator`의 `softCost`나 별도 인풋에 더하지 않고, 향후 확장을 위해 우선 **표시 전용**으로 유지 → 단, 총 투자비 카드 아래에 "* 매도가 기준" 표기를 노출해 사용자에게 반영 여부를 명확히 안내
 
-(원치 않으시면, recommend-scenarios.ts에 `overridePresaleRatio` 옵션을 추가하는 식으로 확장 가능 — 알고리즘 폴더는 사용자 영역이므로 사전 확인 필요.)
+> 재무 로직에 토지+건물 합산을 한 번에 태우는 방식으로 갈 경우 `irr-calculator.ts`의 `landCost` 산식을 조정해야 하는데, 이는 알고리즘 담당(사용자) 영역이므로 이번 작업에서는 **토지 매도가만 landValuePerSqm으로 환산**해 반영하고, 건물 매도가는 표시 + 데이터 저장까지만 처리합니다. 이 정책에 대해 다른 처리 원하시면 알려주세요.
 
-### 2-4. 회수기간 표시 분리
+### 5) 타입
+Supabase 마이그레이션 승인 시 `src/integrations/supabase/types.ts`가 재생성되므로 별도 수동 편집 불필요.
 
-기존 단일 "투자회수기간 (년)" 행을 두 행으로 분리:
-- `운영투자비 회수기간 (무차입 기준)` → `totalInvestmentPaybackYears`
-- `자기자본 회수기간 (대출상환 후 실제값)` → `paybackYears`
-
-보수/기본/낙관 3컬럼 모두 표시. 값 0 또는 비유한일 때 `--`.
-
-## 3. 확인 사항
-
-1. **분양 비율 슬라이더의 실제 알고리즘 반영을 이번에 함께 처리할까요?** algorithm 폴더는 사용자 직접 작성 영역이라 원칙적으로 건드리지 않습니다. 두 옵션:
-   - A. UI만 추가(state 보관·표시). 알고리즘 반영은 추후 직접 작성.
-   - B. `analyzeAsset`/`recommend-scenarios`에 `overridePresaleRatio` 옵션을 새로 추가(알고리즘 파일도 함께 수정).
-
-2. **연간 매출 입력 단위**: 억원(권장, 사용성 우수) vs 원. 어느 쪽을 표시할까요?
+## 변경 파일 요약
+- `supabase/migrations/<timestamp>_add_asking_prices.sql` (신규)
+- `src/pages/admin/AdminProperties.tsx`
+- `src/lib/assetExcel.ts`
+- `src/pages/Analysis.tsx`
