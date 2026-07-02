@@ -180,8 +180,8 @@ const AdminPropertiesPage = () => {
       legal_max_floor_area_ratio: a.legal_max_floor_area_ratio?.toString() || '',
       current_floor_area: a.current_floor_area?.toString() || '',
       land_value_per_sqm: a.land_value_per_sqm?.toString() || '',
-      asking_land_price: (a as any).asking_land_price?.toString() || '',
-      asking_building_price: (a as any).asking_building_price?.toString() || '',
+      asking_land_price: (a as any).asking_land_price != null ? ((a as any).asking_land_price / 1_0000_0000).toString() : '',
+      asking_building_price: (a as any).asking_building_price != null ? ((a as any).asking_building_price / 1_0000_0000).toString() : '',
       
       population_trend: a.population_trend || '',
       commercial_density: a.commercial_density || '',
