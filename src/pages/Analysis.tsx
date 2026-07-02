@@ -95,6 +95,17 @@ const AnalysisPage = () => {
     setUsedFloorAreaByRank({});
   }, [assetId]);
 
+  // 매도자 희망가 → 토지 취득단가 우선 적용 (없으면 공시지가 폴백)
+  const askingLandPrice = (asset as unknown as { asking_land_price?: number | null })?.asking_land_price ?? null;
+  const askingBuildingPrice = (asset as unknown as { asking_building_price?: number | null })?.asking_building_price ?? null;
+  const effectiveLandValuePerSqm = useMemo(() => {
+    if (!asset) return 4_500_000;
+    if (askingLandPrice && asset.land_area && asset.land_area > 0) {
+      return askingLandPrice / asset.land_area;
+    }
+    return asset.land_value_per_sqm ?? 4_500_000;
+  }, [asset, askingLandPrice]);
+
   // 기본 분석(오버라이드 없음) — 스코어링/추천 시나리오/추천 자기자본비율의 기준값
   const analysis: AnalyzeAssetResult | null = useMemo(() => {
     if (!asset) return null;
@@ -103,7 +114,7 @@ const AnalysisPage = () => {
     try {
       return analyzeAsset({
         assetInput: assetInputBase,
-        landValuePerSqm: asset.land_value_per_sqm ?? 4_500_000,
+        landValuePerSqm: effectiveLandValuePerSqm,
         loanRates: algoConfig.loanRates,
         projectYears: algoConfig.projectYears,
         residualValueRatio: algoConfig.residualValueRatio,
@@ -114,6 +125,7 @@ const AnalysisPage = () => {
     }
   }, [
     asset,
+    effectiveLandValuePerSqm,
     algoConfig.loanRates.pf,
     algoConfig.loanRates.collateral,
     algoConfig.projectYears,
