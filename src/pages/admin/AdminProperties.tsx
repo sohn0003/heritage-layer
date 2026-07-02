@@ -180,8 +180,8 @@ const AdminPropertiesPage = () => {
       legal_max_floor_area_ratio: a.legal_max_floor_area_ratio?.toString() || '',
       current_floor_area: a.current_floor_area?.toString() || '',
       land_value_per_sqm: a.land_value_per_sqm?.toString() || '',
-      asking_land_price: (a as any).asking_land_price?.toString() || '',
-      asking_building_price: (a as any).asking_building_price?.toString() || '',
+      asking_land_price: (a as any).asking_land_price != null ? ((a as any).asking_land_price / 1_0000_0000).toString() : '',
+      asking_building_price: (a as any).asking_building_price != null ? ((a as any).asking_building_price / 1_0000_0000).toString() : '',
       
       population_trend: a.population_trend || '',
       commercial_density: a.commercial_density || '',
@@ -230,8 +230,8 @@ const AdminPropertiesPage = () => {
       legal_max_floor_area_ratio: num(form.legal_max_floor_area_ratio),
       current_floor_area: num(form.current_floor_area),
       land_value_per_sqm: num(form.land_value_per_sqm),
-      asking_land_price: num(form.asking_land_price),
-      asking_building_price: num(form.asking_building_price),
+      asking_land_price: form.asking_land_price === '' ? null : Math.round(Number(form.asking_land_price) * 1_0000_0000),
+      asking_building_price: form.asking_building_price === '' ? null : Math.round(Number(form.asking_building_price) * 1_0000_0000),
       
       population_trend: str(form.population_trend),
       commercial_density: str(form.commercial_density),
@@ -633,12 +633,12 @@ const AdminPropertiesPage = () => {
                       <Input type="number" value={form.land_value_per_sqm} onChange={(e) => setF({ land_value_per_sqm: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <Label>예상 매도가 - 토지 (원)</Label>
-                      <Input type="number" placeholder="매도자 희망 토지 총액" value={form.asking_land_price} onChange={(e) => setF({ asking_land_price: e.target.value })} />
+                      <Label>예상 매도가 - 토지 (억원)</Label>
+                      <Input type="number" step="0.01" placeholder="예: 12.35" value={form.asking_land_price} onChange={(e) => setF({ asking_land_price: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <Label>예상 매도가 - 건물 (원)</Label>
-                      <Input type="number" placeholder="매도자 희망 건물 총액" value={form.asking_building_price} onChange={(e) => setF({ asking_building_price: e.target.value })} />
+                      <Label>예상 매도가 - 건물 (억원)</Label>
+                      <Input type="number" step="0.01" placeholder="예: 8.50" value={form.asking_building_price} onChange={(e) => setF({ asking_building_price: e.target.value })} />
                     </div>
                     <div className="rounded-md border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground sm:col-span-2">
                       💡 전환 용도는 알고리즘이 자산 분석 후 1/2/3순위로 자동 추천합니다. 관리자는 입력할 필요가 없습니다.

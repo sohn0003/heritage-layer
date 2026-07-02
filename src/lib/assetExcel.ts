@@ -4,7 +4,7 @@ import { calculateScoringFields, loadAlgorithmConfig } from '@/lib/assetScoring'
 
 // 컬럼 정의: DB 키 ↔ 한글 헤더 ↔ 타입
 type ColType = 'string' | 'number' | 'boolean';
-interface ColDef { key: string; label: string; type: ColType; }
+interface ColDef { key: string; label: string; type: ColType; scale?: number; }
 
 // 편집 가능한 컬럼만 (등급/점수 등 자동 계산 필드 제외)
 export const ASSET_COLUMNS: ColDef[] = [
@@ -28,8 +28,8 @@ export const ASSET_COLUMNS: ColDef[] = [
   { key: 'legal_max_floor_area_ratio', label: '법정 최대 용적률(%)', type: 'number' },
   { key: 'current_floor_area', label: '현재 연면적(㎡)', type: 'number' },
   { key: 'land_value_per_sqm', label: '㎡당 토지가치(원)', type: 'number' },
-  { key: 'asking_land_price', label: '예상매도가-토지(원)', type: 'number' },
-  { key: 'asking_building_price', label: '예상매도가-건물(원)', type: 'number' },
+  { key: 'asking_land_price', label: '예상매도가-토지(억원)', type: 'number', scale: 1_0000_0000 },
+  { key: 'asking_building_price', label: '예상매도가-건물(억원)', type: 'number', scale: 1_0000_0000 },
   
   { key: 'population_trend', label: '인구 추세', type: 'string' },
   { key: 'commercial_density', label: '상권 밀집도', type: 'string' },
@@ -64,7 +64,14 @@ export const exportAssetsToExcel = async () => {
   const allCols = [...ASSET_COLUMNS, ...ASSET_READONLY_COLUMNS];
   const rows = (data || []).map((a: any) => {
     const r: Record<string, any> = {};
-    allCols.forEach(c => { r[c.label] = a[c.key] ?? ''; });
+    allCols.forEach(c => {
+      const v = a[c.key];
+      if (v != null && c.scale && c.type === 'number') {
+        r[c.label] = Number((v / c.scale).toFixed(2));
+      } else {
+        r[c.label] = v ?? '';
+      }
+    });
     return r;
   });
   const ws = XLSX.utils.json_to_sheet(rows, { header: allCols.map(c => c.label) });
@@ -163,7 +170,10 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
         continue;
       }
       let val: any;
-      if (col.type === 'number') val = parseNum(raw);
+      if (col.type === 'number') {
+        val = parseNum(raw);
+        if (val != null && col.scale) val = Math.round(val * col.scale);
+      }
       else if (col.type === 'boolean') val = parseBool(raw);
       else val = raw === '' || raw === null || raw === undefined ? null : String(raw);
       payload[col.key] = val;
