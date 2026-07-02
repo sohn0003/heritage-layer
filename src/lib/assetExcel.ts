@@ -170,7 +170,10 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
         continue;
       }
       let val: any;
-      if (col.type === 'number') val = parseNum(raw);
+      if (col.type === 'number') {
+        val = parseNum(raw);
+        if (val != null && col.scale) val = Math.round(val * col.scale);
+      }
       else if (col.type === 'boolean') val = parseBool(raw);
       else val = raw === '' || raw === null || raw === undefined ? null : String(raw);
       payload[col.key] = val;
