@@ -585,6 +585,17 @@ const AdminPropertiesPage = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
+                      <Label>활용 상태</Label>
+                      <Select value={form.utilization_status} onValueChange={(v) => setF({ utilization_status: v })}>
+                        <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="unutilized">미활용</SelectItem>
+                          <SelectItem value="in_discussion">협의 중</SelectItem>
+                          <SelectItem value="utilized">활용 중</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
                       <Label>위도</Label>
                       <Input type="number" step="any" value={form.latitude} onChange={(e) => setF({ latitude: e.target.value })} />
                     </div>

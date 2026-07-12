@@ -19,6 +19,7 @@ export const ASSET_COLUMNS: ColDef[] = [
   { key: 'land_area', label: '대지면적(㎡)', type: 'number' },
   { key: 'idle_years', label: '방치기간(년)', type: 'number' },
   { key: 'ownership_type', label: '소유구분', type: 'string' },
+  { key: 'utilization_status', label: '활용상태(unutilized/in_discussion/utilized)', type: 'string' },
   { key: 'latitude', label: '위도', type: 'number' },
   { key: 'longitude', label: '경도', type: 'number' },
   { key: 'admin_memo', label: '관리자 메모', type: 'string' },
