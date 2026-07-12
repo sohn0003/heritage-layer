@@ -1,57 +1,72 @@
-# 예상 자산 매도가(토지 / 건물) 표시 및 재무 반영
-
 ## 목표
-- Analysis 페이지의 COSMO-P 블록별 점수 카드 **바로 위**에 "예상 자산 매도가" 카드를 신설
-- 카드 안에는 **토지 매도가**와 **건물 매도가** 두 항목을 각각 표시
-- 관리자 페이지와 엑셀 업로드에서 두 값을 입력·수정할 수 있게 확장
-- 매도가가 입력된 경우 재무 시나리오의 총 투자비에서 **토지 취득가**를 매도가 기준으로 대체하고, 매도가에 값이 없으면 기존 공시지가 × 대지면적 로직으로 폴백
+플랫폼을 완전 무료로 전환. 구독 3단계(Free/Pro/Enterprise) 및 상세 보고서 건별 결제 시스템을 전부 제거하고, 모든 사용자에게 상세 분석 접근 권한 부여.
 
-## 기술 상세
+## 제거 대상
 
-### 1) 데이터베이스 (마이그레이션)
-`public.assets` 테이블에 두 컬럼 추가 (nullable, 원 단위 정수):
-- `asking_land_price` bigint (매도자 희망 토지 가격, 원)
-- `asking_building_price` bigint (매도자 희망 건물 가격, 원)
+### 1. 페이지 & 라우트 (`src/App.tsx`)
+- `/pricing` (Pricing 페이지)
+- `/checkout/toss`, `/checkout/toss/success`, `/checkout/toss/fail`, `/checkout/toss/demo`
+- `/checkout/toss/unlock`, `/checkout/toss/unlock/success`
+- 관련 파일 삭제: `src/pages/Pricing.tsx`, `src/pages/checkout/*` 전체
+- `PaymentTestModeBanner` 제거
 
-컬럼만 추가하는 ALTER이므로 신규 GRANT/RLS 변경은 불필요.
+### 2. 결제 관련 컴포넌트/훅/라이브러리
+- `src/components/payments/` (PaymentMethodModal, UnlockReportModal)
+- `src/components/common/UnlockOverlay.tsx`, `ProLockOverlay.tsx`
+- `src/components/common/PaymentTestModeBanner.tsx`
+- `src/components/mypage/SubscriptionCard.tsx`
+- `src/hooks/usePaddleCheckout.ts`, `src/hooks/useAssetUnlock.ts`
+- `src/lib/paddle.ts`, `src/lib/toss.ts`, `src/lib/entitlements.ts`
+- `src/assets/paddle-logo*`, `src/assets/toss-payments-logo*`
 
-### 2) 관리자 페이지 (`src/pages/admin/AdminProperties.tsx`)
-- `PropertyForm` 타입, `initialForm`, `handleEdit`(row → form 매핑), `save`(form → payload)에 두 필드 추가
-- 공시지가 입력 칸 근처(자산 정보 섹션)에 "예상 매도가 - 토지(원)", "예상 매도가 - 건물(원)" `Input type="number"` 두 개 추가
+### 3. Edge Functions (`supabase/functions/`)
+- `payments-webhook`, `get-paddle-price`, `paddle-customer-portal`
+- `toss-confirm-unlock`, `toss-issue-billing-key`, `toss-cancel-subscription`
+- `_shared/paddle.ts`
 
-### 3) 엑셀 업로드 (`src/lib/assetExcel.ts`)
-`ASSET_EXCEL_COLUMNS`에 두 항목 추가:
-- `{ key: 'asking_land_price', label: '예상매도가-토지(원)', type: 'number' }`
-- `{ key: 'asking_building_price', label: '예상매도가-건물(원)', type: 'number' }`
+### 4. AuthContext 정리 (`src/contexts/AuthContext.tsx`)
+- `subscriptionTier`, `hasProAccess`, `refreshTier` 제거 또는 모두 무료/full access로 고정
+- 안전한 방식: `hasProAccess`를 항상 `true` 반환하도록 하고 `subscriptionTier`를 `'pro'` 고정으로 유지 → 다른 컴포넌트 파급 최소화
+- 그러나 요청이 "완전 제거"이므로, 사용처를 모두 제거하는 방향 선호
 
-### 4) Analysis 페이지 (`src/pages/Analysis.tsx`)
-**UI**: 372번 라인 "COSMO-P 블록별 점수" `Card` 위에 신규 카드 삽입.
-```
-[예상 자산 매도가]
-  토지 매도가 : xxx,xxx,xxx원  (혹은 "매도자 미제시")
-  건물 매도가 : xxx,xxx,xxx원
-  합계        : xxx,xxx,xxx원
-```
-- 카드 스타일은 기존 `Card + CardHeader + CardContent` 패턴 유지, `grid sm:grid-cols-2` 로 두 칸 배치
-- 값이 null인 경우 "매도자 미제시"로 표시
+### 5. 네비게이션 & 링크 정리
+- `Navbar` 에서 요금제 링크 제거
+- `Home`, `Bridge`, `Mypage` 등에서 `/pricing`, `Pro 잠금 오버레이`, `구독 카드` 참조 제거
+- `Analysis.tsx`에서 상세 보고서 잠금(UnlockOverlay/ProLockOverlay) 제거 → 모든 사용자에게 전체 분석 노출
+- `Properties.tsx`, `AssetCard.tsx` 등의 잠금 UI 제거
+- `AuthModal`의 결제 관련 문구 정리
 
-**재무 반영**: `Analysis.tsx`에서 `runFinancialAnalysis`/시나리오 계산에 넘기는 `landValuePerSqm` 산출 시 매도가 우선 사용:
-```
-effectiveLandValuePerSqm =
-  asking_land_price && land_area
-    ? asking_land_price / land_area
-    : asset.land_value_per_sqm ?? 4_500_000
-```
-- 두 군데(106, 153번 라인)에 동일 적용
-- 건물 매도가는 별도 취득가 항목이 없으므로 `irr-calculator`의 `softCost`나 별도 인풋에 더하지 않고, 향후 확장을 위해 우선 **표시 전용**으로 유지 → 단, 총 투자비 카드 아래에 "* 매도가 기준" 표기를 노출해 사용자에게 반영 여부를 명확히 안내
+### 6. DB & 마이그레이션
+- 기존 `subscriptions`, `asset_unlocks`(있다면) 테이블은 그대로 두되 코드 참조만 제거 (데이터 보존).
+- 신규 마이그레이션은 만들지 않음 (요청 범위 밖의 파괴적 변경 회피).
 
-> 재무 로직에 토지+건물 합산을 한 번에 태우는 방식으로 갈 경우 `irr-calculator.ts`의 `landCost` 산식을 조정해야 하는데, 이는 알고리즘 담당(사용자) 영역이므로 이번 작업에서는 **토지 매도가만 landValuePerSqm으로 환산**해 반영하고, 건물 매도가는 표시 + 데이터 저장까지만 처리합니다. 이 정책에 대해 다른 처리 원하시면 알려주세요.
+### 7. 환경 변수 / 시크릿
+- `.env*` 에서 `VITE_TOSS_CLIENT_KEY`, `VITE_PADDLE_*` 관련 항목 제거
+- Supabase 시크릿(Paddle/Toss)은 사용자에게 안내만 하고 직접 삭제하지 않음
 
-### 5) 타입
-Supabase 마이그레이션 승인 시 `src/integrations/supabase/types.ts`가 재생성되므로 별도 수동 편집 불필요.
+### 8. 문서 / 메모리
+- `mem://index.md`에서 결제 관련 Core 항목(`hasProAccess`, 카카오 로그인 관련 등) 정리
+- `mem://features/payments`, `mem://features/pro-lock` 메모리 항목 제거 (index에서도 삭제)
 
-## 변경 파일 요약
-- `supabase/migrations/<timestamp>_add_asking_prices.sql` (신규)
-- `src/pages/admin/AdminProperties.tsx`
-- `src/lib/assetExcel.ts`
-- `src/pages/Analysis.tsx`
+## 기술 세부
+
+### AuthContext 처리 방안
+두 가지 선택:
+- **A. 완전 삭제**: `subscriptionTier`, `hasProAccess`, `refreshTier`, `isAdmin` 중 결제 관련만 제거. 모든 사용처(수십 곳 예상)를 수정.
+- **B. 스텁 유지**: 하위호환 위해 `hasProAccess: true` 고정, `subscriptionTier: 'pro'` 고정으로 유지. 사용처 수정 최소화.
+
+→ **A(완전 삭제)** 권장: 사용자 요청이 "완전 제거"이며 장기 유지보수 관점에서 깔끔.
+
+### 잠금 UI가 있는 곳 처리
+- `<UnlockOverlay>`, `<ProLockOverlay>` 래퍼 제거 → 자식 컴포넌트를 그대로 노출
+- `hasProAccess` 조건 분기 제거 → 조건 없는 렌더링
+
+## 확인 필요 사항
+1. **Mypage의 구독 카드**를 완전히 제거해도 되는지 (사용자 계정 정보 카드는 유지)
+2. **결제 관련 시크릿/DB 테이블**은 그대로 두는 방향이 맞는지 (나중에 되돌릴 여지 확보)
+3. **Bridge Solution 페이지**(`/bridge`)는 유지하는지 — 이는 프로젝트 단위 유료 실행 지원이라 구독과는 별개인데, 함께 없앨지 유지할지
+
+## 산출물
+- 삭제/수정된 파일 목록
+- 빌드 & 타입체크 통과
+- 앱 전역에서 요금제/결제/잠금 UI 완전 부재 확인

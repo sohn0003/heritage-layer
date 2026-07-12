@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Star, FileText, User, Crown, ArrowRight, Inbox } from 'lucide-react';
-import SubscriptionCard from '@/components/mypage/SubscriptionCard';
-import { tierLabel } from '@/lib/entitlements';
-import { toast } from 'sonner';
+import { Star, FileText, User, ArrowRight, Inbox } from 'lucide-react';
 import Seo from '@/components/common/Seo';
 
 interface SavedAsset {
@@ -22,35 +19,15 @@ interface SavedAsset {
 }
 
 const Mypage = () => {
-  const { user, subscriptionTier, hasProAccess, isAdmin, loading, refreshTier } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [savedAssets, setSavedAssets] = useState<SavedAsset[]>([]);
   const [profileName, setProfileName] = useState<string>('');
-  const [subRefreshKey, setSubRefreshKey] = useState(0);
-
-  // 결제 완료 후 리다이렉트 처리 — Realtime이 누락될 경우를 대비한 보장 refetch
-  useEffect(() => {
-    if (searchParams.get('checkout') === 'success') {
-      toast.success('구독이 활성화되었습니다.', { description: '결제 정보가 곧 반영됩니다.' });
-      const tryRefresh = async (delay: number) => {
-        setTimeout(async () => {
-          await refreshTier();
-          setSubRefreshKey(k => k + 1);
-        }, delay);
-      };
-      tryRefresh(1500);
-      tryRefresh(5000);
-      searchParams.delete('checkout');
-      setSearchParams(searchParams, { replace: true });
-    }
-  }, [searchParams, setSearchParams, refreshTier]);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
-      // Fetch profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('name, email')
@@ -60,7 +37,6 @@ const Mypage = () => {
         setProfileName(profile.name || profile.email || '');
       }
 
-      // Fetch saved assets with asset details
       const { data: saved } = await supabase
         .from('saved_assets')
         .select('id, asset_id, created_at')
@@ -68,7 +44,6 @@ const Mypage = () => {
         .order('created_at', { ascending: false });
 
       if (saved) {
-        // Fetch asset details for each saved asset
         const assetIds = saved.map(s => s.asset_id);
         const { data: assets } = await supabase
           .from('assets_public')
@@ -103,28 +78,16 @@ const Mypage = () => {
     );
   }
 
-  const isPro = hasProAccess;
-  const planLabel = tierLabel(subscriptionTier);
-
-  const savedReports: { id: string; title: string; date: string }[] = [];
-
   return (
     <div className="min-h-screen pt-20 px-4 pb-12">
       <Seo
         title="마이페이지 — Heritage Layer"
-        description="저장한 매물, 구독 정보 및 분석 리포트를 확인하세요."
+        description="저장한 매물과 분석 활동 내역을 확인하세요."
         path="/mypage"
       />
       <div className="mx-auto max-w-4xl space-y-8">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">마이페이지</h1>
-          <div className="flex items-center gap-2 rounded-full border border-border px-3 py-1 text-sm">
-            <Crown className={`h-4 w-4 ${isPro ? 'text-accent' : 'text-muted-foreground'}`} />
-            <span className={isPro ? 'text-accent font-medium' : 'text-muted-foreground'}>
-              {planLabel}
-            </span>
-          </div>
         </div>
 
         {/* Profile Info */}
@@ -144,17 +107,8 @@ const Mypage = () => {
               <span className="text-sm text-muted-foreground">닉네임</span>
               <span className="text-sm font-medium">{profileName || '미설정'}</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">구독 등급</span>
-              <span className={`text-sm font-medium ${isPro ? 'text-accent' : ''}`}>
-                {planLabel}
-              </span>
-            </div>
           </CardContent>
         </Card>
-
-        {/* Subscription Management */}
-        <SubscriptionCard refreshKey={subRefreshKey} />
 
         {/* Admin: Deal Interest Inbox */}
         {isAdmin && (
@@ -218,7 +172,7 @@ const Mypage = () => {
           </CardContent>
         </Card>
 
-        {/* Saved Reports */}
+        {/* Saved Reports (placeholder) */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -227,34 +181,10 @@ const Mypage = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {savedReports.length === 0 ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">
-                <FileText className="mx-auto mb-2 h-8 w-8 opacity-30" />
-                <p>비어있음</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {savedReports.map((report) => (
-                  <div
-                    key={report.id}
-                    className="flex items-center justify-between rounded-lg border border-border p-3 transition-colors hover:bg-muted/50 cursor-pointer"
-                    onClick={() => {
-                      if (!isPro) navigate('/pricing');
-                    }}
-                  >
-                    <div>
-                      <p className="text-sm font-medium">{report.title}</p>
-                      <p className="text-xs text-muted-foreground">{report.date}</p>
-                    </div>
-                    {!isPro && (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                        Pro 전용
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              <FileText className="mx-auto mb-2 h-8 w-8 opacity-30" />
+              <p>비어있음</p>
+            </div>
           </CardContent>
         </Card>
       </div>

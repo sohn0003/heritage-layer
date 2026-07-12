@@ -953,7 +953,7 @@ const HomePage = () => {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button size="lg" onClick={() => navigate('/properties')}>자산 탐색</Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/pricing')}>요금 안내</Button>
+            <Button size="lg" variant="outline" onClick={() => navigate('/about')}>서비스 소개</Button>
           </div>
         </div>
       </section>
@@ -992,7 +992,6 @@ const HomePage = () => {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Service</p>
             <button onClick={() => navigate('/properties')} className="block hover:text-foreground">자산 탐색</button>
             <button onClick={() => navigate('/about')} className="block hover:text-foreground">회사 소개</button>
-            <button onClick={() => navigate('/pricing')} className="block hover:text-foreground">요금 안내</button>
             <button onClick={() => navigate('/contact')} className="block hover:text-foreground">문의하기</button>
           </div>
         </div>
@@ -1001,11 +1000,8 @@ const HomePage = () => {
             <button onClick={() => navigate('/terms')} className="hover:text-foreground">이용약관</button>
             <span className="opacity-40">·</span>
             <button onClick={() => navigate('/privacy')} className="hover:text-foreground">개인정보 처리방침</button>
-            <span className="opacity-40">·</span>
-            <button onClick={() => navigate('/refund')} className="hover:text-foreground">환불 정책</button>
           </div>
           <p>© 2025 (주)더레이어코퍼레이션 (The Layer Corporation Co., Ltd.). All rights reserved.</p>
-          <p className="opacity-70">Our order process is conducted by our online reseller Paddle.com, which is the Merchant of Record for all our orders.</p>
         </div>
       </footer>
     </div>

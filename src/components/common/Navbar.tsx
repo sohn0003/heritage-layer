@@ -82,14 +82,6 @@ const Navbar = () => {
           </div>
 
           <div className="hidden items-center gap-2 md:flex">
-            <Link
-              to="/pricing"
-              className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
-                location.pathname === '/pricing' ? activeStyle : textMuted
-              }`}
-            >
-              Pricing
-            </Link>
             {user ? (
               <div className="flex items-center gap-2">
                 <Link
