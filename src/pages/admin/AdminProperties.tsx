@@ -74,6 +74,7 @@ interface AssetForm {
   land_area: string;
   idle_years: string;
   ownership_type: string;
+  utilization_status: string;
   
   gov_cooperation: boolean;
   latitude: string;
@@ -113,7 +114,7 @@ interface AssetForm {
 
 const emptyForm: AssetForm = {
   address: '', asset_type: '폐교', zoning: '', building_coverage: '', floor_area_ratio: '',
-  land_area: '', idle_years: '', ownership_type: '', gov_cooperation: false,
+  land_area: '', idle_years: '', ownership_type: '', utilization_status: 'unutilized', gov_cooperation: false,
   latitude: '', longitude: '', admin_memo: '', is_published: false,
   current_building_coverage: '', legal_max_building_coverage: '',
   current_floor_area_ratio: '', legal_max_floor_area_ratio: '',
@@ -169,6 +170,7 @@ const AdminPropertiesPage = () => {
       land_area: a.land_area?.toString() || '',
       idle_years: a.idle_years?.toString() || '',
       ownership_type: a.ownership_type || '',
+      utilization_status: a.utilization_status || 'unutilized',
       gov_cooperation: a.gov_cooperation || false,
       latitude: a.latitude?.toString() || '',
       longitude: a.longitude?.toString() || '',
@@ -218,6 +220,7 @@ const AdminPropertiesPage = () => {
       land_area: num(form.land_area),
       idle_years: num(form.idle_years),
       ownership_type: str(form.ownership_type),
+      utilization_status: form.utilization_status || 'unutilized',
       
       gov_cooperation: form.gov_cooperation,
       latitude: num(form.latitude),
