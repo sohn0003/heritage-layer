@@ -58,8 +58,8 @@ const AnalysisPage = () => {
   const [searchParams] = useSearchParams();
   const assetId = searchParams.get('id');
   const navigate = useNavigate();
-  const { user } = useAuth();
-  // 전면 무료 공개 — 모든 사용자가 상세 분석 열람 가능
+  const { user, loading: authLoading } = useAuth();
+  // 상세 분석 열람은 로그인 회원 전용 (무료)
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -75,17 +75,16 @@ const AnalysisPage = () => {
   const algoConfig = useAlgorithmConfig();
 
   useEffect(() => {
-    if (!assetId) {
-      setLoading(false);
-      return;
-    }
+    if (authLoading) return;
+    if (!user) { setLoading(false); return; }
+    if (!assetId) { setLoading(false); return; }
     const fetchAsset = async () => {
       const { data } = await supabase.from('assets_public').select('*').eq('id', assetId).maybeSingle();
       setAsset(data);
       setLoading(false);
     };
     fetchAsset();
-  }, [assetId]);
+  }, [assetId, user, authLoading]);
 
   // 자산 변경 시 오버라이드 초기화
   useEffect(() => {
@@ -273,8 +272,23 @@ const AnalysisPage = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
+  }
+  if (!user) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-4 px-4 text-center">
+        <ShieldAlert className="h-10 w-10 text-accent" />
+        <h1 className="text-xl font-semibold">회원 전용 콘텐츠</h1>
+        <p className="text-sm text-muted-foreground">
+          상세 분석은 회원가입 후 무료로 이용하실 수 있습니다. 로그인 또는 회원가입 후 다시 시도해주세요.
+        </p>
+        <div className="flex gap-2">
+          <Button onClick={() => navigate('/mypage')}>로그인 / 회원가입</Button>
+          <Button variant="outline" onClick={() => navigate('/properties')}>자산 목록</Button>
+        </div>
+      </div>
+    );
   }
 
   if (!assetId || !asset) {
