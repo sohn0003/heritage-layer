@@ -1216,11 +1216,8 @@ const AnalysisPage = () => {
         {user && (
           <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
         )}
-        {isPro && user && (
+        {user && (
           <Button onClick={handleDealInterest}>관심 상담 신청</Button>
-        )}
-        {!isPro && (
-          <Button onClick={() => navigate('/pricing')}>Pro 구독 시작하기</Button>
         )}
         <Button variant="outline" onClick={() => navigate('/properties')}>
           목록으로 돌아가기
