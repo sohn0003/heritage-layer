@@ -10,9 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import UnlockOverlay from '@/components/common/UnlockOverlay';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAssetUnlock } from '@/hooks/useAssetUnlock';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
@@ -54,10 +52,9 @@ const AnalysisPage = () => {
   const [searchParams] = useSearchParams();
   const assetId = searchParams.get('id');
   const navigate = useNavigate();
-  const { user, hasProAccess } = useAuth();
-  const { unlocked: assetUnlocked } = useAssetUnlock(assetId);
-  // Pro 구독자 또는 해당 자산을 단건 결제한 사용자는 잠금 해제
-  const isPro = hasProAccess || assetUnlocked;
+  const { user } = useAuth();
+  // 전면 무료 공개 — 모든 사용자가 상세 분석 열람 가능
+  const isPro = true;
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
