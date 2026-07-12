@@ -21,6 +21,7 @@ const mapZoning = (v: any): ZoningType => {
   if (s.includes('2종') || s.includes('이종')) return 'residential_2nd';
   if (s.includes('3종') || s.includes('삼종')) return 'residential_3rd';
   if (s.includes('1종') || s.includes('일종')) return 'residential_1st';
+  if (s.includes('계획관리')) return 'management_planning';
   if (s.includes('준공업')) return 'semi_industrial';
   if (s.includes('자연녹지')) return 'green_natural';
   if (s.includes('생산녹지')) return 'green_production';

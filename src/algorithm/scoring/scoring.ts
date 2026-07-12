@@ -86,6 +86,7 @@ export type ZoningType =
   | 'semi_residential'         // 준주거
   | 'residential_2nd'          // 2종 일반주거
   | 'residential_3rd'          // 3종 일반주거
+  | 'management_planning'      // 계획관리지역
   | 'green_natural'            // 자연녹지
   | 'green_production'         // 생산녹지
   | 'residential_1st'          // 1종 일반주거
@@ -146,6 +147,7 @@ function scoreA1Zoning(zoning: ZoningType): number {
     semi_residential: 80,
     residential_2nd: 65,
     residential_3rd: 60,
+    management_planning: 55,
     green_natural: 45,
     green_production: 35,
     residential_1st: 30,

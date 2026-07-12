@@ -31,6 +31,7 @@ const zoningLabel: Record<AssetInput['zoning'], string> = {
   residential_3rd: '3종 일반주거',
   residential_2nd: '2종 일반주거',
   residential_1st: '1종 일반주거',
+  management_planning: '계획관리지역',
   semi_industrial: '준공업',
   green_natural: '자연녹지',
   green_production: '생산녹지',
@@ -46,6 +47,7 @@ const zoningComment = (z: AssetInput['zoning']): string => {
   if (z === 'semi_residential') return '주거·상업 혼합 — 복합시설에 유리';
   if (z === 'residential_3rd' || z === 'residential_2nd') return '주거 중심 — 임대·소규모 복합에 적합';
   if (z === 'residential_1st') return '저층 주거 위주 — 사업 자유도 낮음';
+  if (z === 'management_planning') return '비도시 관리지역 중 개발 여지 최대 — 관광·물류·전원형에 유리';
   if (z === 'semi_industrial') return '준공업 — 용도 제약으로 활용 폭 좁음';
   if (z === 'green_natural' || z === 'green_production') return '녹지 — 개발 제약이 큼';
   return '보전·농림 — 개발 제약이 매우 큼';

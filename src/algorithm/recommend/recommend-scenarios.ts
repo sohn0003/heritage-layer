@@ -209,6 +209,14 @@ const ZONING_BASE_SCORE: Record<ZoningType, ZoningCompatibility> = {
     public_complex: 18, residential: 8, mixed_use_residential: 10,
     office: 25, retail_shopping: 20, medical: 10, religious_cultural: 12,
   },
+  management_planning: {
+    // 계획관리지역 — 비도시 관광·물류·전원형 개발에 유리, 대규모 상업/오피스는 제한
+    accommodation: 33, cultural_complex: 28, education: 25,
+    senior_welfare: 33, retail_fnb: 25, shared_residence: 28,
+    logistics: 35, knowledge_industry: 25, wellness: 35,
+    public_complex: 25, residential: 28, mixed_use_residential: 22,
+    office: 18, retail_shopping: 18, medical: 28, religious_cultural: 30,
+  },
   green_conservation: {
     accommodation: 15, cultural_complex: 15, education: 10,
     senior_welfare: 10, retail_fnb: 5, shared_residence: 5,
