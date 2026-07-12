@@ -1165,42 +1165,10 @@ const AnalysisPage = () => {
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 pt-2">
-                    <Badge
-                      variant={
-                        signalSummary.triggerLevel === 'action'
-                          ? 'default'
-                          : signalSummary.triggerLevel === 'alert'
-                          ? 'secondary'
-                          : 'outline'
-                      }
-                    >
-                      트리거: {
-                        signalSummary.triggerLevel === 'action' ? '즉시 액션'
-                        : signalSummary.triggerLevel === 'alert' ? '내부 알림'
-                        : signalSummary.triggerLevel === 'watch' ? '관심 수집'
-                        : '대기'
-                      }
-                    </Badge>
-                    <Badge variant="outline">우선순위 {signalSummary.priorityScore}/100</Badge>
                     {signalSummary.clusterDetected && (
                       <Badge variant="default">클러스터 감지</Badge>
                     )}
                   </div>
-                  {signalSummary.recommendedActions.length > 0 && (
-                    <div>
-                      <strong className="text-foreground">권장 액션:</strong>
-                      <ul className="mt-1 list-disc pl-5">
-                        {signalSummary.recommendedActions.map((a) => (
-                          <li key={a}>
-                            {a === 'send_proposal' && '딜 제안서 발송'}
-                            {a === 'internal_alert' && '내부 딜팀 알림'}
-                            {a === 'owner_contact' && '자산 소유자 접촉'}
-                            {a === 'cluster_report' && '클러스터 리포트 생성'}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </>
               ) : (
                 <p>신호 데이터를 불러오는 중...</p>
