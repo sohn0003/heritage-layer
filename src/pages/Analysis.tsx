@@ -1148,6 +1148,9 @@ const AnalysisPage = () => {
                     <div>
                       <p className="text-xs">종합 신호 점수</p>
                       <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
+                      <p className="mt-1 text-[11px] leading-tight text-muted-foreground">
+                        저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs">관심 유저 수</p>
