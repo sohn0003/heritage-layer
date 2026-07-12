@@ -28,6 +28,7 @@ import {
 import Seo from '@/components/common/Seo';
 import GradeMeter from '@/components/common/GradeMeter';
 import RatioBar from '@/components/common/RatioBar';
+import AuthModal from '@/components/common/AuthModal';
 
 // 알고리즘 모듈 연동
 import { type ScoreResult } from '@/algorithm/scoring/scoring';
