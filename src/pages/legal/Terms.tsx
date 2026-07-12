@@ -25,8 +25,7 @@ const Terms = () => (
       <h2>2. 서비스의 내용</h2>
       <p>
         Heritage Layer는 한국 유휴 부동산(폐교·종교시설·유휴 자산 등)의 데이터 탐색, 재무 시나리오 분석, 등급 평가,
-        파트너 매칭(브릿지) 정보를 제공하는 SaaS 플랫폼입니다. 서비스는 Free / Pro / Enterprise 등 구독 플랜으로
-        구분되어 제공됩니다.
+        파트너 매칭(브릿지) 정보를 제공하는 SaaS 플랫폼입니다. 서비스는 회원가입 시 무료로 제공됩니다.
       </p>
 
       <h2>3. 회원 계정 및 계정 보안</h2>
@@ -64,22 +63,11 @@ const Terms = () => (
         해당 콘텐츠를 서비스 제공 목적에 한정하여 호스팅·처리할 수 있는 비독점적·무상의 라이선스를 부여합니다.
       </p>
 
-      <h2>7. 결제, 구독 및 환불</h2>
+      <h2>7. 결제 및 유료 서비스</h2>
       <p>
-        유료 구독의 결제, 청구, 세금, 인보이스, 청구주기, 갱신, 취소 및 환불 처리 등 상거래 절차는 <strong>Paddle.com Market
-        Limited</strong>이 회사의 공식 리셀러(Merchant of Record)로서 수행합니다. 결제 관련 세부 약관은 Paddle Buyer Terms
-        (<a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer">paddle.com/legal/checkout-buyer-terms</a>)
-        를 따르며, 본 약관과 충돌하는 경우 결제·환불·세금 관련 사항은 Paddle Buyer Terms가 우선합니다.
-      </p>
-      <p>
-        구독은 선택한 주기(월간/연간)에 따라 자동 갱신되며, 이용자는 마이페이지의 "구독 관리"를 통해 언제든지 갱신을
-        취소할 수 있습니다. 환불은 별도의 <a href="/refund">환불 정책</a>을 따릅니다.
-      </p>
-
-      <h2>8. Merchant of Record 고지</h2>
-      <p>
-        <strong>Our order process is conducted by our online reseller Paddle.com. Paddle.com is the Merchant of Record
-        for all our orders. Paddle provides all customer service inquiries and handles returns.</strong>
+        본 서비스의 데이터 플랫폼(자산 탐색·분석·시나리오 열람 등)은 현재 무료로 제공됩니다. 별도의 프로젝트 단위
+        실행 지원(Bridge Solution)은 회사와 이용자 간 개별 계약을 통해 진행되며, 관련 대가·범위·환불 조건은 해당
+        계약서에 따릅니다.
       </p>
 
       <h2>9. 서비스 수준 및 보증의 부인</h2>
@@ -107,7 +95,6 @@ const Terms = () => (
       <p>회사는 다음 사유가 있는 경우 사전 통지 후(긴급한 경우 사후 통지) 서비스 이용을 정지하거나 계약을 해지할 수 있습니다.</p>
       <ul>
         <li>본 약관의 중대한 또는 반복적 위반</li>
-        <li>구독료 미납</li>
         <li>보안 또는 사기 위험이 합리적으로 의심되는 행위</li>
         <li>관련 법령 위반</li>
       </ul>
