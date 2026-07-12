@@ -279,17 +279,20 @@ const AnalysisPage = () => {
   }
   if (!user) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-4 px-4 text-center">
-        <ShieldAlert className="h-10 w-10 text-accent" />
-        <h1 className="text-xl font-semibold">회원 전용 콘텐츠</h1>
-        <p className="text-sm text-muted-foreground">
-          상세 분석은 회원가입 후 무료로 이용하실 수 있습니다. 로그인 또는 회원가입 후 다시 시도해주세요.
-        </p>
-        <div className="flex gap-2">
-          <Button onClick={() => navigate('/mypage')}>로그인 / 회원가입</Button>
-          <Button variant="outline" onClick={() => navigate('/properties')}>자산 목록</Button>
+      <>
+        <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-4 px-4 text-center">
+          <ShieldAlert className="h-10 w-10 text-accent" />
+          <h1 className="text-xl font-semibold">회원 전용 콘텐츠</h1>
+          <p className="text-sm text-muted-foreground">
+            상세 분석은 회원가입 후 무료로 이용하실 수 있습니다. 로그인 또는 회원가입 후 다시 시도해주세요.
+          </p>
+          <div className="flex gap-2">
+            <Button onClick={() => setAuthOpen(true)}>로그인 / 회원가입</Button>
+            <Button variant="outline" onClick={() => navigate('/properties')}>자산 목록</Button>
+          </div>
         </div>
-      </div>
+        <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+      </>
     );
   }
 
