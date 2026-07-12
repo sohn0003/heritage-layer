@@ -75,17 +75,16 @@ const AnalysisPage = () => {
   const algoConfig = useAlgorithmConfig();
 
   useEffect(() => {
-    if (!assetId) {
-      setLoading(false);
-      return;
-    }
+    if (authLoading) return;
+    if (!user) { setLoading(false); return; }
+    if (!assetId) { setLoading(false); return; }
     const fetchAsset = async () => {
       const { data } = await supabase.from('assets_public').select('*').eq('id', assetId).maybeSingle();
       setAsset(data);
       setLoading(false);
     };
     fetchAsset();
-  }, [assetId]);
+  }, [assetId, user, authLoading]);
 
   // 자산 변경 시 오버라이드 초기화
   useEffect(() => {
