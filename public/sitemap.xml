@@ -16,11 +16,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://heritagelayer.com/pricing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://heritagelayer.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -47,11 +42,6 @@
   </url>
   <url>
     <loc>https://heritagelayer.com/privacy</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://heritagelayer.com/refund</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
