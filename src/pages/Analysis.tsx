@@ -283,9 +283,10 @@ const AnalysisPage = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
   }
+  if (!user) return null;
 
   if (!assetId || !asset) {
     return (
