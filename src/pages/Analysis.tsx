@@ -1152,11 +1152,20 @@ const AnalysisPage = () => {
                 <>
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
-                      <p className="text-xs">종합 신호 점수</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
-                      <p className="mt-1 text-[11px] leading-tight text-muted-foreground">
-                        저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.
+                      <p className="flex items-center gap-1 text-xs">
+                        종합 신호 점수
+                        <TooltipProvider delayDuration={100}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                              <p>저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </p>
+                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
                     </div>
                     <div>
                       <p className="text-xs">관심 유저 수</p>
