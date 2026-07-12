@@ -54,7 +54,6 @@ const AnalysisPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   // 전면 무료 공개 — 모든 사용자가 상세 분석 열람 가능
-  const isPro = true;
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -293,7 +292,7 @@ const AnalysisPage = () => {
     <div className="pt-16">
       <Seo
         title="자산 분석 — Heritage Layer"
-        description="입지·법규·수익성 시나리오를 데이터 기반으로 분석하는 Heritage Layer Pro 분석 도구."
+        description="입지·법규·수익성 시나리오를 데이터 기반으로 분석하는 Heritage Layer 분석 도구."
         path="/analysis"
       />
       {/* 자산 핵심 정보 헤더 (스크롤 시 함께 이동) */}
@@ -325,7 +324,7 @@ const AnalysisPage = () => {
 
       <div className="mx-auto max-w-5xl px-4 py-8">
       {/* 분석 가정 안내 */}
-      {isPro && (
+      {true && (
         <Card className="mb-6 border-dashed bg-muted/30">
           <CardContent className="p-4 text-xs text-muted-foreground">
             <strong className="text-foreground">분석 가정:</strong>{' '}
@@ -471,7 +470,7 @@ const AnalysisPage = () => {
         </Card>
       )}
 
-      {/* 세부 점수 항목 (Pro 전용 — Free는 모자이크) */}
+      {/* 세부 점수 항목 */}
       {scoringResult && (
         <div className="mb-8">
           <>
@@ -629,9 +628,9 @@ const AnalysisPage = () => {
         </div>
       )}
 
-      {/* Pro Sections */}
+      {/* 상세 분석 섹션 */}
       <div className="space-y-6">
-        {/* 시나리오 추천 — 1/2/3순위 탭 (Pro) */}
+        {/* 시나리오 추천 — 1/2/3순위 탭 */}
         <>
           <Card>
             <CardHeader>
