@@ -578,7 +578,7 @@ const AboutPage = () => {
             </Card>
 
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Button size="lg" className="bg-accent text-white hover:bg-accent/90" onClick={() => navigate('/pricing')}>요금 안내 보기</Button>
+              <Button size="lg" className="bg-accent text-white hover:bg-accent/90" onClick={() => navigate('/properties')}>자산 탐색하기</Button>
               <Button
                 size="lg"
                 variant="outline"

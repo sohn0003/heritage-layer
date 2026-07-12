@@ -101,7 +101,7 @@ const Bridge = () => {
             정보를 넘어, 실행까지
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base text-primary-foreground/80 md:text-lg">
-            구독이 정보 접근권이라면, Bridge Solution은 프로젝트 단위 실행 지원입니다.
+            Heritage Layer의 데이터 플랫폼은 무료로 열려 있으며, Bridge Solution은 실제 프로젝트 단위의 실행 지원입니다.
             <br className="hidden md:block" />
             사업성 검토부터 인허가·금융 조달, 전체 PM까지 — 필요한 만큼 선택하세요.
           </p>
@@ -109,29 +109,21 @@ const Bridge = () => {
             <Button size="lg" variant="secondary" onClick={() => openInquiry('L1')}>
               프로젝트 상담 신청
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
-              onClick={() => navigate('/pricing')}
-            >
-              구독 요금제 보기
-            </Button>
           </div>
         </div>
       </section>
 
-      {/* 구독 vs Bridge */}
+      {/* 데이터 플랫폼 vs Bridge */}
       <section className="mx-auto max-w-5xl px-4 py-16">
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">구독 서비스</CardTitle>
-              <p className="text-sm text-muted-foreground">정보 접근권 · 월정액</p>
+              <CardTitle className="text-lg">Heritage Layer 데이터 플랫폼</CardTitle>
+              <p className="text-sm text-muted-foreground">정보 접근권 · 완전 무료</p>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
               <p>· 전국 유휴자산 지도와 데이터 분석 결과 열람</p>
-              <p>· Pro부터 IRR·DSCR 시뮬레이션과 시나리오 비교</p>
+              <p>· IRR·DSCR 시뮬레이션과 시나리오 비교</p>
               <p>· 사용자가 직접 판단 · 외부 실행</p>
             </CardContent>
           </Card>
@@ -146,7 +138,7 @@ const Bridge = () => {
             <CardContent className="space-y-2 text-sm text-muted-foreground">
               <p>· 인허가·지자체 협의·PF 구조화 등 실제 실행 지원</p>
               <p>· 변호사·건축사·금융 파트너 네트워크 활용</p>
-              <p>· Enterprise 고객 전용 또는 단독 계약 가능 (Level 1)</p>
+              <p>· 프로젝트 단위 별도 계약</p>
             </CardContent>
           </Card>
         </div>
