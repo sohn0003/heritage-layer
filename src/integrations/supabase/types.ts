@@ -94,6 +94,7 @@ export type Database = {
           scoring_grade: string | null
           scoring_total: number | null
           use_change_expansion: string | null
+          utilization_status: string
           zoning: string | null
           zoning_upgrade_gain: string | null
         }
@@ -143,6 +144,7 @@ export type Database = {
           scoring_grade?: string | null
           scoring_total?: number | null
           use_change_expansion?: string | null
+          utilization_status?: string
           zoning?: string | null
           zoning_upgrade_gain?: string | null
         }
@@ -192,6 +194,7 @@ export type Database = {
           scoring_grade?: string | null
           scoring_total?: number | null
           use_change_expansion?: string | null
+          utilization_status?: string
           zoning?: string | null
           zoning_upgrade_gain?: string | null
         }
@@ -509,6 +512,7 @@ export type Database = {
           recommended_dev_direction: string | null
           recommended_use_type: string | null
           use_change_expansion: string | null
+          utilization_status: string | null
           zoning: string | null
           zoning_upgrade_gain: string | null
         }
@@ -551,6 +555,7 @@ export type Database = {
           recommended_dev_direction?: string | null
           recommended_use_type?: string | null
           use_change_expansion?: string | null
+          utilization_status?: string | null
           zoning?: string | null
           zoning_upgrade_gain?: string | null
         }
@@ -593,6 +598,7 @@ export type Database = {
           recommended_dev_direction?: string | null
           recommended_use_type?: string | null
           use_change_expansion?: string | null
+          utilization_status?: string | null
           zoning?: string | null
           zoning_upgrade_gain?: string | null
         }
