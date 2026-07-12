@@ -60,16 +60,6 @@ const AnalysisPage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   // 상세 분석 열람은 로그인 회원 전용 (무료)
-  useEffect(() => {
-    if (!authLoading && !user) {
-      toast({
-        title: '로그인이 필요합니다',
-        description: '상세 분석은 회원만 이용할 수 있습니다. 로그인 후 다시 시도해주세요.',
-      });
-      const redirect = assetId ? `/analysis?id=${assetId}` : '/analysis';
-      navigate(`/auth?redirect=${encodeURIComponent(redirect)}`, { replace: true });
-    }
-  }, [authLoading, user, assetId, navigate]);
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -286,7 +276,21 @@ const AnalysisPage = () => {
   if (authLoading || loading) {
     return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
   }
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-4 px-4 text-center">
+        <ShieldAlert className="h-10 w-10 text-accent" />
+        <h1 className="text-xl font-semibold">회원 전용 콘텐츠</h1>
+        <p className="text-sm text-muted-foreground">
+          상세 분석은 회원가입 후 무료로 이용하실 수 있습니다. 로그인 또는 회원가입 후 다시 시도해주세요.
+        </p>
+        <div className="flex gap-2">
+          <Button onClick={() => navigate('/mypage')}>로그인 / 회원가입</Button>
+          <Button variant="outline" onClick={() => navigate('/properties')}>자산 목록</Button>
+        </div>
+      </div>
+    );
+  }
 
   if (!assetId || !asset) {
     return (
