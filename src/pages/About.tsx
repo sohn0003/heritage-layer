@@ -249,17 +249,17 @@ const StepBlock = ({ num, title, desc, icon: Icon, side, accent, children }: {
   );
 };
 
-// ── 비교표 데이터 ───────────────────────────────
-const comparison = [
-  { feature: '자산 탐색', free: true, pro: true },
-  { feature: '기본 정보 열람', free: true, pro: true },
-  { feature: '재생 등급 확인', free: true, pro: true },
-  { feature: '재생 시나리오', free: false, pro: true },
-  { feature: '재무 수익성 지표', free: false, pro: true },
-  { feature: '시나리오 비교표', free: false, pro: true },
-  { feature: '정부협력 경로', free: false, pro: true },
-  { feature: '딜 관심 표명', free: false, pro: true },
-  { feature: '무제한 자산 저장', free: false, pro: true },
+// ── 플랫폼 기능 카드 데이터 ───────────────────────────────
+const features = [
+  { icon: Search, title: '자산 탐색', desc: '전국 유휴 부동산 데이터를 지도와 리스트로 탐색합니다.' },
+  { icon: FileText, title: '기본 정보 열람', desc: '위치, 면적, 용도, 소유 구분 등 핵심 정보를 한눈에 확인합니다.' },
+  { icon: Sparkles, title: '재생 등급 확인', desc: 'S~D 등급으로 자산의 재생 가능성을 빠르게 파악합니다.' },
+  { icon: Lightbulb, title: '재생 시나리오', desc: 'AI가 추천하는 1·2·3순위 재생 방향을 제시합니다.' },
+  { icon: BarChart3, title: '재무 수익성 지표', desc: 'IRR, NPV, 공사비 등 주요 재무 지표를 계산합니다.' },
+  { icon: GitCompare, title: '시나리오 비교표', desc: '여러 시나리오의 수익성과 위험도를 비교 분석합니다.' },
+  { icon: Landmark, title: '정부협력 경로', desc: '폐교·빈집 등 자산별 지원 정책과 협력 기관을 안내합니다.' },
+  { icon: HandCoins, title: '딜 관심 표명', desc: '관심 자산에 대해 시행사·관리 주체와 연결을 요청할 수 있습니다.' },
+  { icon: Bookmark, title: '무제한 자산 저장', desc: '마음에 드는 자산을 저장하고 비교 목록을 관리합니다.' },
 ];
 
 const AboutPage = () => {
