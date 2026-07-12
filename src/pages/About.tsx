@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Database, Lightbulb, Rocket, Check, X, AlertTriangle,
+  Database, Lightbulb, Rocket, AlertTriangle,
   TrendingDown, School, Home as HomeIcon, Building2, Users, Sparkles,
-  ArrowRight,
+  ArrowRight, Search, FileText, BarChart3, GitCompare, Landmark, HandCoins, Bookmark,
 } from 'lucide-react';
 import aboutHeroBg from '@/assets/about-hero-bg.png';
 import Seo from '@/components/common/Seo';
@@ -249,17 +248,17 @@ const StepBlock = ({ num, title, desc, icon: Icon, side, accent, children }: {
   );
 };
 
-// ── 비교표 데이터 ───────────────────────────────
-const comparison = [
-  { feature: '자산 탐색', free: true, pro: true },
-  { feature: '기본 정보 열람', free: true, pro: true },
-  { feature: '재생 등급 확인', free: true, pro: true },
-  { feature: '재생 시나리오', free: false, pro: true },
-  { feature: '재무 수익성 지표', free: false, pro: true },
-  { feature: '시나리오 비교표', free: false, pro: true },
-  { feature: '정부협력 경로', free: false, pro: true },
-  { feature: '딜 관심 표명', free: false, pro: true },
-  { feature: '무제한 자산 저장', free: false, pro: true },
+// ── 플랫폼 기능 카드 데이터 ───────────────────────────────
+const features = [
+  { icon: Search, title: '자산 탐색', desc: '전국 유휴 부동산 데이터를 지도와 리스트로 탐색합니다.' },
+  { icon: FileText, title: '기본 정보 열람', desc: '위치, 면적, 용도, 소유 구분 등 핵심 정보를 한눈에 확인합니다.' },
+  { icon: Sparkles, title: '재생 등급 확인', desc: 'S~D 등급으로 자산의 재생 가능성을 빠르게 파악합니다.' },
+  { icon: Lightbulb, title: '재생 시나리오', desc: 'AI가 추천하는 1·2·3순위 재생 방향을 제시합니다.' },
+  { icon: BarChart3, title: '재무 수익성 지표', desc: 'IRR, NPV, 공사비 등 주요 재무 지표를 계산합니다.' },
+  { icon: GitCompare, title: '시나리오 비교표', desc: '여러 시나리오의 수익성과 위험도를 비교 분석합니다.' },
+  { icon: Landmark, title: '정부협력 경로', desc: '폐교·빈집 등 자산별 지원 정책과 협력 기관을 안내합니다.' },
+  { icon: HandCoins, title: '딜 관심 표명', desc: '관심 자산에 대해 시행사·관리 주체와 연결을 요청할 수 있습니다.' },
+  { icon: Bookmark, title: '무제한 자산 저장', desc: '마음에 드는 자산을 저장하고 비교 목록을 관리합니다.' },
 ];
 
 const AboutPage = () => {
@@ -519,65 +518,41 @@ const AboutPage = () => {
           </div>
         </section>
 
-        {/* ── PLATFORM / PRICING (다크 블록 내부, 글라스 카드) ── */}
+        {/* ── PLATFORM FEATURES (다크 블록 내부, 글라스 카드) ── */}
         <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
-          <div className="relative mx-auto max-w-4xl">
+          <div className="relative mx-auto max-w-5xl">
             <div className="mb-12 text-center text-[hsl(0_0%_96%)]">
               <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Platform</span>
-              <h2 className="mt-3 text-4xl font-bold md:text-5xl">플랫폼 소개</h2>
+              <h2 className="mt-3 text-4xl font-bold md:text-5xl">플랫폼 기능</h2>
               <p className="mx-auto mt-4 max-w-2xl text-[hsl(0_0%_78%)]">
-                Heritage Layer의 스코어링 시스템은 입지, 법규, 시장 데이터를 결합하여
-                각 자산의 재생 가능성을 <span className="font-semibold text-white">S~D 등급</span>으로 평가합니다.
+                Heritage Layer는 누구나 무료로 이용할 수 있는 데이터 기반 재생 플랫폼입니다.
               </p>
             </div>
 
-            <Card style={glassDarkCardStyle} className="border-0 overflow-hidden rounded-2xl">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-b border-white/15 hover:bg-transparent">
-                      <TableHead className="w-1/2 py-5 text-base font-bold text-white">기능</TableHead>
-                      <TableHead className="py-5 text-center text-base font-bold text-white">무료</TableHead>
-                      <TableHead className="py-5 text-center text-base font-bold" style={{ color: 'hsl(40 90% 70%)' }}>Pro</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {comparison.map((row) => (
-                      <TableRow key={row.feature} className="border-b border-white/10 hover:bg-white/[0.04]">
-                        <TableCell className="py-4 text-base font-medium text-[hsl(0_0%_92%)]">{row.feature}</TableCell>
-                        <TableCell className="py-4 text-center">
-                          {row.free ? (
-                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: 'hsl(40 90% 70% / 0.18)' }}>
-                              <Check className="h-5 w-5" style={{ color: 'hsl(40 90% 75%)' }} strokeWidth={3} />
-                            </span>
-                          ) : (
-                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: 'hsl(0 0% 100% / 0.06)' }}>
-                              <X className="h-5 w-5" style={{ color: 'hsl(0 0% 60%)' }} strokeWidth={2.5} />
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="py-4 text-center">
-                          {row.pro ? (
-                            <span
-                              className="inline-flex h-8 w-8 items-center justify-center rounded-full"
-                              style={{ background: 'linear-gradient(135deg, hsl(40 90% 60%), hsl(30 90% 55%))', boxShadow: '0 0 18px hsl(40 90% 55% / 0.4)' }}
-                            >
-                              <Check className="h-5 w-5 text-white" strokeWidth={3} />
-                            </span>
-                          ) : (
-                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full" style={{ background: 'hsl(0 0% 100% / 0.06)' }}>
-                              <X className="h-5 w-5" style={{ color: 'hsl(0 0% 60%)' }} strokeWidth={2.5} />
-                            </span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {features.map((feature) => (
+                <Card
+                  key={feature.title}
+                  style={glassDarkCardStyle}
+                  className="border-0 overflow-hidden rounded-2xl transition-all duration-300 hover:bg-white/[0.08]"
+                >
+                  <CardContent className="flex items-start gap-4 p-6">
+                    <div
+                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                      style={{ background: 'hsl(40 90% 60% / 0.15)', boxShadow: 'inset 0 0 0 1px hsl(40 90% 60% / 0.25)' }}
+                    >
+                      <feature.icon className="h-6 w-6" style={{ color: 'hsl(40 90% 70%)' }} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white">{feature.title}</h3>
+                      <p className="mt-1 text-sm leading-relaxed text-[hsl(0_0%_75%)]">{feature.desc}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <div className="mt-10 flex flex-wrap justify-center gap-3">
               <Button size="lg" className="bg-accent text-white hover:bg-accent/90" onClick={() => navigate('/properties')}>자산 탐색하기</Button>
               <Button
                 size="lg"
