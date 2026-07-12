@@ -58,8 +58,18 @@ const AnalysisPage = () => {
   const [searchParams] = useSearchParams();
   const assetId = searchParams.get('id');
   const navigate = useNavigate();
-  const { user } = useAuth();
-  // 전면 무료 공개 — 모든 사용자가 상세 분석 열람 가능
+  const { user, loading: authLoading } = useAuth();
+  // 상세 분석 열람은 로그인 회원 전용 (무료)
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast({
+        title: '로그인이 필요합니다',
+        description: '상세 분석은 회원만 이용할 수 있습니다. 로그인 후 다시 시도해주세요.',
+      });
+      const redirect = assetId ? `/analysis?id=${assetId}` : '/analysis';
+      navigate(`/auth?redirect=${encodeURIComponent(redirect)}`, { replace: true });
+    }
+  }, [authLoading, user, assetId, navigate]);
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
