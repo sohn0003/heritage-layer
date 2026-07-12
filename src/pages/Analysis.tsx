@@ -63,6 +63,7 @@ const AnalysisPage = () => {
 
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [authOpen, setAuthOpen] = useState(false);
   // 탭(시나리오)별 오버라이드 — undefined면 추천값/기본값 사용
   const [equityByRank, setEquityByRank] = useState<Record<number, number | undefined>>({});
   const [presaleByRank, setPresaleByRank] = useState<Record<number, number>>({});       // 0~100 (%)
