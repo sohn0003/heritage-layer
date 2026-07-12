@@ -335,9 +335,25 @@ const AnalysisPage = () => {
                 )}
               </div>
               <h1 className="text-2xl font-bold leading-tight">{asset.address}</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                방치 기간: {asset.idle_years ?? '-'}년 · 소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}
-              </p>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+                <span>방치 기간: {asset.idle_years ?? '-'}년</span>
+                <span>·</span>
+                <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
+                <span>·</span>
+                <span className="flex items-center gap-1">
+                  활용 상태:
+                  {(() => {
+                    const s = asset.utilization_status ?? 'unutilized';
+                    const map: Record<string, { label: string; cls: string }> = {
+                      unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
+                      in_discussion: { label: '협의 중', cls: 'border-amber-400 text-amber-600' },
+                      utilized: { label: '활용 중', cls: 'border-emerald-400 text-emerald-600' },
+                    };
+                    const v = map[s] ?? map.unutilized;
+                    return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
+                  })()}
+                </span>
+              </div>
             </div>
             {/* 우측 상단 등급 계기판 */}
             {scoringResult && (
