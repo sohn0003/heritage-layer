@@ -199,23 +199,35 @@ export type Database = {
       }
       deal_signals: {
         Row: {
+          admin_response: string | null
+          admin_status: string
           asset_id: string
           created_at: string
           id: string
+          responded_at: string | null
+          responded_by: string | null
           signal_type: string
           user_id: string
         }
         Insert: {
+          admin_response?: string | null
+          admin_status?: string
           asset_id: string
           created_at?: string
           id?: string
+          responded_at?: string | null
+          responded_by?: string | null
           signal_type: string
           user_id: string
         }
         Update: {
+          admin_response?: string | null
+          admin_status?: string
           asset_id?: string
           created_at?: string
           id?: string
+          responded_at?: string | null
+          responded_by?: string | null
           signal_type?: string
           user_id?: string
         }
