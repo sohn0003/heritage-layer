@@ -353,8 +353,8 @@ const AboutPage = () => {
                   >
                     <p.icon className="h-12 w-12 md:h-14 md:w-14" style={{ color: p.color }} />
                   </div>
-                  <div className="flex-1 text-center md:text-left">
-                    <div className="mb-2 flex items-center justify-center gap-3 md:justify-start">
+                  <div className="flex-1 text-left">
+                    <div className="mb-2 flex items-center justify-start gap-3">
                       <span className="text-xs font-bold tabular-nums tracking-widest" style={{ color: p.color }}>
                         0{i + 1}
                       </span>
