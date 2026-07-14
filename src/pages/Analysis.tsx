@@ -346,8 +346,8 @@ const AnalysisPage = () => {
                     const s = asset.utilization_status ?? 'unutilized';
                     const map: Record<string, { label: string; cls: string }> = {
                       unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
-                      in_discussion: { label: '협의 중', cls: 'border-amber-400 text-amber-600' },
-                      utilized: { label: '활용 중', cls: 'border-emerald-400 text-emerald-600' },
+                      in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
+                      utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
                     };
                     const v = map[s] ?? map.unutilized;
                     return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
