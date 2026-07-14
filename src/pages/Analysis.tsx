@@ -476,7 +476,7 @@ const AnalysisPage = () => {
           </CardHeader>
           <CardContent className="grid gap-6 sm:grid-cols-2">
             <div>
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-emerald-600">
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--primary))]">
                 <Sparkles className="h-4 w-4" /> 핵심 강점
               </div>
               <div className="flex flex-wrap gap-2">
@@ -484,7 +484,7 @@ const AnalysisPage = () => {
                   <span className="text-xs text-muted-foreground">두드러진 강점 없음</span>
                 ) : (
                   analysis.recommendation.assetSummary.keyStrengths.map((s, i) => (
-                    <Badge key={i} variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                    <Badge key={i} variant="outline" className="border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.08)] text-[hsl(var(--primary))] dark:bg-[hsl(var(--primary)_/_0.15)] dark:border-[hsl(var(--primary))]">
                       {s}
                     </Badge>
                   ))
@@ -492,7 +492,7 @@ const AnalysisPage = () => {
               </div>
             </div>
             <div>
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-amber-600">
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--accent))]">
                 <ShieldAlert className="h-4 w-4" /> 주요 리스크
               </div>
               <div className="flex flex-wrap gap-2">
@@ -500,7 +500,7 @@ const AnalysisPage = () => {
                   <span className="text-xs text-muted-foreground">특이 리스크 없음</span>
                 ) : (
                   analysis.recommendation.assetSummary.keyRisks.map((s, i) => (
-                    <Badge key={i} variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                    <Badge key={i} variant="outline" className="border-[hsl(var(--accent))] bg-[hsl(var(--accent)_/_0.08)] text-[hsl(var(--accent))] dark:bg-[hsl(var(--accent)_/_0.15)] dark:border-[hsl(var(--accent))]">
                       {s}
                     </Badge>
                   ))
