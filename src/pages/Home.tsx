@@ -880,10 +880,20 @@ const HomePage = () => {
 
       {/* ── CTA ── */}
       <section className="relative overflow-hidden px-4 py-20 md:py-24">
-        <div className="relative mx-auto max-w-3xl rounded-2xl p-7 text-center sm:rounded-3xl sm:p-10 md:p-14" style={glassCardStyle}>
-          <Sparkles className="mx-auto mb-4 h-10 w-10 text-accent" />
+        <div
+          className="relative mx-auto max-w-3xl rounded-2xl p-7 text-center sm:rounded-3xl sm:p-10 md:p-14"
+          style={{
+            background: 'hsl(0 0% 100% / 0.07)',
+            border: '1px solid hsl(0 0% 100% / 0.14)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            color: 'hsl(0 0% 96%)',
+            boxShadow: '0 20px 60px -20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          <Sparkles className="mx-auto mb-4 h-10 w-10" style={{ color: 'hsl(25 55% 62%)' }} />
           <h2 className="text-3xl font-bold md:text-4xl">유휴 부동산을 새로운 기회로</h2>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-4" style={{ color: 'hsl(0 0% 75%)' }}>
             지금 가입하고 전국 자산 데이터와 AI 분석 결과를 확인해보세요.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
