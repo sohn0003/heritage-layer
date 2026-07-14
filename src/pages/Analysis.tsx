@@ -331,7 +331,7 @@ const AnalysisPage = () => {
                 </span>
                 <Badge variant="secondary">{asset.asset_type}</Badge>
                 {asset.gov_cooperation && (
-                  <Badge variant="outline" className="border-emerald-300 text-emerald-600">정부협력</Badge>
+                  <Badge variant="outline" className="border-[hsl(var(--accent))] text-[hsl(var(--accent))]">정부협력</Badge>
                 )}
               </div>
               <h1 className="text-2xl font-bold leading-tight">{asset.address}</h1>
@@ -346,8 +346,8 @@ const AnalysisPage = () => {
                     const s = asset.utilization_status ?? 'unutilized';
                     const map: Record<string, { label: string; cls: string }> = {
                       unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
-                      in_discussion: { label: '협의 중', cls: 'border-amber-400 text-amber-600' },
-                      utilized: { label: '활용 중', cls: 'border-emerald-400 text-emerald-600' },
+                      in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
+                      utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
                     };
                     const v = map[s] ?? map.unutilized;
                     return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
@@ -476,7 +476,7 @@ const AnalysisPage = () => {
           </CardHeader>
           <CardContent className="grid gap-6 sm:grid-cols-2">
             <div>
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-emerald-600">
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--primary))]">
                 <Sparkles className="h-4 w-4" /> 핵심 강점
               </div>
               <div className="flex flex-wrap gap-2">
@@ -484,7 +484,7 @@ const AnalysisPage = () => {
                   <span className="text-xs text-muted-foreground">두드러진 강점 없음</span>
                 ) : (
                   analysis.recommendation.assetSummary.keyStrengths.map((s, i) => (
-                    <Badge key={i} variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                    <Badge key={i} variant="outline" className="border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.08)] text-[hsl(var(--primary))] dark:bg-[hsl(var(--primary)_/_0.15)] dark:border-[hsl(var(--primary))]">
                       {s}
                     </Badge>
                   ))
@@ -492,7 +492,7 @@ const AnalysisPage = () => {
               </div>
             </div>
             <div>
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-amber-600">
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--accent))]">
                 <ShieldAlert className="h-4 w-4" /> 주요 리스크
               </div>
               <div className="flex flex-wrap gap-2">
@@ -500,7 +500,7 @@ const AnalysisPage = () => {
                   <span className="text-xs text-muted-foreground">특이 리스크 없음</span>
                 ) : (
                   analysis.recommendation.assetSummary.keyRisks.map((s, i) => (
-                    <Badge key={i} variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                    <Badge key={i} variant="outline" className="border-[hsl(var(--accent))] bg-[hsl(var(--accent)_/_0.08)] text-[hsl(var(--accent))] dark:bg-[hsl(var(--accent)_/_0.15)] dark:border-[hsl(var(--accent))]">
                       {s}
                     </Badge>
                   ))
@@ -695,9 +695,9 @@ const AnalysisPage = () => {
                   {scenarios.map((scenario) => {
                     const feasibility = scenario.irrResult.summary.investmentFeasibility;
                     const feasibilityClass =
-                      feasibility === '높음' ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                      : feasibility === '중간' ? 'border-amber-300 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                      : 'border-rose-300 bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300';
+                      feasibility === '높음' ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.08)] text-[hsl(var(--primary))] dark:bg-[hsl(var(--primary)_/_0.15)] dark:border-[hsl(var(--primary))]'
+                      : feasibility === '중간' ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)_/_0.08)] text-[hsl(var(--accent))] dark:bg-[hsl(var(--accent)_/_0.15)] dark:border-[hsl(var(--accent))]'
+                      : 'border-[hsl(var(--grade-d))] bg-[hsl(var(--grade-d)_/_0.08)] text-[hsl(var(--grade-d))] dark:bg-[hsl(var(--grade-d)_/_0.15)] dark:border-[hsl(var(--grade-d))]';
                     const recommendedEquity =
                       baseScenarios?.find((b) => b.rank === scenario.rank)?.recommendedEquityRatio
                       ?? scenario.recommendedEquityRatio;
@@ -728,26 +728,26 @@ const AnalysisPage = () => {
                         {/* 추천 이유 / 리스크 */}
                         <div className="grid gap-4 sm:grid-cols-2">
                           <div>
-                            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-600">
+                            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--primary))]">
                               <CheckCircle2 className="h-4 w-4" /> 추천 이유
                             </div>
                             <ul className="space-y-1.5 text-sm text-muted-foreground">
                               {scenario.reasons.map((r, i) => (
                                 <li key={i} className="flex gap-2">
-                                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />
+                                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[hsl(var(--primary))]" />
                                   <span>{r}</span>
                                 </li>
                               ))}
                             </ul>
                           </div>
                           <div>
-                            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-600">
+                            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--accent))]">
                               <AlertTriangle className="h-4 w-4" /> 주요 리스크
                             </div>
                             <ul className="space-y-1.5 text-sm text-muted-foreground">
                               {scenario.risks.map((r, i) => (
                                 <li key={i} className="flex gap-2">
-                                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-500" />
+                                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[hsl(var(--accent))]" />
                                   <span>{r}</span>
                                 </li>
                               ))}

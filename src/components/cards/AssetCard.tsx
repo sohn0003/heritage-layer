@@ -88,11 +88,11 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
   const Icon = ASSET_ICONS[asset.asset_type] ?? Building;
 
   const gradeStyles: Record<string, string> = {
-    S: 'border-emerald-500 text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-700',
-    A: 'border-blue-500 text-blue-600 bg-blue-50 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-700',
-    B: 'border-slate-400 text-slate-600 bg-slate-50 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-700',
-    C: 'border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-700',
-    D: 'border-red-500 text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 dark:border-red-700',
+    S: 'border-[hsl(var(--grade-s))] text-[hsl(var(--grade-s))] bg-[hsl(var(--grade-s)_/_0.12)] dark:bg-[hsl(var(--grade-s)_/_0.15)] dark:border-[hsl(var(--grade-s))]',
+    A: 'border-[hsl(var(--grade-a))] text-[hsl(var(--grade-a))] bg-[hsl(var(--grade-a)_/_0.12)] dark:bg-[hsl(var(--grade-a)_/_0.15)] dark:border-[hsl(var(--grade-a))]',
+    B: 'border-[hsl(var(--grade-b))] text-[hsl(var(--grade-b))] bg-[hsl(var(--grade-b)_/_0.12)] dark:bg-[hsl(var(--grade-b)_/_0.15)] dark:border-[hsl(var(--grade-b))]',
+    C: 'border-[hsl(var(--grade-c))] text-[hsl(var(--grade-c))] bg-[hsl(var(--grade-c)_/_0.12)] dark:bg-[hsl(var(--grade-c)_/_0.15)] dark:border-[hsl(var(--grade-c))]',
+    D: 'border-[hsl(var(--grade-d))] text-[hsl(var(--grade-d))] bg-[hsl(var(--grade-d)_/_0.12)] dark:bg-[hsl(var(--grade-d)_/_0.15)] dark:border-[hsl(var(--grade-d))]',
   };
 
   return (
@@ -111,7 +111,7 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
             )}
           </div>
           {asset.gov_cooperation && (
-            <Badge variant="outline" className="border-emerald-300 text-xs text-emerald-600">정부협력</Badge>
+            <Badge variant="outline" className="border-[hsl(var(--accent))] text-xs text-[hsl(var(--accent))]">정부협력</Badge>
           )}
         </div>
 
