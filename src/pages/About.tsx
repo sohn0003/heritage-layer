@@ -239,38 +239,27 @@ const AboutPage = () => {
             <p className="mt-4 text-muted-foreground">유휴자산 재생을 5단계로 연결합니다</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[hsl(0_0%_100%_/_0.12)] sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {[
-              { num: '01', title: '자산 탐색', desc: '전국 유휴자산 지도 핀 탐색. 등급 배치(S~D)로 즉시 확인.', label: '무료 공개' },
-              { num: '02', title: '등급 분석', desc: 'COSMO-P 알고리즘, 입지·규제·심미성·사업성 4분류 종합 평가.', label: '무료 공개' },
-              { num: '03', title: '시나리오', desc: '1/2/3순위 개발 방향 자동 추천. 전환 용도·공사 방식·대출 구조 제안.', label: '무료 공개' },
-              { num: '04', title: '재무 검증', desc: 'IRR·DSCR·투자회수기간 실시간 시뮬레이션. 자기자본 손익계산으로 즉시 재계산.', label: '무료 공개' },
-              { num: '05', title: '딜 연결', desc: 'THE LAYER 직접 사업 연결. 브릿지 솔루션으로 기회부터 PM까지 지원.', label: 'THE LAYER' },
-            ].map((s, i) => {
-              const isLast = i === 4;
-              return (
-                <div
-                  key={s.num}
-                  className="relative flex min-h-[260px] flex-col justify-between p-6 transition-colors sm:min-h-[300px] md:p-8"
-                  style={{
-                    background: isLast ? 'hsl(43 55% 48%)' : 'hsl(226 35% 12%)',
-                    color: isLast ? 'hsl(226 35% 12%)' : 'hsl(0 0% 96%)',
-                  }}
-                >
-                  <div>
-                    <span
-                      className="text-xs font-bold tracking-[0.2em]"
-                      style={{ color: isLast ? 'hsl(226 35% 22%)' : 'hsl(25 55% 62%)' }}
-                    >
-                      STEP {s.num}
-                    </span>
-                    <h3 className="mt-4 text-2xl font-bold" style={{ color: isLast ? 'hsl(226 35% 12%)' : 'hsl(0 0% 96%)' }}>{s.title}</h3>
-                    <p className="mt-3 text-sm leading-relaxed" style={{ color: isLast ? 'hsl(226 35% 22% / 0.85)' : 'hsl(0 0% 75%)' }}>{s.desc}</p>
-                  </div>
-                  <p className="mt-8 text-xs font-medium tracking-[0.2em] uppercase" style={{ color: isLast ? 'hsl(226 35% 12%)' : 'hsl(25 55% 62%)' }}>{s.label}</p>
-                </div>
-              );
-            })}
+              { num: '01', title: '자산 탐색', desc: '전국 유휴자산 지도 핀 탐색. 등급 배치(S~D)로 즉시 확인.' },
+              { num: '02', title: '등급 분석', desc: 'COSMO-P 알고리즘, 입지·규제·심미성·사업성 4분류 종합 평가.' },
+              { num: '03', title: '시나리오', desc: '1/2/3순위 개발 방향 자동 추천. 전환 용도·공사 방식·대출 구조 제안.' },
+              { num: '04', title: '재무 검증', desc: 'IRR·DSCR·투자회수기간 실시간 시뮬레이션. 자기자본 손익계산으로 즉시 재계산.' },
+              { num: '05', title: '딜 연결', desc: '브릿지 솔루션으로 기회부터 PM까지 지원.' },
+            ].map((s) => (
+              <div
+                key={s.num}
+                className="relative flex flex-col rounded-2xl border border-[hsl(220_30%_12%_/_0.08)] bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:min-h-[280px] md:p-8"
+                style={{
+                  color: 'hsl(226 35% 12%)',
+                  boxShadow: '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
+                }}
+              >
+                <span className="text-xs font-bold tracking-[0.2em] text-accent">STEP {s.num}</span>
+                <h3 className="mt-4 text-xl font-bold text-foreground sm:text-2xl">{s.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
