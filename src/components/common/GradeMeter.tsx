@@ -6,11 +6,11 @@ import { cn } from '@/lib/utils';
 // angle: 바늘 회전각 (0 = 정중앙 = B 위치, 음수 = 좌측, 양수 = 우측)
 // 5개 구간 중심: D=-72°, C=-36°, B=0°, A=+36°, S=+72°
 const GRADE_INFO: Record<string, { color: string; angle: number; label: string }> = {
-  S: { color: 'hsl(199, 70%, 50%)', angle: 72, label: '최우수' },
-  A: { color: 'hsl(150, 60%, 45%)', angle: 36, label: '우수' },
-  B: { color: 'hsl(40, 90%, 55%)', angle: 0, label: '양호' },
-  C: { color: 'hsl(25, 85%, 55%)', angle: -36, label: '보통' },
-  D: { color: 'hsl(0, 75%, 55%)', angle: -72, label: '주의' },
+  S: { color: 'hsl(210 45% 72%)', angle: 72, label: '최우수' },
+  A: { color: 'hsl(210 45% 55%)', angle: 36, label: '우수' },
+  B: { color: 'hsl(210 30% 60%)', angle: 0, label: '양호' },
+  C: { color: 'hsl(25 55% 62%)', angle: -36, label: '보통' },
+  D: { color: 'hsl(15 40% 55%)', angle: -72, label: '주의' },
 };
 
 interface GradeMeterProps {
