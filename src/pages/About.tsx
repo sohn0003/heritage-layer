@@ -298,8 +298,8 @@ const AboutPage = () => {
       <section
         className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28"
       >
-        <Blob className="left-[-10%] top-10 h-96 w-96" color="hsl(0 70% 80%)" />
-        <Blob className="right-[-10%] bottom-10 h-96 w-96" color="hsl(40 90% 80%)" />
+        <Blob className="left-[-10%] top-10 h-96 w-96" color="hsl(15 40% 78%)" />
+        <Blob className="right-[-10%] bottom-10 h-96 w-96" color="hsl(25 45% 78%)" />
 
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-12 text-center">
@@ -326,8 +326,8 @@ const AboutPage = () => {
 
             <div className="space-y-6">
               {[
-                { icon: Database, t: '데이터의 분절', d: '교육부·국토부·지자체로 흩어진 자산 정보를 통합 조회할 수 없습니다. 어디에 무엇이 있는지조차 한눈에 파악되지 않습니다.', color: 'hsl(0 70% 55%)' },
-                { icon: Users, t: '주체의 부재', d: '관리 주체가 명확치 않아 책임 있는 재생 사업이 진행되지 못합니다. 누구도 결정권자가 아닌 상태로 수년이 흘러갑니다.', color: 'hsl(25 90% 55%)' },
+                { icon: Database, t: '데이터의 분절', d: '교육부·국토부·지자체로 흩어진 자산 정보를 통합 조회할 수 없습니다. 어디에 무엇이 있는지조차 한눈에 파악되지 않습니다.', color: 'hsl(15 40% 55%)' },
+                { icon: Users, t: '주체의 부재', d: '관리 주체가 명확치 않아 책임 있는 재생 사업이 진행되지 못합니다. 누구도 결정권자가 아닌 상태로 수년이 흘러갑니다.', color: 'hsl(25 55% 58%)' },
                 { icon: Building2, t: '복잡한 인허가', d: '용도변경, 종상향, 환경영향평가 등 절차가 미로처럼 얽혀 있습니다. 작은 사업자에게는 진입 장벽 그 자체입니다.', color: 'hsl(var(--accent))' },
                 { icon: TrendingDown, t: '낮은 수익성 인식', d: '사업성 검토조차 하지 않은 채 폐기 결정이 내려집니다. 데이터 기반 분석 없이는 기회조차 발견되지 않습니다.', color: 'hsl(var(--primary))' },
               ].map((p, i) => (
@@ -364,8 +364,8 @@ const AboutPage = () => {
 
       {/* ── HOW WE WORK (라이트, 다크 블록 진입 전) ── */}
       <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
-        <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(220 50% 80%)" />
-        <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(40 80% 80%)" />
+        <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(210 40% 82%)" />
+        <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(25 45% 78%)" />
 
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-16 text-center">
@@ -404,17 +404,17 @@ const AboutPage = () => {
       <div
         aria-hidden
         className="h-40 -mb-px"
-        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 38% 10%) 100%)' }}
+        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(226 35% 12%) 100%)' }}
       />
       {/* ── DARK BLOCK: INSIGHT + MISSION + PLATFORM (연속 단일 배경) ── */}
       <div
         className="relative overflow-hidden"
-        style={{ background: 'hsl(220 38% 10%)' }}
+        style={{ background: 'hsl(226 35% 12%)' }}
       >
         {/* 전체 다크 블록을 가로지르는 연속 블롭 */}
-        <Blob className="right-[-15%] top-[6%] h-[600px] w-[600px]" color="hsl(40 90% 55%)" />
-        <Blob className="left-[-15%] top-[40%] h-[600px] w-[600px]" color="hsl(220 80% 60%)" />
-        <Blob className="right-[-10%] bottom-[5%] h-[600px] w-[600px]" color="hsl(40 90% 55%)" />
+        <Blob className="right-[-15%] top-[6%] h-[600px] w-[600px]" color="hsl(25 55% 55%)" />
+        <Blob className="left-[-15%] top-[40%] h-[600px] w-[600px]" color="hsl(210 45% 55%)" />
+        <Blob className="right-[-10%] bottom-[5%] h-[600px] w-[600px]" color="hsl(25 55% 55%)" />
         {/* ── INSIGHT: 전국 유휴 현황 (다크) ── */}
         <section className="relative overflow-hidden px-4 py-16 sm:py-20 md:py-28">
           <div
@@ -433,9 +433,9 @@ const AboutPage = () => {
 
           <div className="relative mx-auto max-w-6xl text-[hsl(0_0%_96%)]">
             <div className="mb-12 text-center sm:mb-14">
-              <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Insight</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(25 55% 62%)' }}>Insight</span>
               <h2 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
-                <span className="bg-gradient-to-r from-white via-white to-[hsl(40_90%_75%)] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-white via-white to-[hsl(25_55%_68%)] bg-clip-text text-transparent">
                   방치된 자원, 숫자로 보다
                 </span>
               </h2>
@@ -448,14 +448,14 @@ const AboutPage = () => {
               style={{ background: 'hsl(0 0% 100% / 0.08)' }}
             >
               {[
-                { icon: School, label: '전국 폐교', value: 3955, suffix: '개', color: 'hsl(220 90% 70%)' },
-                { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(40 95% 65%)' },
-                { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(0 80% 65%)' },
+                { icon: School, label: '전국 폐교', value: 3955, suffix: '개', color: 'hsl(210 45% 72%)' },
+                { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(25 55% 62%)' },
+                { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(25 55% 62%)' },
               ].map((s) => (
                 <div
                   key={s.label}
                   className="group relative p-6 transition-colors hover:bg-white/[0.03] sm:p-8"
-                  style={{ background: 'hsl(220 40% 9%)' }}
+                  style={{ background: 'hsl(226 30% 15%)' }}
                 >
                   <div
                     className="absolute inset-x-0 top-0 h-px"
@@ -487,10 +487,10 @@ const AboutPage = () => {
                 <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[hsl(0_0%_60%)]">Top 5</span>
               </div>
               <div className="space-y-6">
-                <InsightBar label="전남" value={839} max={1000} color="hsl(220 90% 70%)" suffix="개" />
-                <InsightBar label="경북" value={745} max={1000} color="hsl(220 90% 70%)" suffix="개" />
-                <InsightBar label="경남" value={584} max={1000} color="hsl(40 95% 65%)" suffix="개" />
-                <InsightBar label="강원" value={476} max={1000} color="hsl(40 95% 65%)" suffix="개" />
+                <InsightBar label="전남" value={839} max={1000} color="hsl(210 45% 72%)" suffix="개" />
+                <InsightBar label="경북" value={745} max={1000} color="hsl(210 45% 72%)" suffix="개" />
+                <InsightBar label="경남" value={584} max={1000} color="hsl(25 55% 62%)" suffix="개" />
+                <InsightBar label="강원" value={476} max={1000} color="hsl(25 55% 62%)" suffix="개" />
                 <InsightBar label="전북" value={329} max={1000} color="hsl(220 30% 65%)" suffix="개" />
               </div>
               <div className="mt-6 h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.15), transparent)' }} />
@@ -522,7 +522,7 @@ const AboutPage = () => {
         <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
           <div className="relative mx-auto max-w-5xl">
             <div className="mb-12 text-center text-[hsl(0_0%_96%)]">
-              <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Platform</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(25 55% 62%)' }}>Platform</span>
               <h2 className="mt-3 text-4xl font-bold md:text-5xl">플랫폼 기능</h2>
               <p className="mx-auto mt-4 max-w-2xl text-[hsl(0_0%_78%)]">
                 Heritage Layer는 누구나 무료로 이용할 수 있는 데이터 기반 재생 플랫폼입니다.
@@ -539,9 +539,9 @@ const AboutPage = () => {
                   <CardContent className="flex items-start gap-4 p-6">
                     <div
                       className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-                      style={{ background: 'hsl(40 90% 60% / 0.15)', boxShadow: 'inset 0 0 0 1px hsl(40 90% 60% / 0.25)' }}
+                      style={{ background: 'hsl(25 55% 58% / 0.15)', boxShadow: 'inset 0 0 0 1px hsl(25 55% 58% / 0.25)' }}
                     >
-                      <feature.icon className="h-6 w-6" style={{ color: 'hsl(40 90% 70%)' }} />
+                      <feature.icon className="h-6 w-6" style={{ color: 'hsl(25 55% 62%)' }} />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-white">{feature.title}</h3>
@@ -570,7 +570,7 @@ const AboutPage = () => {
       <div
         aria-hidden
         className="h-40 -mt-px"
-        style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
+        style={{ background: 'linear-gradient(180deg, hsl(226 35% 12%) 0%, hsl(var(--background)) 100%)' }}
       />
 
       <footer className="border-t px-4 py-8 text-center text-sm text-muted-foreground">
