@@ -228,15 +228,24 @@ const AboutPage = () => {
       </section>
 
       {/* ── HOW WE WORK: Heritage Layer가 제공하는 것 ── */}
-      <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
-        <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(210 40% 82%)" />
-        <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(25 45% 78%)" />
+      <section
+        className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28"
+        style={{ background: 'hsl(226 35% 12%)' }}
+      >
+        {/* 상단 연결 그라데이션: 상위 섹션의 어두운 배경에서 현재 배경으로 자연스럽게 전환 */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-32"
+          style={{ background: 'linear-gradient(180deg, hsl(226 35% 8%) 0%, transparent 100%)' }}
+        />
+        <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(25 55% 55% / 0.18)" />
+        <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(210 45% 55% / 0.18)" />
 
         <div className="relative mx-auto max-w-7xl">
           <div className="mb-12 text-center md:mb-16">
             <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">What We Provide</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">Heritage Layer가 제공하는 것</h2>
-            <p className="mt-4 text-muted-foreground">유휴자산 재생을 5단계로 연결합니다</p>
+            <h2 className="mt-3 text-4xl font-bold text-white md:text-5xl">Heritage Layer가 제공하는 것</h2>
+            <p className="mt-4 text-[hsl(0_0%_75%)]">유휴자산 재생을 5단계로 연결합니다</p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -249,14 +258,19 @@ const AboutPage = () => {
             ].map((s) => (
               <div
                 key={s.num}
-                className="relative flex flex-col rounded-2xl border border-[hsl(220_30%_12%_/_0.08)] bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:min-h-[280px] md:p-8"
+                className="relative flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 sm:min-h-[280px] md:p-8"
                 style={{
-                  boxShadow: '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
+                  background: 'hsl(0 0% 100% / 0.06)',
+                  border: '1px solid hsl(0 0% 100% / 0.12)',
+                  backdropFilter: 'blur(18px)',
+                  WebkitBackdropFilter: 'blur(18px)',
+                  color: 'hsl(0 0% 96%)',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.2), 0 12px 32px -8px rgba(0,0,0,0.35)',
                 }}
               >
-                <span className="text-xs font-bold tracking-[0.2em]" style={{ color: 'hsl(25 55% 55%)' }}>STEP {s.num}</span>
-                <h3 className="mt-4 text-xl font-bold sm:text-2xl" style={{ color: 'hsl(226 35% 12%)' }}>{s.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed" style={{ color: 'hsl(226 35% 40%)' }}>{s.desc}</p>
+                <span className="text-xs font-bold tracking-[0.2em]" style={{ color: 'hsl(25 55% 62%)' }}>STEP {s.num}</span>
+                <h3 className="mt-4 text-xl font-bold text-white sm:text-2xl">{s.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[hsl(0_0%_75%)]">{s.desc}</p>
               </div>
             ))}
           </div>
