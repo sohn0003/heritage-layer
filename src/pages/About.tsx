@@ -277,12 +277,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* fade: light → dark */}
-      <div
-        aria-hidden
-        className="h-40 -mb-px"
-        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(226 35% 12%) 100%)' }}
-      />
       {/* ── DARK BLOCK: INSIGHT + MISSION + PLATFORM (연속 단일 배경) ── */}
       <div
         className="relative overflow-hidden"
