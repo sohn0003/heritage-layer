@@ -333,7 +333,7 @@ const AboutPage = () => {
               ].map((p, i) => (
                 <div
                   key={p.t}
-                  className={`flex flex-col items-center gap-6 rounded-2xl p-5 sm:p-6 sm:rounded-3xl md:p-8 md:flex-row ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
+                  className="flex flex-col items-center gap-6 rounded-2xl p-5 sm:p-6 sm:rounded-3xl md:p-8 md:flex-row"
                   style={{
                     background: 'hsl(0 0% 100% / 0.06)',
                     border: '1px solid hsl(0 0% 100% / 0.14)',
