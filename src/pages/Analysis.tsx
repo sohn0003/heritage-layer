@@ -695,9 +695,9 @@ const AnalysisPage = () => {
                   {scenarios.map((scenario) => {
                     const feasibility = scenario.irrResult.summary.investmentFeasibility;
                     const feasibilityClass =
-                      feasibility === '높음' ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                      : feasibility === '중간' ? 'border-amber-300 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                      : 'border-rose-300 bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300';
+                      feasibility === '높음' ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.08)] text-[hsl(var(--primary))] dark:bg-[hsl(var(--primary)_/_0.15)] dark:border-[hsl(var(--primary))]'
+                      : feasibility === '중간' ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)_/_0.08)] text-[hsl(var(--accent))] dark:bg-[hsl(var(--accent)_/_0.15)] dark:border-[hsl(var(--accent))]'
+                      : 'border-[hsl(var(--grade-d))] bg-[hsl(var(--grade-d)_/_0.08)] text-[hsl(var(--grade-d))] dark:bg-[hsl(var(--grade-d)_/_0.15)] dark:border-[hsl(var(--grade-d))]';
                     const recommendedEquity =
                       baseScenarios?.find((b) => b.rank === scenario.rank)?.recommendedEquityRatio
                       ?? scenario.recommendedEquityRatio;
