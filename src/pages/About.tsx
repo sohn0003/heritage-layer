@@ -4,8 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Database, Lightbulb, Rocket, AlertTriangle,
-  TrendingDown, School, Home as HomeIcon, Building2, Users, Sparkles,
+  Database, Lightbulb, AlertTriangle,
+  TrendingDown, School, Home as HomeIcon, Building2, Sparkles,
   ArrowRight, Search, FileText, BarChart3, GitCompare, Landmark, HandCoins, Bookmark,
 } from 'lucide-react';
 import aboutHeroBg from '@/assets/about-hero-bg.png';
@@ -100,153 +100,7 @@ const InsightBar = ({ label, value, max, color, suffix = '' }: { label: string; 
   );
 };
 
-// ── 단계별 그래픽 ─────────────────────────────────
-const Step1Graphic = () => {
-  const { ref, inView } = useInView<HTMLDivElement>(0.3);
-  return (
-    <div ref={ref} className="relative h-full w-full">
-      {/* 데이터 컬럼들이 위로 자라는 막대 그래프 */}
-      <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full">
-        {[40, 70, 110, 145].map((x, i) => {
-          const heights = [80, 130, 100, 155];
-          return (
-            <g key={i}>
-              <rect
-                x={x - 12} y={170} width="24" rx="4"
-                fill={i % 2 === 0 ? 'hsl(var(--primary))' : 'hsl(var(--accent))'}
-                style={{
-                  transformOrigin: `${x}px 170px`,
-                  transform: inView ? `scaleY(${heights[i] / 100})` : 'scaleY(0)',
-                  transition: `transform 1000ms cubic-bezier(.34,1.56,.64,1) ${i * 150}ms`,
-                  opacity: 0.85,
-                }}
-              />
-            </g>
-          );
-        })}
-      </svg>
-      <Database
-        className="absolute right-3 top-3 h-8 w-8 transition-all duration-700"
-        style={{
-          color: 'hsl(var(--primary))',
-          opacity: inView ? 1 : 0,
-          transform: inView ? 'translateY(0)' : 'translateY(-10px)',
-          transitionDelay: '700ms',
-        }}
-      />
-    </div>
-  );
-};
-
-const Step2Graphic = () => {
-  const { ref, inView } = useInView<HTMLDivElement>(0.3);
-  return (
-    <div ref={ref} className="relative h-full w-full">
-      {/* 전구 + 발산 빛줄기 */}
-      <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full">
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => {
-          const x2 = 100 + Math.cos((deg * Math.PI) / 180) * 80;
-          const y2 = 100 + Math.sin((deg * Math.PI) / 180) * 80;
-          return (
-            <line
-              key={i}
-              x1="100" y1="100" x2={x2} y2={y2}
-              stroke="hsl(var(--accent))" strokeWidth="2" strokeLinecap="round"
-              strokeDasharray="80"
-              strokeDashoffset={inView ? 0 : 80}
-              style={{ transition: `stroke-dashoffset 800ms ease-out ${300 + i * 80}ms`, opacity: 0.6 }}
-            />
-          );
-        })}
-      </svg>
-      <div
-        className="absolute left-1/2 top-1/2 flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-all duration-700"
-        style={{
-          background: 'linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)))',
-          boxShadow: '0 20px 50px -10px hsl(var(--accent) / 0.6)',
-          opacity: inView ? 1 : 0,
-          transform: inView ? 'translate(-50%,-50%) scale(1)' : 'translate(-50%,-50%) scale(0.3)',
-        }}
-      >
-        <Lightbulb className="h-10 w-10 text-white" />
-      </div>
-    </div>
-  );
-};
-
-const Step3Graphic = () => {
-  const { ref, inView } = useInView<HTMLDivElement>(0.3);
-  return (
-    <div ref={ref} className="relative h-full w-full">
-      {/* 로켓이 우상향으로 발사 + 궤적 */}
-      <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full">
-        <path
-          d="M 30 170 Q 100 130 170 40"
-          fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5"
-          strokeDasharray="200" strokeDashoffset={inView ? 0 : 200}
-          style={{ transition: 'stroke-dashoffset 1500ms ease-out 200ms' }}
-        />
-        {[0.25, 0.5, 0.75].map((t, i) => {
-          const mt = 1 - t;
-          const cx = mt * mt * 30 + 2 * mt * t * 100 + t * t * 170;
-          const cy = mt * mt * 170 + 2 * mt * t * 130 + t * t * 40;
-          return (
-            <circle
-              key={i} cx={cx} cy={cy} r="4" fill="hsl(var(--accent))"
-              style={{ opacity: inView ? 1 : 0, transition: `opacity 400ms ${800 + i * 150}ms` }}
-            />
-          );
-        })}
-      </svg>
-      <Rocket
-        className="absolute h-12 w-12 transition-all duration-700"
-        style={{
-          left: '85%',
-          top: '20%',
-          transform: inView
-            ? 'translate(-50%, -50%) rotate(-45deg)'
-            : 'translate(calc(-50% - 30px), calc(-50% + 30px)) rotate(-75deg)',
-          color: 'hsl(var(--primary))',
-          opacity: inView ? 1 : 0,
-          transitionDelay: '1500ms',
-          filter: 'drop-shadow(0 6px 12px hsl(var(--primary) / 0.4))',
-        }}
-      />
-    </div>
-  );
-};
-
-const StepBlock = ({ num, title, desc, icon: Icon, side, accent, children }: {
-  num: string; title: string; desc: string; icon: any; side: 'left' | 'right'; accent: string; children: React.ReactNode;
-}) => {
-  const { ref, inView } = useInView<HTMLDivElement>(0.25);
-  const isLeft = side === 'left';
-  return (
-    <div ref={ref} className="relative grid items-center gap-10 py-12 md:grid-cols-2 md:gap-16 md:py-20">
-      <div
-        className={`${isLeft ? 'md:order-1' : 'md:order-2'} transition-all duration-1000`}
-        style={{ opacity: inView ? 1 : 0, transform: inView ? 'translateX(0)' : `translateX(${isLeft ? -40 : 40}px)` }}
-      >
-        <div className="mb-4 flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl text-sm font-bold tracking-widest"
-            style={{ background: `${accent}22`, color: accent }}>{num}</span>
-          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">Step {num}</span>
-        </div>
-        <h3 className="text-3xl font-bold leading-tight md:text-4xl">{title}</h3>
-        <p className="mt-4 text-base text-muted-foreground md:text-lg">{desc}</p>
-      </div>
-      <div
-        className={`${isLeft ? 'md:order-2' : 'md:order-1'} relative mx-auto aspect-square w-full max-w-[420px] transition-all duration-1000`}
-        style={{ opacity: inView ? 1 : 0, transform: inView ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.95)', transitionDelay: '150ms' }}
-      >
-        <div className="absolute inset-0 rounded-3xl"
-          style={{ ...glassCardStyle, background: `linear-gradient(135deg, ${accent}10, rgba(255,255,255,0.6))` }} />
-        <div className="relative h-full w-full p-8">{children}</div>
-        <Icon className="absolute -bottom-4 -right-4 h-16 w-16 opacity-15" style={{ color: accent }} />
-      </div>
-    </div>
-  );
-};
+// ── 플랫폼 기능 카드 데이터 ───────────────────────────────
 
 // ── 플랫폼 기능 카드 데이터 ───────────────────────────────
 const features = [
@@ -373,41 +227,51 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* ── HOW WE WORK (라이트, 다크 블록 진입 전) ── */}
+      {/* ── HOW WE WORK: Heritage Layer가 제공하는 것 ── */}
       <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
         <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(210 40% 82%)" />
         <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(25 45% 78%)" />
 
-        <div className="relative mx-auto max-w-6xl">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">How We Work</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">우리가 일하는 방식</h2>
-            <p className="mt-4 text-muted-foreground">데이터 → 아이디어 → 실행, 3단계로 자산을 재생합니다</p>
+        <div className="relative mx-auto max-w-7xl">
+          <div className="mb-12 text-center md:mb-16">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">What We Provide</span>
+            <h2 className="mt-3 text-4xl font-bold md:text-5xl">Heritage Layer가 제공하는 것</h2>
+            <p className="mt-4 text-muted-foreground">유휴자산 재생을 5단계로 연결합니다</p>
           </div>
 
-          <StepBlock
-            num="01" title="데이터로 가능성을 본다"
-            desc="전국 유휴자산 데이터를 수집하고 정제합니다. 위치, 법규, 인구, 시장 정보를 한곳에 모아 비교 가능한 형태로 만듭니다."
-            icon={Database} side="left" accent="hsl(var(--primary))"
-          >
-            <Step1Graphic />
-          </StepBlock>
-
-          <StepBlock
-            num="02" title="가장 잘 맞는 재생 방향을 찾는다"
-            desc="입지·법규·시장 데이터를 알고리즘이 결합하여 1·2·3순위 재생 시나리오를 자동 추천합니다. 사람이 며칠 걸릴 검토를 즉시 끝냅니다."
-            icon={Lightbulb} side="right" accent="hsl(var(--accent))"
-          >
-            <Step2Graphic />
-          </StepBlock>
-
-          <StepBlock
-            num="03" title="실제 사업으로 연결한다"
-            desc="프로젝트 매니징을 담당하고 개발에 필요한 리소스를 제공합니다."
-            icon={Rocket} side="left" accent="hsl(var(--primary))"
-          >
-            <Step3Graphic />
-          </StepBlock>
+          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[hsl(0_0%_100%_/_0.12)] sm:grid-cols-2 lg:grid-cols-5">
+            {[
+              { num: '01', title: '자산 탐색', desc: '전국 유휴자산 지도 핀 탐색. 등급 배치(S~D)로 즉시 확인.', label: '무료 공개' },
+              { num: '02', title: '등급 분석', desc: 'COSMO-P 알고리즘, 입지·규제·심미성·사업성 4분류 종합 평가.', label: '무료 공개' },
+              { num: '03', title: '시나리오', desc: '1/2/3순위 개발 방향 자동 추천. 전환 용도·공사 방식·대출 구조 제안.', label: '무료 공개' },
+              { num: '04', title: '재무 검증', desc: 'IRR·DSCR·투자회수기간 실시간 시뮬레이션. 자기자본 손익계산으로 즉시 재계산.', label: '무료 공개' },
+              { num: '05', title: '딜 연결', desc: 'THE LAYER 직접 사업 연결. 브릿지 솔루션으로 기회부터 PM까지 지원.', label: 'THE LAYER' },
+            ].map((s, i) => {
+              const isLast = i === 4;
+              return (
+                <div
+                  key={s.num}
+                  className="relative flex min-h-[260px] flex-col justify-between p-6 transition-colors sm:min-h-[300px] md:p-8"
+                  style={{
+                    background: isLast ? 'hsl(43 55% 48%)' : 'hsl(226 35% 12%)',
+                    color: isLast ? 'hsl(226 35% 12%)' : 'hsl(0 0% 96%)',
+                  }}
+                >
+                  <div>
+                    <span
+                      className="text-xs font-bold tracking-[0.2em]"
+                      style={{ color: isLast ? 'hsl(226 35% 22%)' : 'hsl(25 55% 62%)' }}
+                    >
+                      STEP {s.num}
+                    </span>
+                    <h3 className="mt-4 text-2xl font-bold" style={{ color: isLast ? 'hsl(226 35% 12%)' : 'hsl(0 0% 96%)' }}>{s.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed" style={{ color: isLast ? 'hsl(226 35% 22% / 0.85)' : 'hsl(0 0% 75%)' }}>{s.desc}</p>
+                  </div>
+                  <p className="mt-8 text-xs font-medium tracking-[0.2em] uppercase" style={{ color: isLast ? 'hsl(226 35% 12%)' : 'hsl(25 55% 62%)' }}>{s.label}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
