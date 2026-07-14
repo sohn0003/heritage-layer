@@ -756,7 +756,7 @@ const HomePage = () => {
             {[
               { icon: School, label: '전국 폐교', value: 3955, suffix: '개', color: 'hsl(210 45% 72%)' },
               { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(25 55% 62%)' },
-              { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(25 55% 62%)' },
+              { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(15 40% 55%)' },
             ].map((s) => (
               <div
                 key={s.label}
