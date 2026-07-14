@@ -111,7 +111,7 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
             )}
           </div>
           {asset.gov_cooperation && (
-            <Badge variant="outline" className="border-emerald-300 text-xs text-emerald-600">정부협력</Badge>
+            <Badge variant="outline" className="border-[hsl(var(--accent))] text-xs text-[hsl(var(--accent))]">정부협력</Badge>
           )}
         </div>
 
