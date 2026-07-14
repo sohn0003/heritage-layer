@@ -326,9 +326,9 @@ const AboutPage = () => {
 
             <div className="space-y-6">
               {[
-                { icon: Database, t: '정보 사일로화', d: '유휴자산 정보가 교육부·국토부·행안부·지자체별로 흩어져 있습니다. 통합 파악이 구조적으로 불가능합니다.', color: 'hsl(15 40% 55%)' },
-                { icon: TrendingDown, t: '사업성 판단 어려움', d: '용도지역·건폐율·수요환경을 종합 분석할 도구가 없습니다. 개인·소규모 주체의 진입 장벽이 구조적으로 높습니다.', color: 'hsl(25 55% 58%)' },
-                { icon: Building2, t: '인허가 불확실성', d: '수의계약·민간제안·종상향 가능성 등 공공자산 활용 경로가 복잡합니다. 지자체마다 조건이 다르고 정보가 없습니다.', color: 'hsl(var(--accent))' },
+                { icon: Database, t: '정보 사일로화', d: '유휴자산 정보가 교육부·국토부·행안부·지자체별로 흩어져 있습니다. 통합 파악이 구조적으로 불가능합니다.', color: 'hsl(var(--primary))' },
+                { icon: TrendingDown, t: '사업성 판단 어려움', d: '용도지역·건폐율·수요환경을 종합 분석할 도구가 없습니다. 개인·소규모 주체의 진입 장벽이 구조적으로 높습니다.', color: 'hsl(var(--primary))' },
+                { icon: Building2, t: '인허가 불확실성', d: '수의계약·민간제안·종상향 가능성 등 공공자산 활용 경로가 복잡합니다. 지자체마다 조건이 다르고 정보가 없습니다.', color: 'hsl(var(--primary))' },
                 { icon: TrendingDown, t: '재무 모델 부재', d: '전환 용도별 IRR·DSCR·투자회수기간 등 재무 검증 수단이 없습니다. 투자 결정이 직관에 의존할 수밖에 없습니다.', color: 'hsl(var(--primary))' },
               ].map((p, i) => (
                 <div
