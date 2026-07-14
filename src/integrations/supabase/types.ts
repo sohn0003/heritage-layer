@@ -475,6 +475,8 @@ export type Database = {
       assets_public: {
         Row: {
           address: string | null
+          asking_building_price: number | null
+          asking_land_price: number | null
           asset_type: string | null
           building_condition: string | null
           building_coverage: number | null
@@ -518,6 +520,8 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          asking_building_price?: number | null
+          asking_land_price?: number | null
           asset_type?: string | null
           building_condition?: string | null
           building_coverage?: number | null
@@ -561,6 +565,8 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          asking_building_price?: number | null
+          asking_land_price?: number | null
           asset_type?: string | null
           building_condition?: string | null
           building_coverage?: number | null
