@@ -251,13 +251,12 @@ const AboutPage = () => {
                 key={s.num}
                 className="relative flex flex-col rounded-2xl border border-[hsl(220_30%_12%_/_0.08)] bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:min-h-[280px] md:p-8"
                 style={{
-                  color: 'hsl(226 35% 12%)',
                   boxShadow: '0 1px 2px rgba(27, 46, 74, 0.06), 0 8px 24px -6px rgba(27, 46, 74, 0.12), 0 24px 48px -16px rgba(27, 46, 74, 0.18)',
                 }}
               >
-                <span className="text-xs font-bold tracking-[0.2em] text-accent">STEP {s.num}</span>
-                <h3 className="mt-4 text-xl font-bold text-foreground sm:text-2xl">{s.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+                <span className="text-xs font-bold tracking-[0.2em]" style={{ color: 'hsl(25 55% 55%)' }}>STEP {s.num}</span>
+                <h3 className="mt-4 text-xl font-bold sm:text-2xl" style={{ color: 'hsl(226 35% 12%)' }}>{s.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed" style={{ color: 'hsl(226 35% 40%)' }}>{s.desc}</p>
               </div>
             ))}
           </div>
