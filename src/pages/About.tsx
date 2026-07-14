@@ -333,7 +333,7 @@ const AboutPage = () => {
               ].map((p, i) => (
                 <div
                   key={p.t}
-                  className={`flex flex-col items-center gap-6 rounded-2xl p-5 sm:p-6 sm:rounded-3xl md:p-8 md:flex-row ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
+                  className="flex flex-col items-center gap-6 rounded-2xl p-5 sm:p-6 sm:rounded-3xl md:p-8 md:flex-row"
                   style={{
                     background: 'hsl(0 0% 100% / 0.06)',
                     border: '1px solid hsl(0 0% 100% / 0.14)',
@@ -353,8 +353,8 @@ const AboutPage = () => {
                   >
                     <p.icon className="h-12 w-12 md:h-14 md:w-14" style={{ color: p.color }} />
                   </div>
-                  <div className={`flex-1 text-center ${i % 2 === 1 ? 'md:text-right' : 'md:text-left'}`}>
-                    <div className="mb-2 flex items-center justify-center gap-3 md:justify-start" style={{ flexDirection: i % 2 === 1 ? 'row-reverse' : 'row' }}>
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="mb-2 flex items-center justify-center gap-3 md:justify-start">
                       <span className="text-xs font-bold tabular-nums tracking-widest" style={{ color: p.color }}>
                         0{i + 1}
                       </span>
