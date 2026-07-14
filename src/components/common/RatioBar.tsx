@@ -15,9 +15,9 @@ const RatioBar = ({ label, current, legalMax, unit = '%', className }: RatioBarP
   const usage = hasData ? Math.min((current! / legalMax!) * 100, 100) : 0;
 
   const barColor =
-    usage < 50 ? 'bg-emerald-500'
-    : usage < 80 ? 'bg-amber-500'
-    : 'bg-rose-500';
+    usage < 50 ? 'bg-[hsl(210_45%_72%)]'
+    : usage < 80 ? 'bg-[hsl(25_55%_62%)]'
+    : 'bg-[hsl(15_40%_55%)]';
 
   return (
     <div className={cn('space-y-1.5', className)}>
