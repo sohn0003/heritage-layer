@@ -373,41 +373,51 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* ── HOW WE WORK (라이트, 다크 블록 진입 전) ── */}
+      {/* ── HOW WE WORK: Heritage Layer가 제공하는 것 ── */}
       <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
         <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(210 40% 82%)" />
         <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(25 45% 78%)" />
 
-        <div className="relative mx-auto max-w-6xl">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">How We Work</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">우리가 일하는 방식</h2>
-            <p className="mt-4 text-muted-foreground">데이터 → 아이디어 → 실행, 3단계로 자산을 재생합니다</p>
+        <div className="relative mx-auto max-w-7xl">
+          <div className="mb-12 text-center md:mb-16">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">What We Provide</span>
+            <h2 className="mt-3 text-4xl font-bold md:text-5xl">Heritage Layer가 제공하는 것</h2>
+            <p className="mt-4 text-muted-foreground">유휴자산 재생을 5단계로 연결합니다</p>
           </div>
 
-          <StepBlock
-            num="01" title="데이터로 가능성을 본다"
-            desc="전국 유휴자산 데이터를 수집하고 정제합니다. 위치, 법규, 인구, 시장 정보를 한곳에 모아 비교 가능한 형태로 만듭니다."
-            icon={Database} side="left" accent="hsl(var(--primary))"
-          >
-            <Step1Graphic />
-          </StepBlock>
-
-          <StepBlock
-            num="02" title="가장 잘 맞는 재생 방향을 찾는다"
-            desc="입지·법규·시장 데이터를 알고리즘이 결합하여 1·2·3순위 재생 시나리오를 자동 추천합니다. 사람이 며칠 걸릴 검토를 즉시 끝냅니다."
-            icon={Lightbulb} side="right" accent="hsl(var(--accent))"
-          >
-            <Step2Graphic />
-          </StepBlock>
-
-          <StepBlock
-            num="03" title="실제 사업으로 연결한다"
-            desc="프로젝트 매니징을 담당하고 개발에 필요한 리소스를 제공합니다."
-            icon={Rocket} side="left" accent="hsl(var(--primary))"
-          >
-            <Step3Graphic />
-          </StepBlock>
+          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[hsl(0_0%_100%_/_0.12)] sm:grid-cols-2 lg:grid-cols-5">
+            {[
+              { num: '01', title: '자산 탐색', desc: '전국 유휴자산 지도 핀 탐색. 등급 배치(S~D)로 즉시 확인.', label: '무료 공개' },
+              { num: '02', title: '등급 분석', desc: 'COSMO-P 알고리즘, 입지·규제·심미성·사업성 4분류 종합 평가.', label: '무료 공개' },
+              { num: '03', title: '시나리오', desc: '1/2/3순위 개발 방향 자동 추천. 전환 용도·공사 방식·대출 구조 제안.', label: '무료 공개' },
+              { num: '04', title: '재무 검증', desc: 'IRR·DSCR·투자회수기간 실시간 시뮬레이션. 자기자본 손익계산으로 즉시 재계산.', label: '무료 공개' },
+              { num: '05', title: '딜 연결', desc: 'THE LAYER 직접 사업 연결. 브릿지 솔루션으로 기회부터 PM까지 지원.', label: 'THE LAYER' },
+            ].map((s, i) => {
+              const isLast = i === 4;
+              return (
+                <div
+                  key={s.num}
+                  className="relative flex min-h-[260px] flex-col justify-between p-6 transition-colors sm:min-h-[300px] md:p-8"
+                  style={{
+                    background: isLast ? 'hsl(43 55% 48%)' : 'hsl(226 35% 12%)',
+                    color: isLast ? 'hsl(226 35% 12%)' : 'hsl(0 0% 96%)',
+                  }}
+                >
+                  <div>
+                    <span
+                      className="text-xs font-bold tracking-[0.2em]"
+                      style={{ color: isLast ? 'hsl(226 35% 22%)' : 'hsl(25 55% 62%)' }}
+                    >
+                      STEP {s.num}
+                    </span>
+                    <h3 className="mt-4 text-2xl font-bold" style={{ color: isLast ? 'hsl(226 35% 12%)' : 'hsl(0 0% 96%)' }}>{s.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed" style={{ color: isLast ? 'hsl(226 35% 22% / 0.85)' : 'hsl(0 0% 75%)' }}>{s.desc}</p>
+                  </div>
+                  <p className="mt-8 text-xs font-medium tracking-[0.2em] uppercase" style={{ color: isLast ? 'hsl(226 35% 12%)' : 'hsl(25 55% 62%)' }}>{s.label}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
