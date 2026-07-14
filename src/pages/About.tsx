@@ -353,8 +353,8 @@ const AboutPage = () => {
                   >
                     <p.icon className="h-12 w-12 md:h-14 md:w-14" style={{ color: p.color }} />
                   </div>
-                  <div className={`flex-1 text-center ${i % 2 === 1 ? 'md:text-right' : 'md:text-left'}`}>
-                    <div className="mb-2 flex items-center justify-center gap-3 md:justify-start" style={{ flexDirection: i % 2 === 1 ? 'row-reverse' : 'row' }}>
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="mb-2 flex items-center justify-center gap-3 md:justify-start">
                       <span className="text-xs font-bold tabular-nums tracking-widest" style={{ color: p.color }}>
                         0{i + 1}
                       </span>
