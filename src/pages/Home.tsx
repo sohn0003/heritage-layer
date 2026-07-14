@@ -714,11 +714,11 @@ const HomePage = () => {
       <div
         aria-hidden
         className="h-40 -mb-px"
-        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 38% 10%) 100%)' }}
+        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(226 35% 12%) 100%)' }}
       />
       <div
         className="relative overflow-hidden"
-        style={{ background: 'hsl(220 38% 10%)' }}
+        style={{ background: 'hsl(226 35% 12%)' }}
       >
       {/* ── INSIGHT: 큰 통계 + 다양한 차트 (다크 / 라인 기반) ── */}
       <section
@@ -741,9 +741,9 @@ const HomePage = () => {
 
         <div className="relative mx-auto max-w-6xl text-[hsl(0_0%_96%)]">
           <div className="mb-12 text-center sm:mb-14">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Insight</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(25 55% 62%)' }}>Insight</span>
             <h2 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
-              <span className="bg-gradient-to-r from-white via-white to-[hsl(40_90%_75%)] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-white to-[hsl(25_55%_68%)] bg-clip-text text-transparent">
                 전국 유휴 부동산 현황
               </span>
             </h2>
@@ -754,14 +754,14 @@ const HomePage = () => {
           <div className="mb-14 grid gap-px overflow-hidden rounded-2xl sm:grid-cols-3"
             style={{ background: 'hsl(0 0% 100% / 0.08)' }}>
             {[
-              { icon: School, label: '전국 폐교', value: 3955, suffix: '개', color: 'hsl(220 90% 70%)' },
-              { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(40 95% 65%)' },
-              { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(0 80% 65%)' },
+              { icon: School, label: '전국 폐교', value: 3955, suffix: '개', color: 'hsl(210 45% 72%)' },
+              { icon: HomeIcon, label: '전국 빈집', value: 1450000, suffix: '호', color: 'hsl(25 55% 62%)' },
+              { icon: TrendingDown, label: '소멸위험 지자체', value: 89, suffix: '곳', color: 'hsl(25 55% 62%)' },
             ].map((s) => (
               <div
                 key={s.label}
                 className="group relative p-6 transition-colors hover:bg-white/[0.03] sm:p-8"
-                style={{ background: 'hsl(220 40% 9%)' }}
+                style={{ background: 'hsl(226 30% 15%)' }}
               >
                 {/* 상단 그라데이션 라인 */}
                 <div
@@ -788,16 +788,16 @@ const HomePage = () => {
             <div className="relative">
               <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" style={{ color: 'hsl(220 90% 70%)' }} />
+                  <BarChart3 className="h-5 w-5" style={{ color: 'hsl(210 45% 72%)' }} />
                   <h3 className="text-base font-semibold tracking-tight sm:text-lg">권역별 폐교 분포 (Top 5)</h3>
                 </div>
                 <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[hsl(0_0%_60%)]">Top 5</span>
               </div>
               <div className="space-y-6">
-                <InsightBar label="전남" value={839} max={1000} color="hsl(220 90% 70%)" suffix="개" delay={0} />
-                <InsightBar label="경북" value={745} max={1000} color="hsl(220 90% 70%)" suffix="개" delay={120} />
-                <InsightBar label="경남" value={584} max={1000} color="hsl(40 95% 65%)" suffix="개" delay={240} />
-                <InsightBar label="강원" value={476} max={1000} color="hsl(40 95% 65%)" suffix="개" delay={360} />
+                <InsightBar label="전남" value={839} max={1000} color="hsl(210 45% 72%)" suffix="개" delay={0} />
+                <InsightBar label="경북" value={745} max={1000} color="hsl(210 45% 72%)" suffix="개" delay={120} />
+                <InsightBar label="경남" value={584} max={1000} color="hsl(25 55% 62%)" suffix="개" delay={240} />
+                <InsightBar label="강원" value={476} max={1000} color="hsl(25 55% 62%)" suffix="개" delay={360} />
                 <InsightBar label="전북" value={329} max={1000} color="hsl(220 30% 65%)" suffix="개" delay={480} />
               </div>
               <div className="mt-6 h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.15), transparent)' }} />
@@ -807,7 +807,7 @@ const HomePage = () => {
             <div className="relative">
               <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Layers className="h-5 w-5" style={{ color: 'hsl(40 95% 65%)' }} />
+                  <Layers className="h-5 w-5" style={{ color: 'hsl(25 55% 62%)' }} />
                   <h3 className="text-base font-semibold tracking-tight sm:text-lg">소유 구분 비율</h3>
                 </div>
                 <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[hsl(0_0%_60%)]">Ownership</span>
@@ -815,8 +815,8 @@ const HomePage = () => {
               <DonutChart
                 total={100}
                 segments={[
-                  { label: '국·공유', value: 62, color: 'hsl(220 90% 70%)' },
-                  { label: '사유',   value: 28, color: 'hsl(40 95% 65%)' },
+                  { label: '국·공유', value: 62, color: 'hsl(210 45% 72%)' },
+                  { label: '사유',   value: 28, color: 'hsl(25 55% 62%)' },
                   { label: '기타',   value: 10, color: 'hsl(220 30% 65%)' },
                 ]}
               />
@@ -829,12 +829,12 @@ const HomePage = () => {
           <div className="relative pt-2">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Database className="h-5 w-5" style={{ color: 'hsl(40 95% 65%)' }} />
+                <Database className="h-5 w-5" style={{ color: 'hsl(25 55% 62%)' }} />
                 <h3 className="text-base font-semibold tracking-tight sm:text-lg">연도별 신규 폐교 발생 추이</h3>
               </div>
               <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[hsl(0_0%_60%)]">2019 → 2024 · 단위 개</span>
             </div>
-            <AreaTrendChart data={[112, 138, 165, 190, 224, 261]} color="hsl(40 95% 65%)" />
+            <AreaTrendChart data={[112, 138, 165, 190, 224, 261]} color="hsl(25 55% 62%)" />
             <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs sm:grid-cols-6">
               {[112, 138, 165, 190, 224, 261].map((v, i) => (
                 <span key={i} className="font-semibold tabular-nums text-[hsl(0_0%_88%)]">{v}</span>
@@ -865,9 +865,9 @@ const HomePage = () => {
 
         <div className="relative mx-auto max-w-6xl text-[hsl(0_0%_96%)]">
           <div className="mb-12 text-center sm:mb-14">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Impact</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(25 55% 62%)' }}>Impact</span>
             <h2 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
-              <span className="bg-gradient-to-r from-white via-white to-[hsl(40_90%_75%)] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-white to-[hsl(25_55%_68%)] bg-clip-text text-transparent">
                 우리가 만들고 있는 변화
               </span>
             </h2>
@@ -880,15 +880,15 @@ const HomePage = () => {
             style={{ background: 'hsl(0 0% 100% / 0.08)' }}
           >
             {[
-              { v: 247, s: '',  l: '분석 완료 자산', color: 'hsl(220 90% 70%)' },
-              { v: 38,  s: '',  l: '연결 진행 딜',   color: 'hsl(40 95% 65%)' },
-              { v: 12,  s: '',  l: '협력 지자체',     color: 'hsl(160 70% 60%)' },
-              { v: 9.4, s: '%', l: '평균 추정 IRR',  color: 'hsl(0 80% 68%)', dec: 1 },
+              { v: 247, s: '',  l: '분석 완료 자산', color: 'hsl(210 45% 72%)' },
+              { v: 38,  s: '',  l: '연결 진행 딜',   color: 'hsl(25 55% 62%)' },
+              { v: 12,  s: '',  l: '협력 지자체',     color: 'hsl(202 34% 78%)' },
+              { v: 9.4, s: '%', l: '평균 추정 IRR',  color: 'hsl(25 55% 62%)', dec: 1 },
             ].map((m, i) => (
               <div
                 key={i}
                 className="group relative p-6 transition-colors hover:bg-white/[0.03] sm:p-8"
-                style={{ background: 'hsl(220 40% 9%)' }}
+                style={{ background: 'hsl(226 30% 15%)' }}
               >
                 {/* 상단 그라데이션 라인 */}
                 <div
@@ -914,7 +914,7 @@ const HomePage = () => {
       {/* ── MAP ── */}
       <section className="relative overflow-hidden px-4 py-20 md:py-28">
         <div className="relative mx-auto max-w-5xl text-center text-[hsl(0_0%_96%)]">
-          <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(40 90% 70%)' }}>Explore</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(25 55% 62%)' }}>Explore</span>
           <h2 className="mt-3 text-4xl font-bold md:text-5xl">전국 유휴자산 지도</h2>
           <p className="mb-10 mt-4 text-[hsl(0_0%_75%)]">데이터 기반으로 전국의 재생 가능 자산을 한눈에 확인하세요</p>
           <button
@@ -962,7 +962,7 @@ const HomePage = () => {
       <div
         aria-hidden
         className="h-32 -mt-px"
-        style={{ background: 'linear-gradient(180deg, hsl(220 38% 10%) 0%, hsl(var(--background)) 100%)' }}
+        style={{ background: 'linear-gradient(180deg, hsl(226 35% 12%) 0%, hsl(var(--background)) 100%)' }}
       />
 
       {/* ── FOOTER ── */}
