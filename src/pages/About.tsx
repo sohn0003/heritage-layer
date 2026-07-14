@@ -4,8 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Database, Lightbulb, Rocket, AlertTriangle,
-  TrendingDown, School, Home as HomeIcon, Building2, Users, Sparkles,
+  Database, Lightbulb, AlertTriangle,
+  TrendingDown, School, Home as HomeIcon, Building2, Sparkles,
   ArrowRight, Search, FileText, BarChart3, GitCompare, Landmark, HandCoins, Bookmark,
 } from 'lucide-react';
 import aboutHeroBg from '@/assets/about-hero-bg.png';
