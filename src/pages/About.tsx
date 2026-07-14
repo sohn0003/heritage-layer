@@ -334,11 +334,22 @@ const AboutPage = () => {
                 <div
                   key={p.t}
                   className={`flex flex-col items-center gap-6 rounded-2xl p-5 sm:p-6 sm:rounded-3xl md:p-8 md:flex-row ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
-                  style={glassCardStyle}
+                  style={{
+                    background: 'hsl(0 0% 100% / 0.06)',
+                    border: '1px solid hsl(0 0% 100% / 0.14)',
+                    backdropFilter: 'blur(18px)',
+                    WebkitBackdropFilter: 'blur(18px)',
+                    color: 'hsl(0 0% 96%)',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.2), 0 12px 32px -8px rgba(0,0,0,0.35)',
+                    ['--foreground' as any]: '0 0% 96%',
+                    ['--muted-foreground' as any]: '0 0% 72%',
+                    ['--card-foreground' as any]: '0 0% 96%',
+                    ['--muted' as any]: '0 0% 100% / 0.08',
+                  }}
                 >
                   <div
                     className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl md:h-28 md:w-28"
-                    style={{ background: `${p.color.replace(')', ' / 0.15)')}` }}
+                    style={{ background: `${p.color.replace(')', ' / 0.15)')}`, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
                   >
                     <p.icon className="h-12 w-12 md:h-14 md:w-14" style={{ color: p.color }} />
                   </div>
