@@ -79,29 +79,6 @@ const Blob = ({ className, color }: { className?: string; color: string }) => (
     style={{ background: color, opacity: 0.4 }} />
 );
 
-const InsightBar = ({ label, value, max, color, suffix = '' }: { label: string; value: number; max: number; color: string; suffix?: string }) => {
-  const { ref, inView } = useInView<HTMLDivElement>();
-  const pct = Math.min(100, (value / max) * 100);
-  return (
-    <div ref={ref}>
-      <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-sm font-medium">{label}</span>
-        <span className="text-lg font-bold tabular-nums" style={{ color }}>
-          <CountUp end={value} suffix={suffix} />
-        </span>
-      </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-muted/60">
-        <div
-          className="h-full rounded-full transition-[width] duration-[1800ms] ease-out"
-          style={{ width: inView ? `${pct}%` : '0%', background: `linear-gradient(90deg, ${color}, ${color}cc)` }}
-        />
-      </div>
-    </div>
-  );
-};
-
-// ── 플랫폼 기능 카드 데이터 ───────────────────────────────
-
 // ── 플랫폼 기능 카드 데이터 ───────────────────────────────
 const features = [
   { icon: Search, title: '자산 탐색', desc: '전국 유휴 부동산 데이터를 지도와 리스트로 탐색합니다.' },
