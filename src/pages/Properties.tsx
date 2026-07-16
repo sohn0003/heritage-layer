@@ -276,7 +276,7 @@ const PropertiesPage = () => {
                 <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">전체</SelectItem>
-                  {valueGrades.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                  {historicalOptions.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
