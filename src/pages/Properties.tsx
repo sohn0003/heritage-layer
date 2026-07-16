@@ -50,16 +50,20 @@ const grades = ['S', 'A', 'B', 'C', 'D'];
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
 const ownershipTypes = [{ v: 'Public', l: 'Public' }, { v: 'Private', l: 'Private' }];
 const populationTrends = [
-  { v: 'increasing', l: '증가' },
-  { v: 'stable', l: '유지' },
-  { v: 'decreasing', l: '감소' },
-  { v: 'extinction_risk', l: '소멸위험' },
+  { v: '인구증가', l: '인구증가' },
+  { v: '유지', l: '유지' },
+  { v: '인구감소', l: '인구감소' },
+  { v: '소멸위험 지역', l: '소멸위험 지역' },
 ];
-const densityOptions = [{ v: 'high', l: '높음' }, { v: 'low', l: '낮음' }];
-const valueGrades = ['상', '중', '하'];
+const densityOptions = [
+  { v: '높음(반경 500m 내 10개 이상)', l: '높음 (반경 500m 내 10개 이상)' },
+  { v: '낮음', l: '낮음' },
+];
+const historicalOptions = ['등록문화재·근대건축 유산', '지역 역사 상징성 (50년 이상)', '일반 건물'];
+const sceneryOptions = ['우수한 자연경관 인접', '산·바다·강·호수 조망 가능', '도심 내 평범'];
 const conditionOptions = ['리모델링 가능 (구조 양호)', '일부 보강 후 활용 가능', '대수선 필요', '전면 철거 후 신축 필요'];
 const zoningOptions = ['1종 일반주거', '2종 일반주거', '3종 일반주거', '준주거', '자연녹지', '보전녹지', '계획관리지역', '농림지역', '자연환경보전'];
-const expansionOptions = ['높음', '중간', '낮음', '없음'];
+const expansionOptions = ['허용 용도 대폭 확대 가능', '소폭 확대 가능', '해당 없음'];
 
 const BOOL_FLAGS: { key: keyof Asset; label: string }[] = [
   { key: 'gov_cooperation', label: '정부협력' },
