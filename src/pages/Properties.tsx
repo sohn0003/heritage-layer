@@ -193,7 +193,7 @@ const PropertiesPage = () => {
                 <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">전체</SelectItem>
-                  {ownershipTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  {ownershipTypes.map((t) => <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
