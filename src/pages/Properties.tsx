@@ -119,7 +119,7 @@ const PropertiesPage = () => {
       if (f.gradeFilter.length && !(a.grade && f.gradeFilter.includes(a.grade))) return false;
       if (f.typeFilter !== 'all' && a.asset_type !== f.typeFilter) return false;
       if (f.ownership !== 'all' && a.ownership_type !== f.ownership) return false;
-      if (f.zoning && !(a.zoning || '').toLowerCase().includes(f.zoning.toLowerCase())) return false;
+      if (f.zoning !== 'all' && a.zoning !== f.zoning) return false;
       if (f.idleMin && (a.idle_years ?? -Infinity) < Number(f.idleMin)) return false;
       if (f.idleMax && (a.idle_years ?? Infinity) > Number(f.idleMax)) return false;
       if (f.landMin && (a.land_area ?? -Infinity) < Number(f.landMin)) return false;
