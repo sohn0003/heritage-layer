@@ -122,7 +122,12 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">비밀번호</Label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={mode === 'signup' ? 8 : 6} />
+            {mode === 'signup' && (
+              <p className="text-xs text-muted-foreground">
+                8자 이상, 대소문자·숫자·특수문자를 조합해주세요. 흔히 유출된 비밀번호는 사용할 수 없습니다.
+              </p>
+            )}
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
