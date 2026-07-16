@@ -145,7 +145,7 @@ const PropertiesPage = () => {
     f.gradeFilter.length +
     (f.typeFilter !== 'all' ? 1 : 0) +
     (f.ownership !== 'all' ? 1 : 0) +
-    (f.zoning ? 1 : 0) +
+    (f.zoning !== 'all' ? 1 : 0) +
     (f.idleMin || f.idleMax ? 1 : 0) +
     (f.landMin || f.landMax ? 1 : 0) +
     (f.populationTrend !== 'all' ? 1 : 0) +
