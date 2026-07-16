@@ -21,11 +21,37 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const translateError = (err: any): string => {
+    const code = err?.code || err?.error_code;
+    const msg = err?.message || '';
+    if (code === 'weak_password' || /weak|pwned|known to be weak/i.test(msg)) {
+      return '비밀번호가 너무 단순하거나 유출된 비밀번호입니다. 대소문자·숫자·특수문자를 조합해 8자 이상으로 설정해주세요.';
+    }
+    if (code === 'user_already_exists' || /already registered|already exists/i.test(msg)) {
+      return '이미 가입된 이메일입니다. 로그인해주세요.';
+    }
+    if (code === 'invalid_credentials' || /invalid login/i.test(msg)) {
+      return '이메일 또는 비밀번호가 올바르지 않습니다.';
+    }
+    if (code === 'email_address_invalid' || /invalid.*email/i.test(msg)) {
+      return '올바른 이메일 주소를 입력해주세요.';
+    }
+    if (code === 'over_email_send_rate_limit' || /rate limit/i.test(msg)) {
+      return '요청이 너무 잦습니다. 잠시 후 다시 시도해주세요.';
+    }
+    return msg || '알 수 없는 오류가 발생했습니다.';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     if (mode === 'signup') {
+      if (password.length < 8) {
+        toast({ title: '회원가입 실패', description: '비밀번호는 8자 이상이어야 합니다.', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -35,7 +61,7 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
         },
       });
       if (error) {
-        toast({ title: '회원가입 실패', description: error.message, variant: 'destructive' });
+        toast({ title: '회원가입 실패', description: translateError(error), variant: 'destructive' });
       } else {
         toast({ title: '회원가입 완료', description: '이메일을 확인해주세요.' });
         onOpenChange(false);
@@ -43,7 +69,7 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast({ title: '로그인 실패', description: error.message, variant: 'destructive' });
+        toast({ title: '로그인 실패', description: translateError(error), variant: 'destructive' });
       } else {
         toast({ title: '로그인 성공' });
         onOpenChange(false);
