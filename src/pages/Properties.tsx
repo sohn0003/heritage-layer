@@ -48,7 +48,7 @@ interface Asset {
 
 const grades = ['S', 'A', 'B', 'C', 'D'];
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
-const ownershipTypes = ['국유', '공유', '사유'];
+const ownershipTypes = [{ v: 'Public', l: 'Public' }, { v: 'Private', l: 'Private' }];
 const populationTrends = [
   { v: 'increasing', l: '증가' },
   { v: 'stable', l: '유지' },
@@ -193,7 +193,7 @@ const PropertiesPage = () => {
                 <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">전체</SelectItem>
-                  {ownershipTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  {ownershipTypes.map((t) => <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
