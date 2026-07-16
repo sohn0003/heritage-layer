@@ -205,8 +205,14 @@ const PropertiesPage = () => {
           <AccordionTrigger className="text-sm">제원 / 규모</AccordionTrigger>
           <AccordionContent className="space-y-3 pt-2">
             <div className="space-y-1.5">
-              <Label className="text-xs">용도지역 (텍스트 검색)</Label>
-              <Input className="h-9" value={f.zoning} onChange={(e) => update('zoning', e.target.value)} placeholder="예: 일반주거" />
+              <Label className="text-xs">용도지역</Label>
+              <Select value={f.zoning} onValueChange={(v) => update('zoning', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {zoningOptions.map((z) => <SelectItem key={z} value={z}>{z}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">방치 기간 (년)</Label>
