@@ -57,7 +57,8 @@ const populationTrends = [
 ];
 const densityOptions = [{ v: 'high', l: '높음' }, { v: 'low', l: '낮음' }];
 const valueGrades = ['상', '중', '하'];
-const conditionOptions = ['양호', '보통', '노후', '심각'];
+const conditionOptions = ['리모델링 가능 (구조 양호)', '일부 보강 후 활용 가능', '대수선 필요', '전면 철거 후 신축 필요'];
+const zoningOptions = ['1종 일반주거', '2종 일반주거', '3종 일반주거', '준주거', '자연녹지', '보전녹지', '계획관리지역', '농림지역', '자연환경보전'];
 const expansionOptions = ['높음', '중간', '낮음', '없음'];
 
 const BOOL_FLAGS: { key: keyof Asset; label: string }[] = [
