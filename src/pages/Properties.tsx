@@ -79,7 +79,7 @@ const initialFilters = {
   gradeFilter: [] as string[],
   typeFilter: 'all',
   ownership: 'all',
-  zoning: '',
+  zoning: 'all',
   idleMin: '',
   idleMax: '',
   landMin: '',
