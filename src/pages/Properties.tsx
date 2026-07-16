@@ -57,7 +57,8 @@ const populationTrends = [
 ];
 const densityOptions = [{ v: 'high', l: '높음' }, { v: 'low', l: '낮음' }];
 const valueGrades = ['상', '중', '하'];
-const conditionOptions = ['양호', '보통', '노후', '심각'];
+const conditionOptions = ['리모델링 가능 (구조 양호)', '일부 보강 후 활용 가능', '대수선 필요', '전면 철거 후 신축 필요'];
+const zoningOptions = ['1종 일반주거', '2종 일반주거', '3종 일반주거', '준주거', '자연녹지', '보전녹지', '계획관리지역', '농림지역', '자연환경보전'];
 const expansionOptions = ['높음', '중간', '낮음', '없음'];
 
 const BOOL_FLAGS: { key: keyof Asset; label: string }[] = [
@@ -78,7 +79,7 @@ const initialFilters = {
   gradeFilter: [] as string[],
   typeFilter: 'all',
   ownership: 'all',
-  zoning: '',
+  zoning: 'all',
   idleMin: '',
   idleMax: '',
   landMin: '',
@@ -118,7 +119,7 @@ const PropertiesPage = () => {
       if (f.gradeFilter.length && !(a.grade && f.gradeFilter.includes(a.grade))) return false;
       if (f.typeFilter !== 'all' && a.asset_type !== f.typeFilter) return false;
       if (f.ownership !== 'all' && a.ownership_type !== f.ownership) return false;
-      if (f.zoning && !(a.zoning || '').toLowerCase().includes(f.zoning.toLowerCase())) return false;
+      if (f.zoning !== 'all' && a.zoning !== f.zoning) return false;
       if (f.idleMin && (a.idle_years ?? -Infinity) < Number(f.idleMin)) return false;
       if (f.idleMax && (a.idle_years ?? Infinity) > Number(f.idleMax)) return false;
       if (f.landMin && (a.land_area ?? -Infinity) < Number(f.landMin)) return false;
@@ -144,7 +145,7 @@ const PropertiesPage = () => {
     f.gradeFilter.length +
     (f.typeFilter !== 'all' ? 1 : 0) +
     (f.ownership !== 'all' ? 1 : 0) +
-    (f.zoning ? 1 : 0) +
+    (f.zoning !== 'all' ? 1 : 0) +
     (f.idleMin || f.idleMax ? 1 : 0) +
     (f.landMin || f.landMax ? 1 : 0) +
     (f.populationTrend !== 'all' ? 1 : 0) +
@@ -204,8 +205,14 @@ const PropertiesPage = () => {
           <AccordionTrigger className="text-sm">제원 / 규모</AccordionTrigger>
           <AccordionContent className="space-y-3 pt-2">
             <div className="space-y-1.5">
-              <Label className="text-xs">용도지역 (텍스트 검색)</Label>
-              <Input className="h-9" value={f.zoning} onChange={(e) => update('zoning', e.target.value)} placeholder="예: 일반주거" />
+              <Label className="text-xs">용도지역</Label>
+              <Select value={f.zoning} onValueChange={(v) => update('zoning', v)}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {zoningOptions.map((z) => <SelectItem key={z} value={z}>{z}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">방치 기간 (년)</Label>
