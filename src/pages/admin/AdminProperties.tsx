@@ -266,24 +266,40 @@ const AdminPropertiesPage = () => {
       }
     }
 
-    // 알고리즘 단일 진입점 — 점수/등급/IRR/추천 용도·방향을 한 번에 산출
-    const scoring = calculateScoringFields(payload, algoConfig);
-
-    const finalPayload = { ...payload, ...scoring };
-
+    // 저장 후 서버에서 등급/점수 재계산 (알고리즘은 서버 전용)
+    let savedId: string | null = editId;
     if (editId) {
-      const { error } = await supabase.from('assets').update(finalPayload).eq('id', editId);
-      if (error) toast({ title: '수정 실패', description: error.message, variant: 'destructive' });
-      else toast({ title: `매물이 수정되었습니다 · 등급 ${scoring.grade} (${scoring.scoring_total}점)` });
+      const { error } = await supabase.from('assets').update(payload).eq('id', editId);
+      if (error) {
+        toast({ title: '수정 실패', description: error.message, variant: 'destructive' });
+        setSaving(false);
+        return;
+      }
     } else {
-      const { error } = await supabase.from('assets').insert(finalPayload);
-      if (error) toast({ title: '등록 실패', description: error.message, variant: 'destructive' });
-      else toast({ title: `매물이 등록되었습니다 · 등급 ${scoring.grade} (${scoring.scoring_total}점)` });
+      const { data: inserted, error } = await supabase.from('assets').insert(payload).select('id').single();
+      if (error) {
+        toast({ title: '등록 실패', description: error.message, variant: 'destructive' });
+        setSaving(false);
+        return;
+      }
+      savedId = inserted?.id ?? null;
+    }
+
+    if (savedId) {
+      const { data: scoreResp, error: scoreErr } = await supabase.functions.invoke('admin-score-asset', {
+        body: { mode: 'recompute', asset_id: savedId },
+      });
+      if (scoreErr) {
+        toast({ title: '저장 완료 · 등급 계산 실패', description: scoreErr.message, variant: 'destructive' });
+      } else {
+        toast({ title: editId ? `매물 수정 · 등급 ${scoreResp?.grade ?? '-'} (${scoreResp?.total ?? '-'}점)` : `매물 등록 · 등급 ${scoreResp?.grade ?? '-'} (${scoreResp?.total ?? '-'}점)` });
+      }
     }
     setSaving(false);
     setDialogOpen(false);
     fetchAssets();
   };
+
 
   const handleDelete = async (id: string) => {
     if (!confirm('정말 삭제하시겠습니까?')) return;
