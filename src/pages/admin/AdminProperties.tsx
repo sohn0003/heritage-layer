@@ -479,7 +479,7 @@ const AdminPropertiesPage = () => {
           <Button variant="outline" onClick={handleBulkGeocode} disabled={bulkGeocoding}>
             {bulkGeocoding ? '변환 중...' : '좌표 일괄 변환'}
           </Button>
-          <Button variant="outline" onClick={handleBulkRescore} disabled={rescoring || !algoConfig.loaded}>
+          <Button variant="outline" onClick={handleBulkRescore} disabled={rescoring}>
             {rescoring ? '재계산 중...' : '등급 일괄 재계산'}
           </Button>
           <Button onClick={openCreate}>
