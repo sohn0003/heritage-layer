@@ -4,7 +4,7 @@
 // 유저 행동 신호를 감지하고 딜 인텔리전스로 전환합니다
 // ============================================================
 
-import type { Grade } from '../scoring/scoring';
+import type { Grade } from '../scoring/scoring.ts';
 
 // ────────────────────────────────────────────────────────────
 // 타입 정의
@@ -585,7 +585,7 @@ export function createSignalEvent(
 // 사용 예시
 // ────────────────────────────────────────────────────────────
 //
-// import { processDealSignals, createSignalEvent } from './deal-signal';
+// import { processDealSignals, createSignalEvent } from './deal-signal.ts';
 //
 // // Supabase deal_signals 테이블에서 이벤트 조회 후 처리
 // const events: SignalEvent[] = [

@@ -15,8 +15,8 @@ import type {
   Grade,
   AssetInput,
   ZoningUpgradeGain,
-} from '../scoring/scoring';
-import { calculateScore } from '../scoring/scoring';
+} from '../scoring/scoring.ts';
+import { calculateScore } from '../scoring/scoring.ts';
 
 // ────────────────────────────────────────────────────────────
 // 전환 용도 타입 — 16종
@@ -592,7 +592,7 @@ export function estimatePreliminaryROI(input: PreliminaryROIInput): number {
 import {
   recommendScenarios,
   RecommendationResult,
-} from '../recommend/recommend-scenarios';
+} from '../recommend/recommend-scenarios.ts';
 
 export interface AnalyzeAssetInput {
   assetInput: Omit<AssetInput, 'preliminaryROI'>;

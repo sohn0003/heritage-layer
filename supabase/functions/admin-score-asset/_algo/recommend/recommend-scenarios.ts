@@ -20,7 +20,7 @@ import type {
   CommercialDensity,
   HistoricalValue,
   NaturalScenery,
-} from '../scoring/scoring';
+} from '../scoring/scoring.ts';
 
 import type {
   AssetUseType,
@@ -28,9 +28,9 @@ import type {
   LoanRates,
   IRRResult,
   RevenueAssumption,
-} from '../financial/irr-calculator';
+} from '../financial/irr-calculator.ts';
 
-import { calculateIRRScenarios } from '../financial/irr-calculator';
+import { calculateIRRScenarios } from '../financial/irr-calculator.ts';
 
 // ────────────────────────────────────────────────────────────
 // 개발 방향 타입
