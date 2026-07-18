@@ -436,29 +436,38 @@ const AnalysisPage = () => {
         </CardContent>
       </Card>
 
-      {/* COSMO-P 블록별 스코어 (Free) */}
+      {/* 블록별 평가 (5단계 라벨) */}
       {scoringResult && (
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-lg">COSMO-P 블록별 점수</CardTitle>
+            <CardTitle className="text-lg">COSMO-P 블록별 평가</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-4">
-              {[
-                { label: 'A. 입지·규제 (25%)', value: scoringResult.blockA },
-                { label: 'B. 수요·환경 (25%)', value: scoringResult.blockB },
-                { label: 'C. 심미적 가치 (20%)', value: scoringResult.blockC },
-                { label: 'D. 사업성 (30%)', value: scoringResult.blockD },
-              ].map((item) => (
-                <div key={item.label} className="text-center">
-                  <p className="text-xs text-muted-foreground">{item.label}</p>
-                  <p className="mt-1 text-2xl font-bold">{item.value}</p>
-                </div>
-              ))}
+              {(() => {
+                const labelClass = (v: BlockLabel) =>
+                  v === '우수' ? 'text-[hsl(var(--primary))]'
+                    : v === '양호' ? 'text-[hsl(var(--primary))]'
+                    : v === '보통' ? 'text-foreground'
+                    : v === '미흡' ? 'text-[hsl(var(--accent))]'
+                    : 'text-[hsl(var(--grade-d))]';
+                return [
+                  { label: 'A. 입지·규제', value: scoringResult.blockLabels.A },
+                  { label: 'B. 수요·환경', value: scoringResult.blockLabels.B },
+                  { label: 'C. 심미적 가치', value: scoringResult.blockLabels.C },
+                  { label: 'D. 사업성', value: scoringResult.blockLabels.D },
+                ].map((item) => (
+                  <div key={item.label} className="text-center">
+                    <p className="text-xs text-muted-foreground">{item.label}</p>
+                    <p className={`mt-1 text-2xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                  </div>
+                ));
+              })()}
             </div>
           </CardContent>
         </Card>
       )}
+
 
       {/* 자산 강점·리스크 요약 (Free) */}
       {analysis && (
