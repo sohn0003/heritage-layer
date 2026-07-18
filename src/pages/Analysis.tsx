@@ -1,15 +1,13 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
-import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Tooltip,
   TooltipContent,
@@ -19,10 +17,8 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
-import { getScoreReasons, type ScoreReasonKey } from '@/lib/scoreReasons';
 import {
-  TrendingUp, FileText, BarChart3, Building2, School, Home, Factory, Building,
+  TrendingUp, Building2, School, Home, Factory, Building,
   CheckCircle2, AlertTriangle, Sparkles, ShieldAlert, Info,
 } from 'lucide-react';
 import Seo from '@/components/common/Seo';
@@ -30,20 +26,47 @@ import GradeMeter from '@/components/common/GradeMeter';
 import RatioBar from '@/components/common/RatioBar';
 import AuthModal from '@/components/common/AuthModal';
 
-// 알고리즘 모듈 연동
-import { type ScoreResult } from '@/algorithm/scoring/scoring';
-import {
-  analyzeAsset,
-  type AnalyzeAssetResult,
-} from '@/algorithm/financial/irr-calculator';
-import {
-  getAssetSignalStatus,
-  createSignalEvent,
-  type AssetSignalSummary,
-  type SignalEvent,
-  type SignalType,
-} from '@/algorithm/deal-signal/deal-signal';
-import { buildScoringInput } from '@/lib/assetScoring';
+// 서버 응답 타입 (analyze-asset edge function). 알고리즘 로직은 클라이언트 번들에 포함되지 않습니다.
+type Grade = 'S' | 'A' | 'B' | 'C' | 'D';
+type BlockLabel = '우수' | '양호' | '보통' | '미흡' | '취약';
+interface ScenarioSanitized {
+  rank: 1 | 2 | 3;
+  concept: string;
+  developmentDirectionLabel: string;
+  useTypeSummary: string;
+  useTypeMix: Array<{ useType: string; ratio: number }>;
+  reasons: string[];
+  risks: string[];
+  recommendedEquityRatio: number;
+  loanStructureLabel: string;
+  loanReason: string;
+  suitabilityLabel: BlockLabel;
+  irrResult: {
+    base: { usableFloorArea?: number; recommendedAnnualRevenue?: number; [k: string]: unknown };
+    summary: { investmentFeasibility: string; [k: string]: unknown };
+    [k: string]: unknown;
+  };
+  [k: string]: unknown;
+}
+interface AnalyzeResponse {
+  scoring: {
+    grade: Grade;
+    totalScore: number;
+    blockLabels: { A: BlockLabel; B: BlockLabel; C: BlockLabel; D: BlockLabel };
+  };
+  recommendation: {
+    assetSummary: { keyStrengths: string[]; keyRisks: string[]; [k: string]: unknown };
+    scenarios: ScenarioSanitized[];
+  };
+  config: {
+    landValuePerSqm: number;
+    projectYears: number;
+    residualValueRatio: number;
+    loanRates: { pf: number; collateral: number };
+  };
+}
+type OverridePayload = { rank: number; equityRatio?: number; annualRevenue?: number; operatingMargin?: number };
+type SignalRow = { user_id: string; asset_id: string; signal_type: string; created_at: string };
 
 // 원 → 억원 변환 (소수 1자리)
 const toEokwon = (won: number | null | undefined): string => {
