@@ -99,8 +99,6 @@ const AnalysisPage = () => {
   const [usedFloorAreaByRank, setUsedFloorAreaByRank] = useState<Record<number, number | undefined>>({}); // 사용 연면적(㎡) — 미입력 시 최대 허용 연면적
   const [activeTab, setActiveTab] = useState<'1' | '2' | '3'>('1');
 
-  const algoConfig = useAlgorithmConfig();
-
   useEffect(() => {
     if (authLoading) return;
     if (!user) { setLoading(false); return; }
@@ -123,143 +121,112 @@ const AnalysisPage = () => {
     setUsedFloorAreaByRank({});
   }, [assetId]);
 
-  // 매도자 희망가 → 토지 취득단가 우선 적용 (없으면 공시지가 폴백)
+  // 매도자 희망가 → 표시용
   const askingLandPrice = (asset as unknown as { asking_land_price?: number | null })?.asking_land_price ?? null;
   const askingBuildingPrice = (asset as unknown as { asking_building_price?: number | null })?.asking_building_price ?? null;
-  const effectiveLandValuePerSqm = useMemo(() => {
-    if (!asset) return 4_500_000;
-    if (askingLandPrice && asset.land_area && asset.land_area > 0) {
-      return askingLandPrice / asset.land_area;
-    }
-    return asset.land_value_per_sqm ?? 4_500_000;
-  }, [asset, askingLandPrice]);
 
-  // 기본 분석(오버라이드 없음) — 스코어링/추천 시나리오/추천 자기자본비율의 기준값
-  const analysis: AnalyzeAssetResult | null = useMemo(() => {
-    if (!asset) return null;
-    const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
-    void preliminaryROI;
-    try {
-      return analyzeAsset({
-        assetInput: assetInputBase,
-        landValuePerSqm: effectiveLandValuePerSqm,
-        loanRates: algoConfig.loanRates,
-        projectYears: algoConfig.projectYears,
-        residualValueRatio: algoConfig.residualValueRatio,
+  // 서버로 보낼 오버라이드 페이로드 (queryKey에 포함)
+  const overridesPayload = useMemo<OverridePayload[]>(() => {
+    const ranks = new Set<number>([
+      ...Object.keys(equityByRank).map(Number),
+      ...Object.keys(revenueByRank).map(Number),
+      ...Object.keys(marginByRank).map(Number),
+    ]);
+    return Array.from(ranks).map((rank) => {
+      const eq = equityByRank[rank];
+      const rev = revenueByRank[rank];
+      const mar = marginByRank[rank];
+      return {
+        rank,
+        equityRatio: eq,
+        annualRevenue: rev !== undefined && rev > 0 ? rev : undefined,
+        operatingMargin: mar !== undefined ? mar / 100 : undefined,
+      };
+    }).filter((o) => o.equityRatio !== undefined || o.annualRevenue !== undefined || o.operatingMargin !== undefined);
+  }, [equityByRank, revenueByRank, marginByRank]);
+
+  // 서버 API 호출 (알고리즘은 서버 전용)
+  const analysisQuery = useQuery<AnalyzeResponse>({
+    queryKey: ['analyze-asset', assetId, JSON.stringify(overridesPayload)],
+    enabled: !!assetId && !!user,
+    staleTime: 30_000,
+    placeholderData: (prev) => prev,
+    retry: false,
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('analyze-asset', {
+        body: { asset_id: assetId, overrides: overridesPayload },
       });
-    } catch (e) {
-      console.error('analyzeAsset 실패', e);
-      return null;
-    }
-  }, [
-    asset,
-    effectiveLandValuePerSqm,
-    algoConfig.loanRates.pf,
-    algoConfig.loanRates.collateral,
-    algoConfig.projectYears,
-    algoConfig.residualValueRatio,
-  ]);
-
-  const scoringResult: ScoreResult | null = analysis?.scoring ?? null;
-  const baseScenarios = analysis?.recommendation.scenarios;
-
-  const scoreReasons = useMemo(() => {
-    if (!asset || !scoringResult) return null;
-    try {
-      const input = buildScoringInput(asset);
-      return getScoreReasons(input, scoringResult.detail);
-    } catch (e) {
-      console.error('getScoreReasons 실패', e);
-      return null;
-    }
-  }, [asset, scoringResult]);
-
-  // 시나리오별 슬라이더 값을 적용한 표시용 시나리오 — 오버라이드된 IRR/DSCR/자기자본 등 반영
-  const displayScenarios = useMemo(() => {
-    if (!asset || !baseScenarios) return baseScenarios;
-    const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
-    void preliminaryROI;
-    return baseScenarios.map((base) => {
-      const eqOverride = equityByRank[base.rank];
-      const revOverride = revenueByRank[base.rank];
-      const marOverride = marginByRank[base.rank];
-      const eqChanged = eqOverride !== undefined && eqOverride !== base.recommendedEquityRatio;
-      const revChanged = revOverride !== undefined && revOverride > 0;
-      const marChanged = marOverride !== undefined;
-      if (!eqChanged && !revChanged && !marChanged) return base;
-      try {
-        const r = analyzeAsset({
-          assetInput: assetInputBase,
-          landValuePerSqm: effectiveLandValuePerSqm,
-          loanRates: algoConfig.loanRates,
-          projectYears: algoConfig.projectYears,
-          residualValueRatio: algoConfig.residualValueRatio,
-          overrideEquityRatio: eqChanged ? eqOverride : undefined,
-          overrideAnnualRevenue: revChanged ? revOverride : undefined,
-          overrideOperatingMargin: marChanged ? (marOverride as number) / 100 : undefined,
-        });
-        return r.recommendation.scenarios.find((x) => x.rank === base.rank) ?? base;
-      } catch (e) {
-        console.error('analyzeAsset 오버라이드 실패', e);
-        return base;
+      if (error) {
+        const msg = (error as { message?: string }).message ?? '분석 요청 실패';
+        throw new Error(msg);
       }
-    });
-  }, [
-    asset,
-    baseScenarios,
-    equityByRank,
-    revenueByRank,
-    marginByRank,
-    algoConfig.loanRates.pf,
-    algoConfig.loanRates.collateral,
-    algoConfig.projectYears,
-    algoConfig.residualValueRatio,
-  ]);
+      return data as AnalyzeResponse;
+    },
+  });
 
-  const scenarios = displayScenarios;
+  useEffect(() => {
+    if (analysisQuery.error) {
+      toast({
+        title: '분석을 불러오지 못했습니다',
+        description: (analysisQuery.error as Error).message,
+        variant: 'destructive',
+      });
+    }
+  }, [analysisQuery.error]);
+
+  const analysis = analysisQuery.data ?? null;
+  const scoringResult = analysis?.scoring ?? null;
+  const baseScenarios = analysis?.recommendation.scenarios;
+  const scenarios = baseScenarios;
   const activeScenario = scenarios?.find((s) => String(s.rank) === activeTab) ?? scenarios?.[0];
-
-
-  const [signalEvents, setSignalEvents] = useState<SignalEvent[]>([]);
-
-  // 현재 자산에 대한 사용자 신호 이벤트 조회
-  const fetchSignals = async () => {
-    if (!assetId || !user) {
-      setSignalEvents([]);
-      return;
-    }
-    const { data } = await supabase
-      .from('deal_signals')
-      .select('*')
-      .eq('asset_id', assetId);
-    if (data) {
-      setSignalEvents(
-        data.map((row: any) =>
-          createSignalEvent(row.user_id, row.asset_id, row.signal_type as SignalType, undefined),
-        ).map((ev, i) => ({ ...ev, timestamp: new Date(data[i].created_at) })),
-      );
-    }
+  const algoConfig = analysis?.config ?? {
+    landValuePerSqm: 4_500_000,
+    projectYears: 10,
+    residualValueRatio: 0.4,
+    loanRates: { pf: 5.5, collateral: 4.8 },
   };
 
+  // 사용자 액션 신호 (deal_signals). 알고리즘 없이 단순 집계만 수행.
+  const [signalRows, setSignalRows] = useState<SignalRow[]>([]);
+  const fetchSignals = async () => {
+    if (!assetId || !user) { setSignalRows([]); return; }
+    const { data } = await supabase.from('deal_signals').select('*').eq('asset_id', assetId);
+    if (data) setSignalRows(data as SignalRow[]);
+  };
   // 자산 열람 시 'viewed' 신호 자동 기록
   useEffect(() => {
     if (!assetId || !user) return;
     (async () => {
       await supabase.from('deal_signals').insert({
-        user_id: user.id,
-        asset_id: assetId,
-        signal_type: 'viewed',
+        user_id: user.id, asset_id: assetId, signal_type: 'viewed',
       });
       fetchSignals();
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assetId, user?.id]);
 
-  // 신호 집계 결과
-  const signalSummary: AssetSignalSummary | null = useMemo(() => {
-    if (!asset || !scoringResult) return null;
-    return getAssetSignalStatus(asset.id, signalEvents, scoringResult.grade);
-  }, [asset, scoringResult, signalEvents]);
+  // 신호 집계 (알고리즘 없이 단순 카운트)
+  const signalSummary = useMemo(() => {
+    if (!signalRows.length) return null;
+    const users = new Set(signalRows.map((r) => r.user_id));
+    const counts: Record<string, number> = {};
+    const perUserViews: Record<string, number> = {};
+    signalRows.forEach((r) => {
+      counts[r.signal_type] = (counts[r.signal_type] || 0) + 1;
+      if (r.signal_type === 'viewed') perUserViews[r.user_id] = (perUserViews[r.user_id] || 0) + 1;
+    });
+    const repeatedViewCount = Object.values(perUserViews).filter((c) => c > 1).length;
+    return {
+      totalSignalScore: signalRows.length,
+      uniqueUsers: users.size,
+      savedCount: counts.saved ?? 0,
+      viewCount: counts.viewed ?? 0,
+      repeatedViewCount,
+      dealInterestCount: counts.deal_interest ?? 0,
+      clusterDetected: users.size >= 5,
+    };
+  }, [signalRows]);
+
 
   const handleDealInterest = async () => {
     if (!user) return;
