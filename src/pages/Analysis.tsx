@@ -563,13 +563,14 @@ const AnalysisPage = () => {
                         </div>
 
                         {/* 적합도 */}
+                        {/* 적합도 */}
                         <div>
                           <div className="mb-1.5 flex items-baseline justify-between">
                             <Label className="text-xs font-medium text-muted-foreground">시나리오 적합도</Label>
-                            <span className="text-sm font-semibold">{scenario.suitabilityScore}점</span>
+                            <Badge variant="outline" className="font-semibold">{scenario.suitabilityLabel}</Badge>
                           </div>
-                          <Progress value={scenario.suitabilityScore} className="h-2" />
                         </div>
+
 
                         {/* 추천 이유 / 리스크 */}
                         <div className="grid gap-4 sm:grid-cols-2">
