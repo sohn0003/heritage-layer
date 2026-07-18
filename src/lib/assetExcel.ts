@@ -1,6 +1,5 @@
 import * as XLSX from 'xlsx';
 import { supabase } from '@/integrations/supabase/client';
-import { calculateScoringFields, loadAlgorithmConfig } from '@/lib/assetScoring';
 
 // 컬럼 정의: DB 키 ↔ 한글 헤더 ↔ 타입
 type ColType = 'string' | 'number' | 'boolean';
