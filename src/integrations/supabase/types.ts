@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      analysis_audit_log: {
+        Row: {
+          asset_id: string
+          created_at: string
+          id: string
+          overrides_count: number
+          user_id: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          id?: string
+          overrides_count?: number
+          user_id: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          id?: string
+          overrides_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       asset_unlocks: {
         Row: {
           amount: number
