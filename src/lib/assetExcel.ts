@@ -207,22 +207,33 @@ export const importAssetsFromExcel = async (file: File): Promise<ImportResult> =
       await new Promise((res) => setTimeout(res, 120));
     }
 
-    // 자동 등급/점수 산출
-    const scoring = calculateScoringFields(payload, algoConfig);
-    const finalPayload = { ...payload, ...scoring };
+    // 등급/점수는 서버 admin-score-asset 함수가 산출하므로 여기서는 원본만 저장
     try {
       if (id) {
-        const { error } = await (supabase.from('assets').update as any)(finalPayload).eq('id', id);
+        const { error } = await (supabase.from('assets').update as any)(payload).eq('id', id);
         if (error) throw error;
         result.updated++;
+        updatedIds.push(id);
       } else {
-        const { error } = await (supabase.from('assets').insert as any)(finalPayload);
+        const { data: ins, error } = await (supabase.from('assets').insert as any)(payload).select('id').single();
         if (error) throw error;
         result.inserted++;
+        if (ins?.id) insertedIds.push(ins.id);
       }
     } catch (e: any) {
       result.failed++;
       result.errors.push(`행 ${i + 2}: ${e.message}`);
+    }
+  }
+
+  // 임포트된 자산 등급/점수 서버 재계산 (백그라운드 성격, 실패해도 임포트 결과는 유지)
+  const idsToScore = [...insertedIds, ...updatedIds];
+  if (idsToScore.length > 0) {
+    try {
+      await supabase.functions.invoke('admin-score-asset', { body: { mode: 'recompute_all' } });
+    } catch (e) {
+      console.error('임포트 후 등급 재계산 실패', e);
+      result.errors.push('임포트는 완료됐으나 등급 재계산에 실패했습니다. "등급 일괄 재계산"을 눌러 재시도하세요.');
     }
   }
   return result;
