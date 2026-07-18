@@ -17,8 +17,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Download, Upload, MapPin } from 'lucide-react';
 import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
-import { calculateScoringFields } from '@/lib/assetScoring';
-import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
 import GradeBadge from '@/components/common/GradeBadge';
 import { isValidKoreaCoordinate } from '@/lib/geo';
 
