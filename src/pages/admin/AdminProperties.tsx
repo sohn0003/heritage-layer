@@ -412,23 +412,20 @@ const AdminPropertiesPage = () => {
 
   const handleBulkRescore = async () => {
     if (assets.length === 0) return;
-    if (!confirm(`${assets.length}건의 자산 등급을 현재 알고리즘 기준으로 재계산하시겠습니까?`)) return;
+    if (!confirm(`${assets.length}건의 자산 등급을 서버에서 재계산하시겠습니까? (다소 시간이 걸릴 수 있습니다)`)) return;
     setRescoring(true);
-    let ok = 0, fail = 0;
-    for (const a of assets) {
-      try {
-        const scoring = calculateScoringFields(a, algoConfig);
-        const { error } = await supabase.from('assets').update(scoring).eq('id', a.id);
-        if (error) fail++; else ok++;
-      } catch (e) {
-        console.error('재계산 실패', a.id, e);
-        fail++;
-      }
-    }
+    const { data, error } = await supabase.functions.invoke('admin-score-asset', {
+      body: { mode: 'recompute_all' },
+    });
     setRescoring(false);
-    toast({ title: `등급 재계산 완료 · 성공 ${ok}건 / 실패 ${fail}건` });
-    fetchAssets();
+    if (error) {
+      toast({ title: '재계산 실패', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: `등급 재계산 완료 · 성공 ${data?.updated ?? 0}건 / 실패 ${data?.failed ?? 0}건` });
+      fetchAssets();
+    }
   };
+
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-8 pt-32">
