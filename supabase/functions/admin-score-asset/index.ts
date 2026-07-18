@@ -7,8 +7,8 @@
 //   { mode: "recompute_all" }              — 전체 자산 재계산 + DB 업데이트 (관리자 전용)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { analyzeAsset } from "../analyze-asset/_algo/financial/irr-calculator.ts";
-import { buildScoringInput } from "../analyze-asset/_algo/buildScoringInput.ts";
+import { analyzeAsset } from "./_algo/financial/irr-calculator.ts";
+import { buildScoringInput } from "./_algo/buildScoringInput.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
