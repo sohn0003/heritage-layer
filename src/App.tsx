@@ -38,8 +38,8 @@ const App = () => (
             <Route path="/mypage" element={<Mypage />} />
             <Route path="/bridge" element={<Bridge />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin/properties" element={<AdminProperties />} />
-            <Route path="/admin/signals" element={<AdminDealSignals />} />
+            <Route path="/admin/properties" element={<Suspense fallback={<div className="p-8 text-muted-foreground">로딩 중...</div>}><AdminProperties /></Suspense>} />
+            <Route path="/admin/signals" element={<Suspense fallback={<div className="p-8 text-muted-foreground">로딩 중...</div>}><AdminDealSignals /></Suspense>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />
