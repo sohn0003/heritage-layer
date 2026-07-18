@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -12,8 +13,9 @@ import About from "@/pages/About";
 import Mypage from "@/pages/Mypage";
 import Bridge from "@/pages/Bridge";
 import Contact from "@/pages/Contact";
-import AdminProperties from "@/pages/admin/AdminProperties";
-import AdminDealSignals from "@/pages/admin/AdminDealSignals";
+// 관리자 페이지는 알고리즘 코드를 사용하므로 lazy-load하여 공개 번들에서 분리합니다.
+const AdminProperties = lazy(() => import("@/pages/admin/AdminProperties"));
+const AdminDealSignals = lazy(() => import("@/pages/admin/AdminDealSignals"));
 import NotFound from "@/pages/NotFound";
 import Terms from "@/pages/legal/Terms";
 import Privacy from "@/pages/legal/Privacy";
@@ -36,8 +38,8 @@ const App = () => (
             <Route path="/mypage" element={<Mypage />} />
             <Route path="/bridge" element={<Bridge />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin/properties" element={<AdminProperties />} />
-            <Route path="/admin/signals" element={<AdminDealSignals />} />
+            <Route path="/admin/properties" element={<Suspense fallback={<div className="p-8 text-muted-foreground">로딩 중...</div>}><AdminProperties /></Suspense>} />
+            <Route path="/admin/signals" element={<Suspense fallback={<div className="p-8 text-muted-foreground">로딩 중...</div>}><AdminDealSignals /></Suspense>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />

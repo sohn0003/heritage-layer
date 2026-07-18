@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +10,6 @@ import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Tooltip,
   TooltipContent,
@@ -19,8 +19,6 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { useAlgorithmConfig } from '@/hooks/useAlgorithmConfig';
-import { getScoreReasons, type ScoreReasonKey } from '@/lib/scoreReasons';
 import {
   TrendingUp, FileText, BarChart3, Building2, School, Home, Factory, Building,
   CheckCircle2, AlertTriangle, Sparkles, ShieldAlert, Info,
@@ -30,20 +28,47 @@ import GradeMeter from '@/components/common/GradeMeter';
 import RatioBar from '@/components/common/RatioBar';
 import AuthModal from '@/components/common/AuthModal';
 
-// 알고리즘 모듈 연동
-import { type ScoreResult } from '@/algorithm/scoring/scoring';
-import {
-  analyzeAsset,
-  type AnalyzeAssetResult,
-} from '@/algorithm/financial/irr-calculator';
-import {
-  getAssetSignalStatus,
-  createSignalEvent,
-  type AssetSignalSummary,
-  type SignalEvent,
-  type SignalType,
-} from '@/algorithm/deal-signal/deal-signal';
-import { buildScoringInput } from '@/lib/assetScoring';
+// 서버 응답 타입 (analyze-asset edge function). 알고리즘 로직은 클라이언트 번들에 포함되지 않습니다.
+type Grade = 'S' | 'A' | 'B' | 'C' | 'D';
+type BlockLabel = '우수' | '양호' | '보통' | '미흡' | '취약';
+interface ScenarioSanitized {
+  rank: 1 | 2 | 3;
+  concept: string;
+  developmentDirectionLabel: string;
+  useTypeSummary: string;
+  useTypeMix: Array<{ useType: string; ratio: number }>;
+  reasons: string[];
+  risks: string[];
+  recommendedEquityRatio: number;
+  loanStructureLabel: string;
+  loanReason: string;
+  suitabilityLabel: BlockLabel;
+  irrResult: {
+    base: { usableFloorArea?: number; recommendedAnnualRevenue?: number; [k: string]: unknown };
+    summary: { investmentFeasibility: string; [k: string]: unknown };
+    [k: string]: unknown;
+  };
+  [k: string]: unknown;
+}
+interface AnalyzeResponse {
+  scoring: {
+    grade: Grade;
+    totalScore: number;
+    blockLabels: { A: BlockLabel; B: BlockLabel; C: BlockLabel; D: BlockLabel };
+  };
+  recommendation: {
+    assetSummary: { keyStrengths: string[]; keyRisks: string[]; [k: string]: unknown };
+    scenarios: ScenarioSanitized[];
+  };
+  config: {
+    landValuePerSqm: number;
+    projectYears: number;
+    residualValueRatio: number;
+    loanRates: { pf: number; collateral: number };
+  };
+}
+type OverridePayload = { rank: number; equityRatio?: number; annualRevenue?: number; operatingMargin?: number };
+type SignalRow = { user_id: string; asset_id: string; signal_type: string; created_at: string };
 
 // 원 → 억원 변환 (소수 1자리)
 const toEokwon = (won: number | null | undefined): string => {
@@ -74,8 +99,6 @@ const AnalysisPage = () => {
   const [usedFloorAreaByRank, setUsedFloorAreaByRank] = useState<Record<number, number | undefined>>({}); // 사용 연면적(㎡) — 미입력 시 최대 허용 연면적
   const [activeTab, setActiveTab] = useState<'1' | '2' | '3'>('1');
 
-  const algoConfig = useAlgorithmConfig();
-
   useEffect(() => {
     if (authLoading) return;
     if (!user) { setLoading(false); return; }
@@ -98,143 +121,112 @@ const AnalysisPage = () => {
     setUsedFloorAreaByRank({});
   }, [assetId]);
 
-  // 매도자 희망가 → 토지 취득단가 우선 적용 (없으면 공시지가 폴백)
+  // 매도자 희망가 → 표시용
   const askingLandPrice = (asset as unknown as { asking_land_price?: number | null })?.asking_land_price ?? null;
   const askingBuildingPrice = (asset as unknown as { asking_building_price?: number | null })?.asking_building_price ?? null;
-  const effectiveLandValuePerSqm = useMemo(() => {
-    if (!asset) return 4_500_000;
-    if (askingLandPrice && asset.land_area && asset.land_area > 0) {
-      return askingLandPrice / asset.land_area;
-    }
-    return asset.land_value_per_sqm ?? 4_500_000;
-  }, [asset, askingLandPrice]);
 
-  // 기본 분석(오버라이드 없음) — 스코어링/추천 시나리오/추천 자기자본비율의 기준값
-  const analysis: AnalyzeAssetResult | null = useMemo(() => {
-    if (!asset) return null;
-    const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
-    void preliminaryROI;
-    try {
-      return analyzeAsset({
-        assetInput: assetInputBase,
-        landValuePerSqm: effectiveLandValuePerSqm,
-        loanRates: algoConfig.loanRates,
-        projectYears: algoConfig.projectYears,
-        residualValueRatio: algoConfig.residualValueRatio,
+  // 서버로 보낼 오버라이드 페이로드 (queryKey에 포함)
+  const overridesPayload = useMemo<OverridePayload[]>(() => {
+    const ranks = new Set<number>([
+      ...Object.keys(equityByRank).map(Number),
+      ...Object.keys(revenueByRank).map(Number),
+      ...Object.keys(marginByRank).map(Number),
+    ]);
+    return Array.from(ranks).map((rank) => {
+      const eq = equityByRank[rank];
+      const rev = revenueByRank[rank];
+      const mar = marginByRank[rank];
+      return {
+        rank,
+        equityRatio: eq,
+        annualRevenue: rev !== undefined && rev > 0 ? rev : undefined,
+        operatingMargin: mar !== undefined ? mar / 100 : undefined,
+      };
+    }).filter((o) => o.equityRatio !== undefined || o.annualRevenue !== undefined || o.operatingMargin !== undefined);
+  }, [equityByRank, revenueByRank, marginByRank]);
+
+  // 서버 API 호출 (알고리즘은 서버 전용)
+  const analysisQuery = useQuery<AnalyzeResponse>({
+    queryKey: ['analyze-asset', assetId, JSON.stringify(overridesPayload)],
+    enabled: !!assetId && !!user,
+    staleTime: 30_000,
+    placeholderData: (prev) => prev,
+    retry: false,
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('analyze-asset', {
+        body: { asset_id: assetId, overrides: overridesPayload },
       });
-    } catch (e) {
-      console.error('analyzeAsset 실패', e);
-      return null;
-    }
-  }, [
-    asset,
-    effectiveLandValuePerSqm,
-    algoConfig.loanRates.pf,
-    algoConfig.loanRates.collateral,
-    algoConfig.projectYears,
-    algoConfig.residualValueRatio,
-  ]);
-
-  const scoringResult: ScoreResult | null = analysis?.scoring ?? null;
-  const baseScenarios = analysis?.recommendation.scenarios;
-
-  const scoreReasons = useMemo(() => {
-    if (!asset || !scoringResult) return null;
-    try {
-      const input = buildScoringInput(asset);
-      return getScoreReasons(input, scoringResult.detail);
-    } catch (e) {
-      console.error('getScoreReasons 실패', e);
-      return null;
-    }
-  }, [asset, scoringResult]);
-
-  // 시나리오별 슬라이더 값을 적용한 표시용 시나리오 — 오버라이드된 IRR/DSCR/자기자본 등 반영
-  const displayScenarios = useMemo(() => {
-    if (!asset || !baseScenarios) return baseScenarios;
-    const { preliminaryROI, ...assetInputBase } = buildScoringInput(asset);
-    void preliminaryROI;
-    return baseScenarios.map((base) => {
-      const eqOverride = equityByRank[base.rank];
-      const revOverride = revenueByRank[base.rank];
-      const marOverride = marginByRank[base.rank];
-      const eqChanged = eqOverride !== undefined && eqOverride !== base.recommendedEquityRatio;
-      const revChanged = revOverride !== undefined && revOverride > 0;
-      const marChanged = marOverride !== undefined;
-      if (!eqChanged && !revChanged && !marChanged) return base;
-      try {
-        const r = analyzeAsset({
-          assetInput: assetInputBase,
-          landValuePerSqm: effectiveLandValuePerSqm,
-          loanRates: algoConfig.loanRates,
-          projectYears: algoConfig.projectYears,
-          residualValueRatio: algoConfig.residualValueRatio,
-          overrideEquityRatio: eqChanged ? eqOverride : undefined,
-          overrideAnnualRevenue: revChanged ? revOverride : undefined,
-          overrideOperatingMargin: marChanged ? (marOverride as number) / 100 : undefined,
-        });
-        return r.recommendation.scenarios.find((x) => x.rank === base.rank) ?? base;
-      } catch (e) {
-        console.error('analyzeAsset 오버라이드 실패', e);
-        return base;
+      if (error) {
+        const msg = (error as { message?: string }).message ?? '분석 요청 실패';
+        throw new Error(msg);
       }
-    });
-  }, [
-    asset,
-    baseScenarios,
-    equityByRank,
-    revenueByRank,
-    marginByRank,
-    algoConfig.loanRates.pf,
-    algoConfig.loanRates.collateral,
-    algoConfig.projectYears,
-    algoConfig.residualValueRatio,
-  ]);
+      return data as AnalyzeResponse;
+    },
+  });
 
-  const scenarios = displayScenarios;
+  useEffect(() => {
+    if (analysisQuery.error) {
+      toast({
+        title: '분석을 불러오지 못했습니다',
+        description: (analysisQuery.error as Error).message,
+        variant: 'destructive',
+      });
+    }
+  }, [analysisQuery.error]);
+
+  const analysis = analysisQuery.data ?? null;
+  const scoringResult = analysis?.scoring ?? null;
+  const baseScenarios = analysis?.recommendation.scenarios;
+  const scenarios = baseScenarios;
   const activeScenario = scenarios?.find((s) => String(s.rank) === activeTab) ?? scenarios?.[0];
-
-
-  const [signalEvents, setSignalEvents] = useState<SignalEvent[]>([]);
-
-  // 현재 자산에 대한 사용자 신호 이벤트 조회
-  const fetchSignals = async () => {
-    if (!assetId || !user) {
-      setSignalEvents([]);
-      return;
-    }
-    const { data } = await supabase
-      .from('deal_signals')
-      .select('*')
-      .eq('asset_id', assetId);
-    if (data) {
-      setSignalEvents(
-        data.map((row: any) =>
-          createSignalEvent(row.user_id, row.asset_id, row.signal_type as SignalType, undefined),
-        ).map((ev, i) => ({ ...ev, timestamp: new Date(data[i].created_at) })),
-      );
-    }
+  const algoConfig = analysis?.config ?? {
+    landValuePerSqm: 4_500_000,
+    projectYears: 10,
+    residualValueRatio: 0.4,
+    loanRates: { pf: 5.5, collateral: 4.8 },
   };
 
+  // 사용자 액션 신호 (deal_signals). 알고리즘 없이 단순 집계만 수행.
+  const [signalRows, setSignalRows] = useState<SignalRow[]>([]);
+  const fetchSignals = async () => {
+    if (!assetId || !user) { setSignalRows([]); return; }
+    const { data } = await supabase.from('deal_signals').select('*').eq('asset_id', assetId);
+    if (data) setSignalRows(data as SignalRow[]);
+  };
   // 자산 열람 시 'viewed' 신호 자동 기록
   useEffect(() => {
     if (!assetId || !user) return;
     (async () => {
       await supabase.from('deal_signals').insert({
-        user_id: user.id,
-        asset_id: assetId,
-        signal_type: 'viewed',
+        user_id: user.id, asset_id: assetId, signal_type: 'viewed',
       });
       fetchSignals();
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assetId, user?.id]);
 
-  // 신호 집계 결과
-  const signalSummary: AssetSignalSummary | null = useMemo(() => {
-    if (!asset || !scoringResult) return null;
-    return getAssetSignalStatus(asset.id, signalEvents, scoringResult.grade);
-  }, [asset, scoringResult, signalEvents]);
+  // 신호 집계 (알고리즘 없이 단순 카운트)
+  const signalSummary = useMemo(() => {
+    if (!signalRows.length) return null;
+    const users = new Set(signalRows.map((r) => r.user_id));
+    const counts: Record<string, number> = {};
+    const perUserViews: Record<string, number> = {};
+    signalRows.forEach((r) => {
+      counts[r.signal_type] = (counts[r.signal_type] || 0) + 1;
+      if (r.signal_type === 'viewed') perUserViews[r.user_id] = (perUserViews[r.user_id] || 0) + 1;
+    });
+    const repeatedViewCount = Object.values(perUserViews).filter((c) => c > 1).length;
+    return {
+      totalSignalScore: signalRows.length,
+      uniqueUsers: users.size,
+      savedCount: counts.saved ?? 0,
+      viewCount: counts.viewed ?? 0,
+      repeatedViewCount,
+      dealInterestCount: counts.deal_interest ?? 0,
+      clusterDetected: users.size >= 5,
+    };
+  }, [signalRows]);
+
 
   const handleDealInterest = async () => {
     if (!user) return;
@@ -444,29 +436,38 @@ const AnalysisPage = () => {
         </CardContent>
       </Card>
 
-      {/* COSMO-P 블록별 스코어 (Free) */}
+      {/* 블록별 평가 (5단계 라벨) */}
       {scoringResult && (
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-lg">COSMO-P 블록별 점수</CardTitle>
+            <CardTitle className="text-lg">COSMO-P 블록별 평가</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-4">
-              {[
-                { label: 'A. 입지·규제 (25%)', value: scoringResult.blockA },
-                { label: 'B. 수요·환경 (25%)', value: scoringResult.blockB },
-                { label: 'C. 심미적 가치 (20%)', value: scoringResult.blockC },
-                { label: 'D. 사업성 (30%)', value: scoringResult.blockD },
-              ].map((item) => (
-                <div key={item.label} className="text-center">
-                  <p className="text-xs text-muted-foreground">{item.label}</p>
-                  <p className="mt-1 text-2xl font-bold">{item.value}</p>
-                </div>
-              ))}
+              {(() => {
+                const labelClass = (v: BlockLabel) =>
+                  v === '우수' ? 'text-[hsl(var(--primary))]'
+                    : v === '양호' ? 'text-[hsl(var(--primary))]'
+                    : v === '보통' ? 'text-foreground'
+                    : v === '미흡' ? 'text-[hsl(var(--accent))]'
+                    : 'text-[hsl(var(--grade-d))]';
+                return [
+                  { label: 'A. 입지·규제', value: scoringResult.blockLabels.A },
+                  { label: 'B. 수요·환경', value: scoringResult.blockLabels.B },
+                  { label: 'C. 심미적 가치', value: scoringResult.blockLabels.C },
+                  { label: 'D. 사업성', value: scoringResult.blockLabels.D },
+                ].map((item) => (
+                  <div key={item.label} className="text-center">
+                    <p className="text-xs text-muted-foreground">{item.label}</p>
+                    <p className={`mt-1 text-2xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                  </div>
+                ));
+              })()}
             </div>
           </CardContent>
         </Card>
       )}
+
 
       {/* 자산 강점·리스크 요약 (Free) */}
       {analysis && (
@@ -511,163 +512,8 @@ const AnalysisPage = () => {
         </Card>
       )}
 
-      {/* 세부 점수 항목 */}
-      {scoringResult && (
-        <div className="mb-8">
-          <>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">세부 항목 점수</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-3 text-xs text-muted-foreground">각 항목의 i 아이콘을 클릭하면 산출 기준과 의미가 표시됩니다.</p>
-                <div className="w-full divide-y divide-border">
-                  {[
-                    {
-                      label: 'A1. 용도지역',
-                      key: 'a1_zoning',
-                      value: scoringResult.detail.a1_zoning,
-                      short: '용도지역의 활용 폭 평가',
-                      desc: '대지의 용도지역(주거·상업·공업·녹지 등)을 평가합니다. 상업지·준주거지처럼 활용 폭이 넓을수록 높은 점수가 부여되며, 보전녹지·자연환경보전지역은 개발 제약으로 점수가 낮아집니다.\n\n이 점수는 향후 가능한 사업 유형(숙박·오피스·복합시설 등)의 범위를 결정하는 1차 필터입니다.',
-                    },
-                    {
-                      label: 'A2. 개발 여력',
-                      key: 'a2_developmentCapacity',
-                      value: scoringResult.detail.a2_developmentCapacity.toFixed(1),
-                      short: '추가 건축 가능 연면적',
-                      desc: '현재 건폐율·용적률과 법정 최대치 사이의 차이를 계산해, 추가로 지을 수 있는 연면적이 얼마나 남아 있는지 평가합니다. 여력이 클수록 증축·재건축으로 사업성을 끌어올릴 여지가 큽니다.\n\n저활용 자산일수록 이 점수가 높게 산출되어 재생 잠재력이 크다는 신호가 됩니다.',
-                    },
-                    {
-                      label: 'A3. 인허가 조정',
-                      key: 'a3_permitAdjustment',
-                      value: scoringResult.detail.a3_permitAdjustment,
-                      short: '규제·제도 가감점',
-                      desc: '환경청 인가, 군사·문화재 구역, 도시계획시설 저촉 등 인허가 리스크 요인을 가감점으로 반영합니다. 규제 충돌이 많을수록 음(-) 조정이 들어갑니다.\n\n반대로 도시재생 활성화 지역·균형발전 예산 대상 등 우호적 제도권에 속한 자산은 양(+) 조정으로 가점이 부여됩니다.',
-                    },
-                    {
-                      label: 'A4. 종상향 조정',
-                      key: 'a4_zoningUpgradeAdjustment',
-                      value: scoringResult.detail.a4_zoningUpgradeAdjustment,
-                      short: '용도지역 상향 시 가점',
-                      desc: '용도지역을 한 단계 상향(종상향)했을 때 추가로 확보 가능한 용적률을 가점으로 반영합니다. 50% 이상 추가 가능한 자산은 큰 폭의 가점, 종상향이 불가한 자산은 가점이 없습니다.\n\n실현되면 사업 규모를 비약적으로 키울 수 있는 잠재 옵션입니다.',
-                    },
-                    {
-                      label: 'B1. 인구·상권',
-                      key: 'b1_populationCommercial',
-                      value: scoringResult.detail.b1_populationCommercial,
-                      short: '수요 기반 평가',
-                      desc: '주변 인구 추이(증가/유지/감소/소멸위험)와 상권 밀도를 결합해 수요 기반을 평가합니다. 인구가 늘고 상권이 두꺼울수록 임대·운영 안정성이 높습니다.\n\n소멸위험 지역이라도 관광·웰니스 등 외부 유입형 컨셉으로 보완 가능한지를 함께 고려합니다.',
-                    },
-                    {
-                      label: 'B2. 교통 접근성',
-                      key: 'b2_transportation',
-                      value: scoringResult.detail.b2_transportation,
-                      short: '도심까지의 거리 기반',
-                      desc: '도심까지의 거리(km)를 기준으로 접근성을 평가합니다. 도심 인접 자산은 일반 임대·복합시설에 유리하고, 원거리 자산은 체류형·관광형 컨셉에 유리합니다.\n\n거리만이 아니라, 거리 대비 어떤 사업 컨셉이 적합한지를 시나리오 추천에 반영합니다.',
-                    },
-                    {
-                      label: 'B3. 방치 기간',
-                      key: 'b3_idleYearsAdjustment',
-                      value: scoringResult.detail.b3_idleYearsAdjustment,
-                      short: '방치 연수 가감점',
-                      desc: '얼마나 오랫동안 방치되었는지를 가감점으로 반영합니다. 방치 기간이 길수록 건물 노후·민원 누적 등 음(-) 조정이 적용됩니다.\n\n동시에 정책적 처분 우선순위가 높아져 사업 추진 속도 측면에서는 양(+)으로 작용할 수 있습니다.',
-                    },
-                    {
-                      label: 'C1. 역사·건축',
-                      key: 'c1_historicalArchitectural',
-                      value: scoringResult.detail.c1_historicalArchitectural,
-                      short: '문화재·상징성·예술성',
-                      desc: '등록문화재·근대건축 유산, 지역 상징성, 건축예술적 특성 등을 평가합니다. 역사·건축적 가치가 높을수록 브랜딩과 스토리텔링에 유리하고 프리미엄 가격대를 형성할 수 있습니다.\n\n다만 보전 의무로 인해 개발 자유도가 낮아질 수 있어, 시나리오 추천에서 리모델링 비중이 높아지는 경향이 있습니다.',
-                    },
-                    {
-                      label: 'C2. 자연경관',
-                      key: 'c2_naturalScenery',
-                      value: scoringResult.detail.c2_naturalScenery,
-                      short: '산·바다·강 조망 가치',
-                      desc: '산·바다·강·호수 조망 가능 여부와 인접 자연경관 수준을 평가합니다. 경관 자산은 숙박·웰니스·리조트 컨셉에서 핵심 가치로 작동합니다.\n\n경관 저해 요소(인접 시설·시야 가림)가 있는 경우 음(-) 조정이 적용됩니다.',
-                    },
-                    {
-                      label: 'D1. 건물 상태',
-                      key: 'd1_buildingCondition',
-                      value: scoringResult.detail.d1_buildingCondition,
-                      short: '리모델링·철거 여부',
-                      desc: '리모델링 가능·일부 보강·대수선 필요·전면 철거 등 4단계로 건물 컨디션을 평가합니다. 상태가 좋을수록 초기 투입비가 줄어 IRR이 개선됩니다.\n\n전면 철거가 필요한 자산은 신축 사업으로 전환되어 자본 규모와 일정이 달라집니다.',
-                    },
-                    {
-                      label: 'D2. 수익성',
-                      key: 'd2_profitability',
-                      value: scoringResult.detail.d2_profitability,
-                      short: '예비 ROI 1차 평가',
-                      desc: '예비 ROI(공시지가·연면적·예상 단가 기반의 1차 추정 수익률)를 점수화한 항목입니다. 본격적인 IRR 분석에 앞서 자산이 사업성 검토 대상인지 빠르게 판별합니다.\n\n실제 IRR은 시나리오·금융구조에 따라 달라지므로 이 점수는 1차 스크리닝 용도로만 사용됩니다.',
-                    },
-                    {
-                      label: 'D3. 정부 지원',
-                      key: 'd3_governmentSupport',
-                      value: scoringResult.detail.d3_governmentSupport,
-                      short: '보조금·예산 지원 여부',
-                      desc: '도시재생·폐교활용·균형발전 등 정부·지자체 보조금/예산 지원 대상 여부를 평가합니다. 지원 대상이면 자기자본 부담이 줄어들어 사업 실행 가능성이 크게 올라갑니다.\n\n동시에 공공성 요건이 부과될 수 있어, 시나리오 추천에서 운영 컨셉의 일정 비중이 공공·문화 용도로 배분됩니다.',
-                    },
-                    {
-                      label: '추가 개발 가능 연면적 (㎡)',
-                      key: 'additionalFloorArea',
-                      value: scoringResult.detail.additionalFloorArea.toLocaleString(),
-                      short: '법정 최대까지 남은 면적',
-                      desc: '현재 연면적과 법정 최대 연면적의 차이로, 합법적으로 추가 건축 가능한 면적입니다. 이 값이 클수록 증축형 시나리오의 매출 잠재력이 커집니다.',
-                    },
-                    {
-                      label: '종상향 후 최대 연면적 (㎡)',
-                      key: 'maxFloorAreaAfterUpgrade',
-                      value: scoringResult.detail.maxFloorAreaAfterUpgrade.toLocaleString(),
-                      short: '종상향 시 잠재 상한',
-                      desc: '용도지역 종상향이 실현되었을 때 확보 가능한 최대 연면적입니다. 실현 가능성과 별개로 잠재 사업 규모를 가늠하는 상한선 지표입니다.',
-                    },
-                    {
-                      label: '건폐율 사용률 (%)',
-                      key: 'buildingCoverageUsageRate',
-                      value: scoringResult.detail.buildingCoverageUsageRate,
-                      short: '현재 ÷ 법정 최대 건폐율',
-                      desc: '현재 건폐율 ÷ 법정 최대 건폐율. 100%에 가까울수록 평면적으로는 더 지을 여지가 없고, 낮을수록 동(棟) 추가나 외부공간 활용 여력이 있다는 뜻입니다.',
-                    },
-                    {
-                      label: '용적률 사용률 (%)',
-                      key: 'floorAreaRatioUsageRate',
-                      value: scoringResult.detail.floorAreaRatioUsageRate,
-                      short: '현재 ÷ 법정 최대 용적률',
-                      desc: '현재 용적률 ÷ 법정 최대 용적률. 사용률이 낮을수록 같은 대지에 더 많은 연면적을 올릴 수 있어 증축·재건축형 시나리오의 IRR이 유리해집니다.',
-                    },
-                  ].map((row) => (
-                    <div key={row.label} className="flex items-center gap-3 py-3">
-                      <div className="flex items-baseline gap-2 min-w-0 shrink-0">
-                        <span className="text-sm font-medium text-foreground whitespace-nowrap">{row.label}</span>
-                        <span className="text-sm tabular-nums text-muted-foreground">{row.value}</span>
-                      </div>
-                      <span className="text-xs text-muted-foreground truncate hidden sm:inline flex-1 min-w-0">
-                        {(row.key && scoreReasons?.[row.key as ScoreReasonKey]) || row.short}
-                      </span>
-                      <div className="flex items-center shrink-0 ml-auto sm:ml-0">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button
-                              type="button"
-                              aria-label={`${row.label} 설명 보기`}
-                              className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                            >
-                              <Info className="h-4 w-4" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent align="end" className="max-w-sm whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                            {row.desc}
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        </div>
-      )}
+      {/* 세부 항목 점수 섹션은 보안상 서버 전용으로 이전되었습니다. */}
+
 
       {/* 상세 분석 섹션 */}
       <div className="space-y-6">
@@ -717,13 +563,14 @@ const AnalysisPage = () => {
                         </div>
 
                         {/* 적합도 */}
+                        {/* 적합도 */}
                         <div>
                           <div className="mb-1.5 flex items-baseline justify-between">
                             <Label className="text-xs font-medium text-muted-foreground">시나리오 적합도</Label>
-                            <span className="text-sm font-semibold">{scenario.suitabilityScore}점</span>
+                            <Badge variant="outline" className="font-semibold">{scenario.suitabilityLabel}</Badge>
                           </div>
-                          <Progress value={scenario.suitabilityScore} className="h-2" />
                         </div>
+
 
                         {/* 추천 이유 / 리스크 */}
                         <div className="grid gap-4 sm:grid-cols-2">
