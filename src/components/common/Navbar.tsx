@@ -9,7 +9,7 @@ import logo from '@/assets/logo.svg';
 const navItems = [
   { label: 'About', href: '/about' },
   { label: 'Properties', href: '/properties' },
-  { label: 'Solution', href: '/bridge' },
+  { label: '컨설팅 의뢰', href: '/bridge' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -19,7 +19,7 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const isHeroPage = location.pathname === '/' || location.pathname === '/about';
+  const isHeroPage = location.pathname === '/about';
   const isAdminPage = location.pathname.startsWith('/admin');
 
   useEffect(() => {
