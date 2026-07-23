@@ -119,7 +119,7 @@ const AboutPage = () => {
 
       {/* ── PROBLEM: 왜 우리 비즈니스가 필요한가 ── */}
       <section
-        className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28"
+        className="relative overflow-hidden px-6 py-16 sm:px-10 sm:py-24 md:px-16 md:py-32"
       >
         <Blob className="left-[-10%] top-10 h-96 w-96" color="hsl(15 40% 78%)" />
         <Blob className="right-[-10%] bottom-10 h-96 w-96" color="hsl(25 45% 78%)" />
@@ -198,7 +198,7 @@ const AboutPage = () => {
 
       {/* ── HOW WE WORK: Heritage Layer가 제공하는 것 ── */}
       <section
-        className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28"
+        className="relative overflow-hidden px-6 py-16 sm:px-10 sm:py-24 md:px-16 md:py-32"
         style={{ background: 'hsl(226 35% 12%)' }}
       >
         <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(25 55% 55% / 0.18)" />
@@ -269,7 +269,7 @@ const AboutPage = () => {
         </section>
 
         {/* ── PLATFORM FEATURES (다크 블록 내부, 글라스 카드) ── */}
-        <section className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28">
+        <section className="relative overflow-hidden px-6 py-16 sm:px-10 sm:py-24 md:px-16 md:py-32">
           <div className="relative mx-auto max-w-5xl">
             <div className="mb-12 text-center text-[hsl(0_0%_96%)]">
               <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(25 55% 62%)' }}>Platform</span>
