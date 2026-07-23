@@ -997,64 +997,60 @@ const AnalysisPage = () => {
                   })}
                 </Tabs>
               )}
-            </CardContent>
-          </Card>
-        </>
+            </div>
+          </div>
+        </section>
 
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Building2 className="h-5 w-5 text-accent" /> 딜 시그널 현황
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {signalSummary ? (
-                <>
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <div>
-                      <p className="flex items-center gap-1 text-xs">
-                        종합 신호 점수
-                        <TooltipProvider delayDuration={100}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="max-w-xs">
-                              <p>저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs">관심 유저 수</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.uniqueUsers}명</p>
-                    </div>
-                    <div>
-                      <p className="text-xs">저장 / 열람 / 반복열람</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">
-                        {signalSummary.savedCount} / {signalSummary.viewCount} / {signalSummary.repeatedViewCount}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs">관심 상담 신청</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
-                    </div>
+        <section>
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+            <Building2 className="h-5 w-5 text-accent" /> 딜 시그널 현황
+          </h2>
+          <div className="space-y-3 text-sm text-muted-foreground">
+            {signalSummary ? (
+              <>
+                <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <p className="flex items-center gap-1 text-xs">
+                      종합 신호 점수
+                      <TooltipProvider delayDuration={100}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs">
+                            <p>저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2 pt-2">
-                    {signalSummary.clusterDetected && (
-                      <Badge variant="default">클러스터 감지</Badge>
-                    )}
+                  <div>
+                    <p className="text-xs">관심 유저 수</p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.uniqueUsers}명</p>
                   </div>
-                </>
-              ) : (
-                <p>신호 데이터를 불러오는 중...</p>
-              )}
-            </CardContent>
-          </Card>
-        </>
+                  <div>
+                    <p className="text-xs">저장 / 열람 / 반복열람</p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">
+                      {signalSummary.savedCount} / {signalSummary.viewCount} / {signalSummary.repeatedViewCount}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs">관심 상담 신청</p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 pt-2">
+                  {signalSummary.clusterDetected && (
+                    <Badge variant="default">클러스터 감지</Badge>
+                  )}
+                </div>
+              </>
+            ) : (
+              <p>신호 데이터를 불러오는 중...</p>
+            )}
+          </div>
+        </section>
       </div>
 
       {/* Bottom buttons */}
