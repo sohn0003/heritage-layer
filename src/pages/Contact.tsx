@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+// Card 컴포넌트 제거 — 섹션은 선으로 구분합니다.
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -61,148 +61,140 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-muted/30 to-background pt-20">
+    <div className="min-h-screen bg-background pt-20">
       <Seo
         title="문의하기 — Heritage Layer"
         description="유휴자산 등록 의뢰, Bridge Solution 의뢰 등 Heritage Layer에 문의하세요."
         path="/contact"
       />
-      <div className="mx-auto max-w-3xl px-4 py-12 md:py-16">
-        <div className="mb-10 text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Contact</span>
-          <h1 className="mt-3 text-3xl font-bold md:text-4xl">문의하기</h1>
-          <p className="mt-3 text-muted-foreground">
+      <div className="mx-auto max-w-2xl px-6 sm:px-8 py-14 md:py-20">
+        <div className="mb-10">
+          <span className="text-[11px] font-medium uppercase tracking-[0.3em] text-muted-foreground">Contact</span>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">문의하기</h1>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             유휴자산 등록 또는 Bridge Solution 의뢰를 남겨주세요. 담당자가 빠르게 안내드립니다.
           </p>
         </div>
 
-        <div className="mb-8">
-          <div className="flex items-center gap-3 rounded-xl border bg-card/60 p-4 backdrop-blur">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15">
-              <Mail className="h-5 w-5 text-accent" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">이메일</p>
-              <p className="text-sm font-semibold">contact@thelayercorp.com</p>
-            </div>
+        <div className="flex items-center gap-3 border-y border-border/60 py-4 mb-10">
+          <Mail className="h-4 w-4 text-accent" />
+          <div className="flex items-baseline gap-3">
+            <p className="text-xs text-muted-foreground">이메일</p>
+            <p className="text-sm font-medium">contact@thelayercorp.com</p>
           </div>
         </div>
 
-        <Card>
-          <CardContent className="p-6 md:p-8">
-            <div className="mb-5 space-y-2">
-              <Label className="flex items-center gap-2">
-                <FileQuestion className="h-4 w-4 text-accent" /> 문의 항목 *
-              </Label>
-              <Select value={type} onValueChange={setType}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {inquiryTypes.map((t) => (
-                    <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        <div className="mb-8 space-y-2">
+          <Label className="flex items-center gap-2 text-sm">
+            <FileQuestion className="h-4 w-4 text-accent" /> 문의 항목 *
+          </Label>
+          <Select value={type} onValueChange={setType}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {inquiryTypes.map((t) => (
+                <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {type === 'bridge_solution' ? (
+          <BridgeInquiryForm onSuccess={() => setSuccessOpen(true)} />
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="name">이름 *</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="org" className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground" /> 소속 (선택)
+                </Label>
+                <Input id="org" value={organization} onChange={(e) => setOrganization(e.target.value)} maxLength={200} />
+              </div>
             </div>
 
-            {type === 'bridge_solution' ? (
-              <BridgeInquiryForm onSuccess={() => setSuccessOpen(true)} />
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">이름 *</Label>
-                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="org" className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-muted-foreground" /> 소속 (선택)
-                    </Label>
-                    <Input id="org" value={organization} onChange={(e) => setOrganization(e.target.value)} maxLength={200} />
-                  </div>
-                </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="phone">연락처 *</Label>
+                <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={50} placeholder="010-0000-0000" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">이메일 *</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={100} placeholder="email@example.com" required />
+              </div>
+            </div>
 
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">연락처 *</Label>
-                    <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={50} placeholder="010-0000-0000" required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">이메일 *</Label>
-                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={100} placeholder="email@example.com" required />
-                  </div>
-                </div>
-
-                {type === 'asset_report' && (
-                  <div className="space-y-5 rounded-lg border bg-muted/30 p-4">
-                    <p className="text-sm font-semibold">자산 정보</p>
-                    <div className="space-y-2">
-                      <Label htmlFor="asset-address">유휴자산 주소 *</Label>
-                      <Input id="asset-address" value={assetAddress} onChange={(e) => setAssetAddress(e.target.value)} maxLength={200} required placeholder="예) 서울특별시 종로구 ..." />
-                    </div>
-                    <div className="grid gap-5 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="asset-type">유형 *</Label>
-                        <Select value={assetType} onValueChange={setAssetType}>
-                          <SelectTrigger id="asset-type"><SelectValue placeholder="유형 선택" /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="토지">토지</SelectItem>
-                            <SelectItem value="단독주택">단독주택</SelectItem>
-                            <SelectItem value="상가/근린생활시설">상가/근린생활시설</SelectItem>
-                            <SelectItem value="공장/창고">공장/창고</SelectItem>
-                            <SelectItem value="업무시설">업무시설</SelectItem>
-                            <SelectItem value="기타">기타</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="owner-type">소유자 *</Label>
-                        <Select value={ownerType} onValueChange={setOwnerType}>
-                          <SelectTrigger id="owner-type"><SelectValue placeholder="소유자 구분" /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="기관">기관</SelectItem>
-                            <SelectItem value="개인">개인</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="grid gap-5 sm:grid-cols-3">
-                      <div className="space-y-2">
-                        <Label htmlFor="land-area">대지면적 (㎡) *</Label>
-                        <Input id="land-area" type="number" min="0" step="0.01" value={landArea} onChange={(e) => setLandArea(e.target.value)} required />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="building-area">건축면적 (㎡)</Label>
-                        <Input id="building-area" type="number" min="0" step="0.01" value={buildingArea} onChange={(e) => setBuildingArea(e.target.value)} placeholder="선택" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="total-floor-area">연면적 (㎡)</Label>
-                        <Input id="total-floor-area" type="number" min="0" step="0.01" value={totalFloorArea} onChange={(e) => setTotalFloorArea(e.target.value)} placeholder="선택" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
+            {type === 'asset_report' && (
+              <div className="space-y-5 border-t border-border/60 pt-6">
+                <p className="text-sm font-semibold">자산 정보</p>
                 <div className="space-y-2">
-                  <Label htmlFor="message">문의 내용 *</Label>
-                  <Textarea
-                    id="message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    rows={6}
-                    maxLength={2000}
-                    required
-                    placeholder="제보하실 자산의 특이사항을 자유롭게 작성해주세요."
-                  />
-                  <p className="text-right text-xs text-muted-foreground">{message.length}/2000</p>
+                  <Label htmlFor="asset-address">유휴자산 주소 *</Label>
+                  <Input id="asset-address" value={assetAddress} onChange={(e) => setAssetAddress(e.target.value)} maxLength={200} required placeholder="예) 서울특별시 종로구 ..." />
                 </div>
-
-                <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                  {loading ? '접수 중...' : '문의하기'}
-                </Button>
-              </form>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="asset-type">유형 *</Label>
+                    <Select value={assetType} onValueChange={setAssetType}>
+                      <SelectTrigger id="asset-type"><SelectValue placeholder="유형 선택" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="토지">토지</SelectItem>
+                        <SelectItem value="단독주택">단독주택</SelectItem>
+                        <SelectItem value="상가/근린생활시설">상가/근린생활시설</SelectItem>
+                        <SelectItem value="공장/창고">공장/창고</SelectItem>
+                        <SelectItem value="업무시설">업무시설</SelectItem>
+                        <SelectItem value="기타">기타</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="owner-type">소유자 *</Label>
+                    <Select value={ownerType} onValueChange={setOwnerType}>
+                      <SelectTrigger id="owner-type"><SelectValue placeholder="소유자 구분" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="기관">기관</SelectItem>
+                        <SelectItem value="개인">개인</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="land-area">대지면적 (㎡) *</Label>
+                    <Input id="land-area" type="number" min="0" step="0.01" value={landArea} onChange={(e) => setLandArea(e.target.value)} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="building-area">건축면적 (㎡)</Label>
+                    <Input id="building-area" type="number" min="0" step="0.01" value={buildingArea} onChange={(e) => setBuildingArea(e.target.value)} placeholder="선택" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="total-floor-area">연면적 (㎡)</Label>
+                    <Input id="total-floor-area" type="number" min="0" step="0.01" value={totalFloorArea} onChange={(e) => setTotalFloorArea(e.target.value)} placeholder="선택" />
+                  </div>
+                </div>
+              </div>
             )}
-          </CardContent>
-        </Card>
+
+            <div className="space-y-2 border-t border-border/60 pt-6">
+              <Label htmlFor="message">문의 내용 *</Label>
+              <Textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={6}
+                maxLength={2000}
+                required
+                placeholder="제보하실 자산의 특이사항을 자유롭게 작성해주세요."
+              />
+              <p className="text-right text-xs text-muted-foreground">{message.length}/2000</p>
+            </div>
+
+            <Button type="submit" size="lg" className="w-full" disabled={loading}>
+              {loading ? '접수 중...' : '문의하기'}
+            </Button>
+          </form>
+        )}
       </div>
 
       <Dialog open={successOpen} onOpenChange={setSuccessOpen}>

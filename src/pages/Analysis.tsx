@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+// Table 컴포넌트 제거 — 재무 시나리오는 리스트 형태로 렌더링합니다.
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
@@ -314,9 +314,9 @@ const AnalysisPage = () => {
       />
       {/* 자산 핵심 정보 헤더 */}
       <div className="border-b bg-background">
-        <div className="mx-auto max-w-5xl px-5 sm:px-6 py-5">
+        <div className="mx-auto max-w-5xl px-6 sm:px-8 py-6">
           <div className="mb-2 flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-foreground">
+            <span className="flex h-9 w-9 items-center justify-center bg-muted text-foreground">
               <AssetIcon className="h-5 w-5" />
             </span>
             <Badge variant="secondary">{asset.asset_type}</Badge>
@@ -324,13 +324,13 @@ const AnalysisPage = () => {
               <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
             )}
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold leading-tight">{asset.address}</h1>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+          <h1 className="text-xl sm:text-2xl font-bold leading-snug">{asset.address}</h1>
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground leading-relaxed">
             <span>방치 기간: {asset.idle_years ?? '-'}년</span>
-            <span>·</span>
+            <span className="opacity-40">·</span>
             <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
-            <span>·</span>
-            <span className="flex items-center gap-1">
+            <span className="opacity-40">·</span>
+            <span className="inline-flex items-center gap-1">
               활용 상태:
               {(() => {
                 const s = asset.utilization_status ?? 'unutilized';
@@ -344,34 +344,60 @@ const AnalysisPage = () => {
               })()}
             </span>
           </div>
-          {/* 등급 계기판 — 주소/활용상태 아래 */}
-          {scoringResult && (
-            <div className="mt-5 flex justify-center">
-              <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={180} />
-            </div>
-          )}
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-5 sm:px-6 py-8">
-      {/* 분석 가정 안내 — 빨간 테두리 */}
-      {true && (
-        <div className="mb-6 border border-destructive/70 bg-destructive/5 p-4 text-xs text-muted-foreground">
-          <strong className="text-destructive">분석 가정:</strong>{' '}
-          공시지가{' '}
-          <span className="text-foreground">
-            {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
-          </span>{' '}
-          · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
-          {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
-          {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
+      <div className="mx-auto max-w-5xl px-6 sm:px-8 py-8">
+
+      {/* 등급 계기판 + 블록별 평가 — 2단 */}
+      {scoringResult && (
+        <div className="mb-10 grid grid-cols-2 gap-6 border-b border-border/60 pb-8">
+          <div className="flex items-center justify-center">
+            <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={110} />
+          </div>
+          <div>
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">COSMO-P 블록별 평가</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              {(() => {
+                const labelClass = (v: BlockLabel) =>
+                  v === '우수' ? 'text-[hsl(var(--primary))]'
+                    : v === '양호' ? 'text-[hsl(var(--primary))]'
+                    : v === '보통' ? 'text-foreground'
+                    : v === '미흡' ? 'text-[hsl(var(--accent))]'
+                    : 'text-[hsl(var(--grade-d))]';
+                return [
+                  { label: '입지·규제', value: scoringResult.blockLabels.A },
+                  { label: '수요·환경', value: scoringResult.blockLabels.B },
+                  { label: '심미적 가치', value: scoringResult.blockLabels.C },
+                  { label: '사업성', value: scoringResult.blockLabels.D },
+                ].map((item) => (
+                  <div key={item.label} className="flex flex-col">
+                    <p className="text-[11px] text-muted-foreground">{item.label}</p>
+                    <p className={`mt-0.5 text-base font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
         </div>
       )}
 
-      {/* 기본 정보 — 박스 없이 통합 리스트 (건폐/용적 + 기본 항목) */}
-      <div className="mb-8 bg-muted/30 p-5 sm:p-6">
-        <h2 className="mb-4 text-base font-semibold">기본 정보</h2>
-        <div className="mb-5 grid gap-5 sm:grid-cols-2">
+      {/* 분석 가정 안내 — 빨간 테두리 */}
+      <div className="mb-8 border border-destructive/70 bg-destructive/5 p-4 text-xs leading-relaxed text-muted-foreground">
+        <strong className="text-destructive">분석 가정:</strong>{' '}
+        공시지가{' '}
+        <span className="text-foreground">
+          {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
+        </span>{' '}
+        · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
+        {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
+        {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
+      </div>
+
+      {/* 기본 정보 — 박스 없이 선으로 구분 */}
+      <section className="mb-10 border-b border-border/60 pb-8">
+        <h2 className="mb-5 text-base font-semibold">기본 정보</h2>
+        <div className="mb-6 grid gap-5 sm:grid-cols-2">
           <RatioBar
             label="건폐율"
             current={asset.current_building_coverage ?? asset.building_coverage}
@@ -383,7 +409,7 @@ const AnalysisPage = () => {
             legalMax={asset.legal_max_floor_area_ratio}
           />
         </div>
-        <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2 border-t border-border/60 pt-4">
+        <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
           {[
             { label: '용도지역', value: asset.zoning ?? '-' },
             { label: '대지면적', value: asset.land_area ? `${asset.land_area.toLocaleString()}㎡` : '-' },
@@ -398,66 +424,29 @@ const AnalysisPage = () => {
             </div>
           ))}
         </dl>
-      </div>
+      </section>
 
-      {/* 예상 자산 매도가 (Free) */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-lg">예상 자산 매도가</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-md border bg-muted/20 p-4">
-              <p className="text-xs text-muted-foreground">토지 매도가 (매도자 희망)</p>
-              <p className="mt-1 text-xl font-semibold">
-                {((askingLandPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
-              </p>
-            </div>
-            <div className="rounded-md border bg-muted/20 p-4">
-              <p className="text-xs text-muted-foreground">건물 매도가 (매도자 희망)</p>
-              <p className="mt-1 text-xl font-semibold">
-                {((askingBuildingPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
-              </p>
-            </div>
+      {/* 예상 자산 매도가 — 박스 없이 */}
+      <section className="mb-10 border-b border-border/60 pb-8">
+        <h2 className="mb-5 text-base font-semibold">예상 자산 매도가</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div>
+            <p className="text-xs text-muted-foreground">토지 매도가 (매도자 희망)</p>
+            <p className="mt-1 text-xl font-semibold tabular-nums">
+              {((askingLandPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
+            </p>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            * 가격이 없는 경우 매도자 미제시, 공시지가 기준 적용
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* 블록별 평가 (5단계 라벨) — 2x2 */}
-      {scoringResult && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg">COSMO-P 블록별 평가</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              {(() => {
-                const labelClass = (v: BlockLabel) =>
-                  v === '우수' ? 'text-[hsl(var(--primary))]'
-                    : v === '양호' ? 'text-[hsl(var(--primary))]'
-                    : v === '보통' ? 'text-foreground'
-                    : v === '미흡' ? 'text-[hsl(var(--accent))]'
-                    : 'text-[hsl(var(--grade-d))]';
-                return [
-                  { label: 'A. 입지·규제', value: scoringResult.blockLabels.A },
-                  { label: 'B. 수요·환경', value: scoringResult.blockLabels.B },
-                  { label: 'C. 심미적 가치', value: scoringResult.blockLabels.C },
-                  { label: 'D. 사업성', value: scoringResult.blockLabels.D },
-                ].map((item) => (
-                  <div key={item.label} className="border border-border/50 bg-muted/20 py-3 text-center">
-                    <p className="text-xs text-muted-foreground">{item.label}</p>
-                    <p className={`mt-1 text-xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
-                  </div>
-                ));
-              })()}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
+          <div>
+            <p className="text-xs text-muted-foreground">건물 매도가 (매도자 희망)</p>
+            <p className="mt-1 text-xl font-semibold tabular-nums">
+              {((askingBuildingPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
+            </p>
+          </div>
+        </div>
+        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+          * 가격이 없는 경우 매도자 미제시, 공시지가 기준 적용
+        </p>
+      </section>
 
       {/* 전문가 의견 (강점/리스크 요약) */}
       {analysis && (() => {
@@ -469,9 +458,9 @@ const AnalysisPage = () => {
           return `${t}합니다.`;
         };
         return (
-          <div className="mb-8 border-l-2 border-primary/60 bg-muted/20 p-5 sm:p-6">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
-            <div className="space-y-3 text-sm leading-relaxed text-foreground">
+          <section className="mb-10 border-l-2 border-primary/60 pl-5">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
+            <div className="space-y-3 text-sm leading-[1.8] text-foreground">
               {strengths.length > 0 && (
                 <p>
                   <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
@@ -488,7 +477,7 @@ const AnalysisPage = () => {
                 <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
               )}
             </div>
-          </div>
+          </section>
         );
       })()}
 
@@ -580,32 +569,30 @@ const AnalysisPage = () => {
                         </div>
 
                         {/* 금융 구조 추천 */}
-                        <Card className="bg-muted/40">
-                          <CardContent className="space-y-2 p-4 text-sm">
-                            <div className="font-semibold text-foreground">금융 구조 추천</div>
-                            <div className="grid gap-2 sm:grid-cols-3">
-                              <div>
-                                <p className="text-xs text-muted-foreground">추천 자기자본 비율</p>
-                                <p className="text-lg font-bold">{scenario.recommendedEquityRatio}%</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground">대출 방식</p>
-                                <p className="text-lg font-bold">{scenario.loanStructureLabel}</p>
-                              </div>
-                              <div className="sm:col-span-3">
-                                <p className="text-xs text-muted-foreground">선정 이유</p>
-                                <p className="text-sm">{scenario.loanReason}</p>
-                              </div>
+                        <div className="border-t border-border/60 pt-5">
+                          <p className="mb-3 text-sm font-semibold">금융 구조 추천</p>
+                          <div className="grid gap-4 sm:grid-cols-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground">추천 자기자본 비율</p>
+                              <p className="mt-1 text-lg font-bold tabular-nums">{scenario.recommendedEquityRatio}%</p>
                             </div>
-                          </CardContent>
-                        </Card>
+                            <div>
+                              <p className="text-xs text-muted-foreground">대출 방식</p>
+                              <p className="mt-1 text-lg font-bold">{scenario.loanStructureLabel}</p>
+                            </div>
+                            <div className="sm:col-span-3">
+                              <p className="text-xs text-muted-foreground">선정 이유</p>
+                              <p className="mt-1 text-sm leading-relaxed">{scenario.loanReason}</p>
+                            </div>
+                          </div>
+                        </div>
 
                         {/* 사용 연면적 입력 (탭별 개별) */}
                         {(() => {
                           const maxAllowed = Math.round(scenario.irrResult.base.usableFloorArea ?? 0);
                           const usedVal = usedFloorAreaByRank[scenario.rank] ?? maxAllowed;
                           return (
-                            <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
+                            <div className="border-t border-border/60 pt-5">
                               <div className="mb-2 flex items-baseline justify-between gap-2">
                                 <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
                                 <span className="text-xs text-muted-foreground">
@@ -719,7 +706,7 @@ const AnalysisPage = () => {
                             : (recommendedRevenue / 100_000_000).toFixed(1);
                           const marginVal = marginByRank[scenario.rank] ?? 40;
                           return (
-                            <div className="space-y-5 rounded-lg border border-border/60 bg-muted/30 p-4">
+                            <div className="space-y-5 border-t border-border/60 pt-5">
                               {hasPresale && (
                                 <div>
                                   <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -881,114 +868,104 @@ const AnalysisPage = () => {
                           );
                         })()}
 
-                        {/* 재무 지표: 보수적 / 기본 / 낙관적 3컬럼 */}
+                        {/* 재무 지표: 보수적 / 기본 / 낙관적 — 탭 방식 */}
                         <div>
                           <div className="mb-3 flex items-center gap-2">
                             <BarChart3 className="h-4 w-4 text-accent" />
-                            <h4 className="text-sm font-semibold">재무 시나리오 비교</h4>
+                            <h4 className="text-sm font-semibold">재무 시나리오</h4>
                             <Badge variant="outline" className={`ml-auto ${feasibilityClass}`}>
                               투자 타당성: {feasibility}
                             </Badge>
                           </div>
-                          <div className="overflow-x-auto">
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>지표</TableHead>
-                                  <TableHead className="text-right">보수적</TableHead>
-                                  <TableHead className="text-right">기본</TableHead>
-                                  <TableHead className="text-right">낙관적</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {(() => {
-                                  const PRESALE_ELIGIBLE = ['residential', 'mixed_use_residential', 'knowledge_industry', 'office', 'accommodation'];
-                                  const eligibleRatioSum = scenario.useTypeMix
-                                    .filter((m: any) => PRESALE_ELIGIBLE.includes(m.useType))
-                                    .reduce((sum: number, m: any) => sum + (m.ratio ?? 0), 0);
-                                  const presaleVal = presaleByRank[scenario.rank] ?? 0;
-                                  const maxUsableArea = scenario.irrResult.base.usableFloorArea ?? 0;
-                                  const usedInput = usedFloorAreaByRank[scenario.rank] ?? maxUsableArea;
+                          {(() => {
+                            const PRESALE_ELIGIBLE = ['residential', 'mixed_use_residential', 'knowledge_industry', 'office', 'accommodation'];
+                            const eligibleRatioSum = scenario.useTypeMix
+                              .filter((m: any) => PRESALE_ELIGIBLE.includes(m.useType))
+                              .reduce((sum: number, m: any) => sum + (m.ratio ?? 0), 0);
+                            const presaleVal = presaleByRank[scenario.rank] ?? 0;
+                            const maxUsableArea = scenario.irrResult.base.usableFloorArea ?? 0;
+                            const usedInput = usedFloorAreaByRank[scenario.rank] ?? maxUsableArea;
 
-                                  // 사용 연면적에 비례해 각 시나리오 컬럼(보수/기본/낙관) 값을 스케일링
-                                  // — 토지비는 면적과 무관(고정), 건축비·매출·이익·자기자본·대출 등은 면적에 비례
-                                  const scaleLevel = (lv: any) => {
-                                    const lvMax = lv.usableFloorArea ?? 0;
-                                    const usedArea = lvMax > 0 ? Math.min(usedInput, lvMax) : 0;
-                                    const k = lvMax > 0 ? usedArea / lvMax : 0;
-                                    const land = lv.landAcquisitionCost ?? 0;
-                                    const totalInv = land + ((lv.totalInvestment ?? 0) - land) * k;
-                                    return {
-                                      usableFloorArea: usedArea,
-                                      totalInvestment: totalInv,
-                                      equityAmount: (lv.equityAmount ?? 0) * k,
-                                      loanAmount: (lv.loanAmount ?? 0) * k,
-                                      annualRevenue: (lv.annualRevenue ?? 0) * k,
-                                      annualOperatingProfit: (lv.annualOperatingProfit ?? 0) * k,
-                                      irr: lv.irr,            // 모든 CF가 동일 k로 스케일 → IRR 불변
-                                      dscr: lv.dscr,          // OP·부채 둘 다 k로 스케일 → 비율 불변
-                                      paybackYears: lv.paybackYears,
-                                      totalInvestmentPaybackYears: lv.totalInvestmentPaybackYears,
-                                    };
-                                  };
-                                  const cs = scaleLevel(scenario.irrResult.conservative);
-                                  const bs = scaleLevel(scenario.irrResult.base);
-                                  const os = scaleLevel(scenario.irrResult.optimistic);
+                            const scaleLevel = (lv: any) => {
+                              const lvMax = lv.usableFloorArea ?? 0;
+                              const usedArea = lvMax > 0 ? Math.min(usedInput, lvMax) : 0;
+                              const k = lvMax > 0 ? usedArea / lvMax : 0;
+                              const land = lv.landAcquisitionCost ?? 0;
+                              const totalInv = land + ((lv.totalInvestment ?? 0) - land) * k;
+                              return {
+                                usableFloorArea: usedArea,
+                                totalInvestment: totalInv,
+                                equityAmount: (lv.equityAmount ?? 0) * k,
+                                loanAmount: (lv.loanAmount ?? 0) * k,
+                                annualRevenue: (lv.annualRevenue ?? 0) * k,
+                                annualOperatingProfit: (lv.annualOperatingProfit ?? 0) * k,
+                                irr: lv.irr,
+                                dscr: lv.dscr,
+                                paybackYears: lv.paybackYears,
+                                totalInvestmentPaybackYears: lv.totalInvestmentPaybackYears,
+                              };
+                            };
+                            const levelsData = {
+                              conservative: scaleLevel(scenario.irrResult.conservative),
+                              base: scaleLevel(scenario.irrResult.base),
+                              optimistic: scaleLevel(scenario.irrResult.optimistic),
+                            };
 
-                                  // 분양매출 (면적 스케일 반영: presale 면적도 사용 연면적 기반)
-                                  const usableAreaForPresale = usedInput;
-                                  const maxPresaleArea = usableAreaForPresale * (eligibleRatioSum / 100);
-                                  const currentPresaleArea = maxPresaleArea * (presaleVal / 100);
-                                  const currentPyeong = currentPresaleArea / 3.305785;
-                                  const pricePerPyeong = presalePriceByRank[scenario.rank] ?? 0; // 천만원
-                                  const presaleRevenueWon = currentPyeong * pricePerPyeong * 10_000_000;
-                                  const recoverPayback = (totalInvestment: number, annualOp: number) => {
-                                    if (!Number.isFinite(totalInvestment) || !Number.isFinite(annualOp)) return 0;
-                                    const remaining = Math.max(0, totalInvestment - presaleRevenueWon);
-                                    if (remaining === 0) return 0;
-                                    if (annualOp <= 0) return 0;
-                                    return Math.round((remaining / annualOp) * 10) / 10;
-                                  };
-                                  const rows = [
-                                  { label: '사용 연면적 (㎡)', fmt: (v: number) => formatNumber(v),
-                                    c: cs.usableFloorArea, b: bs.usableFloorArea, o: os.usableFloorArea },
-                                  { label: '총 투자비', fmt: (v: number) => toEokwon(v),
-                                    c: cs.totalInvestment, b: bs.totalInvestment, o: os.totalInvestment },
-                                  { label: '자기자본', fmt: (v: number) => toEokwon(v),
-                                    c: cs.equityAmount, b: bs.equityAmount, o: os.equityAmount },
-                                  { label: '대출금액', fmt: (v: number) => toEokwon(v),
-                                    c: cs.loanAmount, b: bs.loanAmount, o: os.loanAmount },
-                                  { label: '연간 매출', fmt: (v: number) => toEokwon(v),
-                                    c: cs.annualRevenue, b: bs.annualRevenue, o: os.annualRevenue },
-                                  { label: '연간 영업이익', fmt: (v: number) => toEokwon(v),
-                                    c: cs.annualOperatingProfit, b: bs.annualOperatingProfit, o: os.annualOperatingProfit },
-                                  { label: '분양매출', fmt: (_v: number) => toEokwon(presaleRevenueWon),
-                                    c: presaleRevenueWon, b: presaleRevenueWon, o: presaleRevenueWon },
-                                  { label: 'IRR', fmt: (v: number) => formatPercent(v),
-                                    c: cs.irr, b: bs.irr, o: os.irr, highlight: true },
-                                  { label: 'DSCR', fmt: (v: number) => (Number.isFinite(v) ? v.toFixed(2) : '--'),
-                                    c: cs.dscr, b: bs.dscr, o: os.dscr },
-                                  { label: '총 투자비 회수기간 (분양 + 영업이익)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
-                                    c: recoverPayback(cs.totalInvestment, cs.annualOperatingProfit),
-                                    b: recoverPayback(bs.totalInvestment, bs.annualOperatingProfit),
-                                    o: recoverPayback(os.totalInvestment, os.annualOperatingProfit) },
-                                  { label: '운영투자비 회수기간 (무차입 기준)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
-                                    c: cs.totalInvestmentPaybackYears, b: bs.totalInvestmentPaybackYears, o: os.totalInvestmentPaybackYears },
-                                  { label: '자기자본 회수기간 (대출상환 후 실제값)', fmt: (v: number) => (Number.isFinite(v) && v > 0 ? `${v}년` : '--'),
-                                    c: cs.paybackYears, b: bs.paybackYears, o: os.paybackYears },
-                                  ];
-                                  return rows.map((row) => (
-                                  <TableRow key={row.label}>
-                                    <TableCell className="font-medium">{row.label}</TableCell>
-                                    <TableCell className="text-right tabular-nums text-muted-foreground">{row.fmt(row.c)}</TableCell>
-                                    <TableCell className={`text-right tabular-nums ${row.highlight ? 'font-bold text-primary' : ''}`}>{row.fmt(row.b)}</TableCell>
-                                    <TableCell className="text-right tabular-nums text-muted-foreground">{row.fmt(row.o)}</TableCell>
-                                  </TableRow>
-                                  ));
-                                })()}
-                              </TableBody>
-                            </Table>
-                          </div>
+                            const maxPresaleArea = usedInput * (eligibleRatioSum / 100);
+                            const currentPresaleArea = maxPresaleArea * (presaleVal / 100);
+                            const currentPyeong = currentPresaleArea / 3.305785;
+                            const pricePerPyeong = presalePriceByRank[scenario.rank] ?? 0;
+                            const presaleRevenueWon = currentPyeong * pricePerPyeong * 10_000_000;
+                            const recoverPayback = (totalInvestment: number, annualOp: number) => {
+                              if (!Number.isFinite(totalInvestment) || !Number.isFinite(annualOp)) return 0;
+                              const remaining = Math.max(0, totalInvestment - presaleRevenueWon);
+                              if (remaining === 0) return 0;
+                              if (annualOp <= 0) return 0;
+                              return Math.round((remaining / annualOp) * 10) / 10;
+                            };
+
+                            const buildRows = (lv: typeof levelsData.base) => [
+                              { label: '사용 연면적 (㎡)', value: formatNumber(lv.usableFloorArea) },
+                              { label: '총 투자비', value: toEokwon(lv.totalInvestment) },
+                              { label: '자기자본', value: toEokwon(lv.equityAmount) },
+                              { label: '대출금액', value: toEokwon(lv.loanAmount) },
+                              { label: '연간 매출', value: toEokwon(lv.annualRevenue) },
+                              { label: '연간 영업이익', value: toEokwon(lv.annualOperatingProfit) },
+                              { label: '분양매출', value: toEokwon(presaleRevenueWon) },
+                              { label: 'IRR', value: formatPercent(lv.irr), highlight: true },
+                              { label: 'DSCR', value: Number.isFinite(lv.dscr) ? lv.dscr.toFixed(2) : '--' },
+                              { label: '총 투자비 회수기간 (분양+영업이익)',
+                                value: (() => { const v = recoverPayback(lv.totalInvestment, lv.annualOperatingProfit); return Number.isFinite(v) && v > 0 ? `${v}년` : '--'; })() },
+                              { label: '운영투자비 회수기간 (무차입)',
+                                value: Number.isFinite(lv.totalInvestmentPaybackYears) && lv.totalInvestmentPaybackYears > 0 ? `${lv.totalInvestmentPaybackYears}년` : '--' },
+                              { label: '자기자본 회수기간 (대출상환 후)',
+                                value: Number.isFinite(lv.paybackYears) && lv.paybackYears > 0 ? `${lv.paybackYears}년` : '--' },
+                            ];
+
+                            const renderList = (rows: ReturnType<typeof buildRows>) => (
+                              <dl className="mt-4 divide-y divide-border/40">
+                                {rows.map((r) => (
+                                  <div key={r.label} className="flex items-baseline justify-between gap-3 py-2.5">
+                                    <dt className="text-sm text-muted-foreground leading-relaxed">{r.label}</dt>
+                                    <dd className={`text-sm tabular-nums text-right ${r.highlight ? 'font-bold text-primary' : 'font-semibold'}`}>{r.value}</dd>
+                                  </div>
+                                ))}
+                              </dl>
+                            );
+
+                            return (
+                              <Tabs defaultValue="base">
+                                <TabsList className="grid w-full grid-cols-3">
+                                  <TabsTrigger value="conservative">보수적</TabsTrigger>
+                                  <TabsTrigger value="base">기본</TabsTrigger>
+                                  <TabsTrigger value="optimistic">낙관적</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="conservative">{renderList(buildRows(levelsData.conservative))}</TabsContent>
+                                <TabsContent value="base">{renderList(buildRows(levelsData.base))}</TabsContent>
+                                <TabsContent value="optimistic">{renderList(buildRows(levelsData.optimistic))}</TabsContent>
+                              </Tabs>
+                            );
+                          })()}
                         </div>
                       </TabsContent>
                     );
