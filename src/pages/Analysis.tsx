@@ -384,8 +384,7 @@ const AnalysisPage = () => {
         </div>
       )}
 
-      {/* 분석 가정 안내 — 빨간 테두리 */}
-      <div className="mb-8 border border-destructive/70 bg-destructive/5 p-4 text-xs leading-relaxed text-muted-foreground">
+      <div className="border border-destructive/70 bg-destructive/5 p-4 text-xs leading-relaxed text-muted-foreground">
         <strong className="text-destructive">분석 가정:</strong>{' '}
         공시지가{' '}
         <span className="text-foreground">
@@ -395,9 +394,13 @@ const AnalysisPage = () => {
         {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
         {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
       </div>
+        </div>
+      </div>
 
-      {/* 기본 정보 — 박스 없이 선으로 구분 */}
-      <section className="mb-10 border-b border-border/60 pb-8">
+      {/* 기본 정보 + 예상 매도가 — 흰색 밴드 */}
+      <div className="bg-card text-card-foreground">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
+      <section className="mb-8">
         <h2 className="mb-5 text-base font-semibold">기본 정보</h2>
         <div className="mb-6 grid gap-5 sm:grid-cols-2">
           <RatioBar
