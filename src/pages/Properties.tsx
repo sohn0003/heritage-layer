@@ -430,7 +430,7 @@ const PropertiesPage = () => {
         {/* 우측(데스크톱) / 하단(모바일) 컬럼 */}
         <div className={`flex w-full flex-col overflow-hidden md:border-l ${listOpen ? 'md:w-[400px]' : 'md:w-0 md:border-l-0'}`}>
           {/* 모바일 전용 지도 — 리스트 접힘 여부에 따라 높이 변경 */}
-          <div className={`w-full shrink-0 border-b md:hidden ${mobileListOpen ? 'h-[45vh]' : 'h-[calc(100vh-8rem)]'}`}>
+          <div className={`w-full shrink-0 border-b md:hidden ${mobileListOpen ? 'h-[45vh]' : 'h-[calc(100vh-6rem)]'}`}>
             <NaverMap
               markers={filtered
                 .filter(hasValidKoreaCoordinate)
