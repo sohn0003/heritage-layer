@@ -116,7 +116,7 @@ const AboutPage = () => {
         <div className="absolute inset-0" style={{ background: 'rgba(0, 0, 0, 0.55)' }} />
         <div className="relative z-10 mx-auto max-w-3xl">
           <Badge variant="secondary" className="mb-4">THE LAYER</Badge>
-          <h1 className="mb-6 text-3xl font-bold sm:text-5xl" style={{ color: 'hsl(0 0% 95%)' }}>
+          <h1 className="mb-6 text-2xl font-medium sm:text-4xl" style={{ color: 'hsl(0 0% 95%)' }}>
             방치된 공간이 지역의 미래입니다
           </h1>
           <p className="leading-relaxed" style={{ color: 'hsl(0 0% 85%)' }}>
@@ -138,7 +138,7 @@ const AboutPage = () => {
             <Badge variant="outline" className="mb-3 border-accent/40 text-accent">
               <AlertTriangle className="mr-1 h-3 w-3" /> Problem
             </Badge>
-            <h2 className="text-4xl font-bold md:text-5xl">방치된 자산이 매년 늘어나고 있습니다</h2>
+            <h2 className="text-3xl font-medium md:text-4xl">방치된 자산이 매년 늘어나고 있습니다</h2>
             <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
               지역은 텅 비어가는데, 활용할 방법은 없습니다.<br />
               데이터가 흩어져 있고, 절차는 복잡합니다.
@@ -152,7 +152,7 @@ const AboutPage = () => {
           <div className="mt-16">
             <div className="mb-10 text-center">
               <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Root Cause</span>
-              <h3 className="mt-3 text-3xl font-bold md:text-4xl">왜 재생되지 못할까요?</h3>
+              <h3 className="mt-3 text-2xl font-medium md:text-3xl">왜 재생되지 못할까요?</h3>
               <p className="mt-3 text-muted-foreground">방치는 우연이 아닙니다. 구조적 원인이 4가지 축에서 작동하고 있습니다.</p>
             </div>
 
@@ -190,7 +190,7 @@ const AboutPage = () => {
                       <span className="text-xs font-bold tabular-nums tracking-widest" style={{ color: p.color }}>
                         0{i + 1}
                       </span>
-                      <h4 className="text-2xl font-bold md:text-3xl">{p.t}</h4>
+                      <h4 className="text-xl font-medium md:text-2xl">{p.t}</h4>
                     </div>
                     <p className="text-base leading-relaxed text-muted-foreground md:text-lg">{p.d}</p>
                   </div>
@@ -262,7 +262,7 @@ const AboutPage = () => {
         <section className="relative overflow-hidden px-4 py-16 text-[hsl(0_0%_96%)] sm:py-20 md:py-24">
           <div className="relative mx-auto max-w-3xl text-center">
             <Sparkles className="mx-auto mb-4 h-10 w-10" style={{ color: 'hsl(var(--accent))' }} />
-            <h2 className="text-3xl font-bold sm:text-5xl">
+            <h2 className="text-2xl font-medium sm:text-4xl">
               우리는 유휴자산을<br />가장 잘 아는 재생 사업자입니다
             </h2>
             <p className="mt-6 text-base leading-relaxed opacity-90 md:text-lg">
@@ -282,7 +282,7 @@ const AboutPage = () => {
           <div className="relative mx-auto max-w-5xl">
             <div className="mb-12 text-center text-[hsl(0_0%_96%)]">
               <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(25 55% 62%)' }}>Platform</span>
-              <h2 className="mt-3 text-4xl font-bold md:text-5xl">플랫폼 기능</h2>
+              <h2 className="mt-3 text-3xl font-medium md:text-4xl">플랫폼 기능</h2>
               <p className="mx-auto mt-4 max-w-2xl text-[hsl(0_0%_78%)]">
                 Heritage Layer는 누구나 무료로 이용할 수 있는 데이터 기반 재생 플랫폼입니다.
               </p>

@@ -677,7 +677,7 @@ const HomePage = ({ embedded = false }: { embedded?: boolean } = {}) => {
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-20 text-center">
             <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Our Service</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">유휴자산 등록부터 매입까지,<br/>매니징해주는 파트너</h2>
+            <h2 className="mt-3 text-3xl font-medium md:text-4xl">유휴자산 등록부터 매입까지,<br/>매니징해주는 파트너</h2>
             <p className="mt-4 text-muted-foreground">
               Heritage Layer는 단순 분석 도구가 아닙니다. 자산 발굴부터 사업화까지 전 과정을 함께 책임지는 엔드투엔드 서비스를 제공합니다.
             </p>
@@ -844,7 +844,7 @@ const HomePage = ({ embedded = false }: { embedded?: boolean } = {}) => {
       <section className="relative overflow-hidden px-4 py-20 md:py-28">
         <div className="relative mx-auto max-w-5xl text-center text-[hsl(0_0%_96%)]">
           <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(25 55% 62%)' }}>Explore</span>
-          <h2 className="mt-3 text-4xl font-bold md:text-5xl">전국 유휴자산 지도</h2>
+          <h2 className="mt-3 text-3xl font-medium md:text-4xl">전국 유휴자산 지도</h2>
           <p className="mb-10 mt-4 text-[hsl(0_0%_75%)]">데이터 기반으로 전국의 재생 가능 자산을 한눈에 확인하세요</p>
           <button
             onClick={() => navigate('/properties')}
@@ -886,7 +886,7 @@ const HomePage = ({ embedded = false }: { embedded?: boolean } = {}) => {
           }}
         >
           <Sparkles className="mx-auto mb-4 h-10 w-10" style={{ color: 'hsl(25 55% 62%)' }} />
-          <h2 className="text-3xl font-bold md:text-4xl">유휴 부동산을 새로운 기회로</h2>
+          <h2 className="text-2xl font-medium md:text-3xl">유휴 부동산을 새로운 기회로</h2>
           <p className="mt-4" style={{ color: 'hsl(0 0% 75%)' }}>
             지금 가입하고 전국 자산 데이터와 AI 분석 결과를 확인해보세요.
           </p>
