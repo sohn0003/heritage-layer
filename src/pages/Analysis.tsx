@@ -431,8 +431,8 @@ const AnalysisPage = () => {
         </dl>
       </section>
 
-      {/* 예상 자산 매도가 — 박스 없이 */}
-      <section className="mb-10 border-b border-border/60 pb-8">
+      {/* 예상 자산 매도가 */}
+      <section>
         <h2 className="mb-5 text-base font-semibold">예상 자산 매도가</h2>
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
@@ -452,8 +452,10 @@ const AnalysisPage = () => {
           * 가격이 없는 경우 매도자 미제시, 공시지가 기준 적용
         </p>
       </section>
+        </div>
+      </div>
 
-      {/* 전문가 의견 (강점/리스크 요약) */}
+      {/* 전문가 의견 밴드 */}
       {analysis && (() => {
         const strengths = analysis.recommendation.assetSummary.keyStrengths;
         const risks = analysis.recommendation.assetSummary.keyRisks;
@@ -463,33 +465,36 @@ const AnalysisPage = () => {
           return `${t}합니다.`;
         };
         return (
-          <section className="mb-10 border-l-2 border-primary/60 pl-5">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
-            <div className="space-y-3 text-sm leading-[1.8] text-foreground">
-              {strengths.length > 0 && (
-                <p>
-                  <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
-                  본 자산은 {strengths.map(sentenceify).join(' 또한 ')}
-                </p>
-              )}
-              {risks.length > 0 && (
-                <p>
-                  <span className="font-semibold text-[hsl(var(--accent))]">리스크:</span>{' '}
-                  다만 {risks.map(sentenceify).join(' 아울러 ')}
-                </p>
-              )}
-              {strengths.length === 0 && risks.length === 0 && (
-                <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
-              )}
+          <div className="bg-background">
+            <div className="mx-auto max-w-5xl px-5 sm:px-10 py-8">
+              <section className="border-l-2 border-primary/60 pl-5">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
+                <div className="space-y-3 text-sm leading-[1.8] text-foreground">
+                  {strengths.length > 0 && (
+                    <p>
+                      <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
+                      본 자산은 {strengths.map(sentenceify).join(' 또한 ')}
+                    </p>
+                  )}
+                  {risks.length > 0 && (
+                    <p>
+                      <span className="font-semibold text-[hsl(var(--accent))]">리스크:</span>{' '}
+                      다만 {risks.map(sentenceify).join(' 아울러 ')}
+                    </p>
+                  )}
+                  {strengths.length === 0 && risks.length === 0 && (
+                    <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
+                  )}
+                </div>
+              </section>
             </div>
-          </section>
+          </div>
         );
       })()}
 
-      {/* 세부 항목 점수 섹션은 보안상 서버 전용으로 이전되었습니다. */}
-
-
-      {/* 상세 분석 섹션 */}
+      {/* 개발 시나리오 — 회색 밴드 */}
+      <div className="bg-muted/60">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
         <section>
