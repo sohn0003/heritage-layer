@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+// Card 컴포넌트 제거 — 섹션은 선으로 구분합니다.
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
