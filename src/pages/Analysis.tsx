@@ -312,46 +312,44 @@ const AnalysisPage = () => {
         description="입지·법규·수익성 시나리오를 데이터 기반으로 분석하는 Heritage Layer 분석 도구."
         path="/analysis"
       />
-      {/* 자산 핵심 정보 헤더 (스크롤 시 함께 이동) */}
+      {/* 자산 핵심 정보 헤더 */}
       <div className="border-b bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <div className="mb-2 flex items-center gap-2">
-                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-foreground">
-                  <AssetIcon className="h-5 w-5" />
-                </span>
-                <Badge variant="secondary">{asset.asset_type}</Badge>
-                {asset.gov_cooperation && (
-                  <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
-                )}
-              </div>
-              <h1 className="text-2xl font-bold leading-tight">{asset.address}</h1>
-              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-                <span>방치 기간: {asset.idle_years ?? '-'}년</span>
-                <span>·</span>
-                <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
-                <span>·</span>
-                <span className="flex items-center gap-1">
-                  활용 상태:
-                  {(() => {
-                    const s = asset.utilization_status ?? 'unutilized';
-                    const map: Record<string, { label: string; cls: string }> = {
-                      unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
-                      in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
-                      utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
-                    };
-                    const v = map[s] ?? map.unutilized;
-                    return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
-                  })()}
-                </span>
-              </div>
-            </div>
-            {/* 우측 상단 등급 계기판 */}
-            {scoringResult && (
-              <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={170} />
+        <div className="mx-auto max-w-5xl px-5 sm:px-6 py-5">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-foreground">
+              <AssetIcon className="h-5 w-5" />
+            </span>
+            <Badge variant="secondary">{asset.asset_type}</Badge>
+            {asset.gov_cooperation && (
+              <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
             )}
           </div>
+          <h1 className="text-xl sm:text-2xl font-bold leading-tight">{asset.address}</h1>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+            <span>방치 기간: {asset.idle_years ?? '-'}년</span>
+            <span>·</span>
+            <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
+            <span>·</span>
+            <span className="flex items-center gap-1">
+              활용 상태:
+              {(() => {
+                const s = asset.utilization_status ?? 'unutilized';
+                const map: Record<string, { label: string; cls: string }> = {
+                  unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
+                  in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
+                  utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
+                };
+                const v = map[s] ?? map.unutilized;
+                return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
+              })()}
+            </span>
+          </div>
+          {/* 등급 계기판 — 주소/활용상태 아래 */}
+          {scoringResult && (
+            <div className="mt-5 flex justify-center">
+              <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={180} />
+            </div>
+          )}
         </div>
       </div>
 
