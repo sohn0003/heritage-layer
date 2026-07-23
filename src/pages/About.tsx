@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import {
   Database, Lightbulb, AlertTriangle,
   TrendingDown, Building2,
-  ArrowRight, Search, FileText, BarChart3, GitCompare, Landmark, HandCoins, Bookmark, Award,
+  Search, FileText, BarChart3, GitCompare, Landmark, HandCoins, Bookmark, Award,
 } from 'lucide-react';
 import Seo from '@/components/common/Seo';
 import { HomeSections } from './Home';
