@@ -366,13 +366,14 @@ const PropertiesPage = () => {
                 필터 {activeCount > 0 && <Badge variant="secondary" className="ml-1">{activeCount}</Badge>}
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[320px] overflow-y-auto sm:w-[380px]">
+            <SheetContent side="bottom" className="h-[65vh] overflow-y-auto rounded-t-2xl">
               <SheetHeader>
                 <SheetTitle>필터</SheetTitle>
               </SheetHeader>
-              <div className="mt-4">{FilterPanel}</div>
+              <div className="mt-4 pb-6">{FilterPanel}</div>
             </SheetContent>
           </Sheet>
+
         </div>
       </div>
 
