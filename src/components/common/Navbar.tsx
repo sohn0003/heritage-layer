@@ -9,6 +9,7 @@ import logo from '@/assets/logo.svg';
 const navItems = [
   { label: 'About', href: '/about' },
   { label: 'Properties', href: '/properties' },
+  { label: 'Solution', href: '/bridge' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -50,7 +51,7 @@ const Navbar = () => {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Heritage Layer" className="h-7 w-7 rounded-md object-contain" />
-            <span className={`text-base tracking-[0.02em] font-light transition-colors duration-300 ${textColor}`}>
+            <span className={`text-base font-semibold tracking-tight transition-colors duration-300 ${textColor}`}>
               Heritage Layer
             </span>
           </Link>

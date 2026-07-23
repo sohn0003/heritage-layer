@@ -95,7 +95,7 @@ const AboutPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background" style={{ zoom: 0.8 } as React.CSSProperties}>
+    <div className="min-h-screen bg-background [&_h1]:leading-[1.5] [&_h2]:leading-[1.5] [&_h3]:leading-[1.5] [&_h4]:leading-[1.5] [&_p]:leading-[1.9]">
       <Seo
         title="회사 소개 — Heritage Layer"
         description="(주)더레이어코퍼레이션이 운영하는 Heritage Layer의 비전, 팀, 그리고 유휴 부동산 재생 접근법을 소개합니다."
