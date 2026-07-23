@@ -331,12 +331,6 @@ const AboutPage = () => {
           </div>
         </section>
       </div>
-      {/* fade: dark → light */}
-      <div
-        aria-hidden
-        className="h-40 -mt-px"
-        style={{ background: 'linear-gradient(180deg, hsl(226 35% 12%) 0%, hsl(var(--background)) 100%)' }}
-      />
 
       <footer className="border-t px-4 py-8 text-center text-sm text-muted-foreground">
         <p>© 2025 더레이어코퍼레이션 (The Layer Corporation). All rights reserved.</p>

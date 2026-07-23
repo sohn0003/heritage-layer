@@ -893,12 +893,6 @@ const HomePage = () => {
         </div>
       </section>
       </div>
-      {/* fade: dark → light */}
-      <div
-        aria-hidden
-        className="h-32 -mt-px"
-        style={{ background: 'linear-gradient(180deg, hsl(226 35% 12%) 0%, hsl(var(--background)) 100%)' }}
-      />
 
       {/* ── FOOTER ── */}
       <footer className="border-t bg-card px-4 py-14">
