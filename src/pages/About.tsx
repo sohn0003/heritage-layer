@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import aboutHeroBg from '@/assets/about-hero-bg.png';
 import Seo from '@/components/common/Seo';
+import { HomeSections } from './Home';
 
 // ── Hooks ───────────────────────────────────────
 const useInView = <T extends Element>(threshold = 0.2) => {
@@ -74,10 +75,8 @@ const glassDarkCardStyle: React.CSSProperties = {
 };
 
 
-const Blob = ({ className, color }: { className?: string; color: string }) => (
-  <div aria-hidden className={`pointer-events-none absolute rounded-full blur-3xl ${className ?? ''}`}
-    style={{ background: color, opacity: 0.4 }} />
-);
+// 미니멀 톤: 배경 블롭을 제거합니다.
+const Blob = (_: { className?: string; color: string }) => null;
 
 // ── 플랫폼 기능 카드 데이터 ───────────────────────────────
 const features = [
@@ -102,6 +101,8 @@ const AboutPage = () => {
         description="(주)더레이어코퍼레이션이 운영하는 Heritage Layer의 비전, 팀, 그리고 유휴 부동산 재생 접근법을 소개합니다."
         path="/about"
       />
+      {/* 기존 홈 콘텐츠를 About 상단으로 이전 */}
+      <HomeSections />
       {/* ── HERO ── */}
       <section
         className="relative flex items-center justify-center px-4 text-center"
@@ -209,12 +210,6 @@ const AboutPage = () => {
         className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28"
         style={{ background: 'hsl(226 35% 12%)' }}
       >
-        {/* 상단 연결 그라데이션: 상위 섹션의 어두운 배경에서 현재 배경으로 자연스럽게 전환 */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-32"
-          style={{ background: 'linear-gradient(180deg, hsl(226 35% 8%) 0%, transparent 100%)' }}
-        />
         <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(25 55% 55% / 0.18)" />
         <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(210 45% 55% / 0.18)" />
 
@@ -330,12 +325,6 @@ const AboutPage = () => {
           </div>
         </section>
       </div>
-      {/* fade: dark → light */}
-      <div
-        aria-hidden
-        className="h-40 -mt-px"
-        style={{ background: 'linear-gradient(180deg, hsl(226 35% 12%) 0%, hsl(var(--background)) 100%)' }}
-      />
 
       <footer className="border-t px-4 py-8 text-center text-sm text-muted-foreground">
         <p>© 2025 더레이어코퍼레이션 (The Layer Corporation). All rights reserved.</p>

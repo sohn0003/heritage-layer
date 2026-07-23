@@ -88,13 +88,8 @@ const glassDarkStyle: React.CSSProperties = {
 };
 
 // 부드러운 색상 블롭 (배경 장식)
-const Blob = ({ className, color }: { className?: string; color: string }) => (
-  <div
-    aria-hidden
-    className={`pointer-events-none absolute rounded-full blur-3xl ${className ?? ''}`}
-    style={{ background: color, opacity: 0.45 }}
-  />
-);
+// 미니멀 톤: 배경 블롭을 제거합니다.
+const Blob = (_: { className?: string; color: string }) => null;
 
 // ─── 막대 그래프 (가로) ─ 라인 + 그라데이션 + 트래블 하이라이트 ─
 const InsightBar = ({
@@ -616,12 +611,12 @@ const HomePage = () => {
         description="잠든 유휴부지에 생명력을 불어넣다. 한국 유휴 부동산을 발굴·분석·재생하는 데이터 기반 부동산 재생 플랫폼."
         path="/"
       />
-      {/* 페이지 진행 바 */}
+      {/* 상단 스크롤 진행 바 (미니멀 — 그라데이션 제거) */}
       <div
         className="fixed left-0 top-16 z-40 h-0.5 origin-left"
         style={{
           width: '100%',
-          background: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)))',
+          background: 'hsl(var(--foreground) / 0.15)',
           transform: `scaleX(${scrollP})`,
           transition: 'transform 100ms linear',
         }}
@@ -710,12 +705,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── DARK BLOCK: INSIGHT + METRICS (연속 단일 배경) ── */}
-      <div
-        aria-hidden
-        className="h-40 -mb-px"
-        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(226 35% 12%) 100%)' }}
-      />
+      {/* ── DARK BLOCK: INSIGHT + METRICS (미니멀 톤: 그라데이션 제거) ── */}
       <div
         className="relative overflow-hidden"
         style={{ background: 'hsl(226 35% 12%)' }}
@@ -903,12 +893,6 @@ const HomePage = () => {
         </div>
       </section>
       </div>
-      {/* fade: dark → light */}
-      <div
-        aria-hidden
-        className="h-32 -mt-px"
-        style={{ background: 'linear-gradient(180deg, hsl(226 35% 12%) 0%, hsl(var(--background)) 100%)' }}
-      />
 
       {/* ── FOOTER ── */}
       <footer className="border-t bg-card px-4 py-14">
@@ -954,3 +938,5 @@ const HomePage = () => {
 };
 
 export default HomePage;
+export { HomePage as HomeSections };
+

@@ -6,7 +6,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/common/Navbar";
-import Home from "@/pages/Home";
 import Properties from "@/pages/Properties";
 import Analysis from "@/pages/Analysis";
 import About from "@/pages/About";
@@ -31,7 +30,7 @@ const App = () => (
         <AuthProvider>
           <Navbar />
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Properties />} />
             <Route path="/properties" element={<Properties />} />
             <Route path="/analysis" element={<Analysis />} />
             <Route path="/about" element={<About />} />
