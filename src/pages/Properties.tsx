@@ -375,7 +375,7 @@ const PropertiesPage = () => {
           {FilterPanel}
         </aside>
 
-        {/* Map area */}
+        {/* Map area — 모바일에서는 리스트 위에 지도 표시 (네이버 지도 스타일) */}
         <div className="hidden flex-1 md:flex">
           <NaverMap
             markers={filtered
@@ -399,8 +399,34 @@ const PropertiesPage = () => {
           />
         </div>
 
-        {/* Asset list */}
-        <div className="w-full overflow-y-auto border-l p-4 md:w-[400px]">
+        {/* 우측(데스크톱) / 하단(모바일) 컬럼 — 모바일에서는 지도+리스트 스택 */}
+        <div className="flex w-full flex-col overflow-hidden md:w-[400px] md:border-l">
+          {/* 모바일 전용 지도 (상단 고정 높이) */}
+          <div className="h-[45vh] w-full shrink-0 border-b md:hidden">
+            <NaverMap
+              markers={filtered
+                .filter(hasValidKoreaCoordinate)
+                .map((a) => ({ lat: a.latitude!, lng: a.longitude!, title: a.address, id: a.id, address: a.address }))}
+              focusedMarkerId={selectedAssetId}
+              onMarkerClick={(idx, marker) => {
+                if (marker?.id) {
+                  setSelectedAssetId(marker.id);
+                  const el = cardRefs.current[marker.id];
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  return;
+                }
+                const validAssets = filtered.filter(hasValidKoreaCoordinate);
+                const picked = validAssets[idx];
+                if (!picked) return;
+                setSelectedAssetId(picked.id);
+                const el = cardRefs.current[picked.id];
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+            />
+          </div>
+
+          {/* Asset list */}
+          <div className="w-full flex-1 overflow-y-auto p-4">
           {filtered.length === 0 ? (
             <div className="flex h-full items-center justify-center text-center text-muted-foreground">
               <p className="text-sm">조건에 맞는 자산이 없습니다</p>
