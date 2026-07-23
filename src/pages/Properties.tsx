@@ -493,37 +493,39 @@ const PropertiesPage = () => {
           {/* 바텀시트 */}
           <div
             className={`absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl border-t bg-background shadow-2xl transition-[height] duration-300 ease-out ${
-              mobileListMode === 'full' ? 'h-[calc(100vh-4rem)]' : mobileListMode === 'half' ? 'h-[55vh]' : 'h-20'
+              mobileListMode === 'full' ? 'h-[calc(100vh-4rem)]' : mobileListMode === 'half' ? 'h-[55vh]' : 'h-28'
             }`}
           >
             <button
               type="button"
-              className="flex shrink-0 touch-none flex-col items-center justify-center py-3 select-none"
+              className="flex shrink-0 touch-none flex-col items-center justify-center py-4 select-none"
               onPointerDown={(e) => {
                 dragStartY.current = e.clientY;
                 dragStartMode.current = mobileListMode;
+                (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
               }}
               onPointerMove={(e) => {
                 if (dragStartY.current == null) return;
                 const dy = e.clientY - dragStartY.current;
-                if (Math.abs(dy) < 30) return;
+                if (Math.abs(dy) < 24) return;
                 const order: Array<'full' | 'half' | 'collapsed'> = ['full', 'half', 'collapsed'];
                 const startIdx = order.indexOf(dragStartMode.current);
-                const steps = Math.min(2, Math.max(-2, Math.round(dy / 80)));
+                const steps = Math.min(2, Math.max(-2, Math.round(dy / 60)));
                 const nextIdx = Math.min(2, Math.max(0, startIdx + steps));
                 setMobileListMode(order[nextIdx]);
               }}
               onPointerUp={(e) => {
-                const moved = dragStartY.current != null && Math.abs(e.clientY - dragStartY.current) >= 30;
+                const moved = dragStartY.current != null && Math.abs(e.clientY - dragStartY.current) >= 24;
                 dragStartY.current = null;
+                try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch { /* ignore */ }
                 if (moved) return;
                 setMobileListMode((m) => (m === 'collapsed' ? 'half' : m === 'half' ? 'full' : 'collapsed'));
               }}
               aria-label="리스트 토글"
             >
-              <span className="h-1 w-10 rounded-full bg-muted-foreground/40" />
-              <span className="mt-1.5 text-[11px] text-muted-foreground">
-                {mobileListMode === 'collapsed' ? `매물 ${filtered.length}건 · 위로 스와이프` : `전체 매물 ${filtered.length}건`}
+              <span className="h-1.5 w-12 rounded-full bg-muted-foreground/50" />
+              <span className="mt-2 text-[11px] text-muted-foreground">
+                {mobileListMode === 'collapsed' ? `매물 ${filtered.length}건 · 탭하여 열기` : `전체 매물 ${filtered.length}건`}
               </span>
             </button>
 
