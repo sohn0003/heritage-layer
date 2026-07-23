@@ -90,10 +90,7 @@ const NaverMap = ({ markers = [], onMarkerClick, focusedMarkerId, className }: N
     mapInstance.current = new window.naver.maps.Map(mapRef.current, {
       center,
       zoom: 7,
-      zoomControl: true,
-      zoomControlOptions: {
-        position: window.naver.maps.Position.TOP_RIGHT,
-      },
+      zoomControl: false,
     });
 
     return () => {
