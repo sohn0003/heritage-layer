@@ -353,29 +353,25 @@ const AnalysisPage = () => {
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-8">
-      {/* 분석 가정 안내 */}
+      <div className="mx-auto max-w-5xl px-5 sm:px-6 py-8">
+      {/* 분석 가정 안내 — 빨간 테두리 */}
       {true && (
-        <Card className="mb-6 border-dashed bg-muted/30">
-          <CardContent className="p-4 text-xs text-muted-foreground">
-            <strong className="text-foreground">분석 가정:</strong>{' '}
-            공시지가{' '}
-            <span className="text-foreground">
-              {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
-            </span>{' '}
-            · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
-            {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
-            {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
-          </CardContent>
-        </Card>
+        <div className="mb-6 border border-destructive/70 bg-destructive/5 p-4 text-xs text-muted-foreground">
+          <strong className="text-destructive">분석 가정:</strong>{' '}
+          공시지가{' '}
+          <span className="text-foreground">
+            {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
+          </span>{' '}
+          · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
+          {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
+          {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
+        </div>
       )}
 
-      {/* 건폐율 / 용적률 — 법정 한도 대비 시각화 */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">건폐율 / 용적률</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-6 sm:grid-cols-2">
+      {/* 기본 정보 — 박스 없이 통합 리스트 (건폐/용적 + 기본 항목) */}
+      <div className="mb-8 bg-muted/30 p-5 sm:p-6">
+        <h2 className="mb-4 text-base font-semibold">기본 정보</h2>
+        <div className="mb-5 grid gap-5 sm:grid-cols-2">
           <RatioBar
             label="건폐율"
             current={asset.current_building_coverage ?? asset.building_coverage}
@@ -386,26 +382,22 @@ const AnalysisPage = () => {
             current={asset.current_floor_area_ratio ?? asset.floor_area_ratio}
             legalMax={asset.legal_max_floor_area_ratio}
           />
-        </CardContent>
-      </Card>
-
-      {/* Free section — 기본 자산 정보 */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[
-          { label: '용도지역', value: asset.zoning ?? '-' },
-          { label: '대지면적', value: asset.land_area ? `${asset.land_area.toLocaleString()}㎡` : '-' },
-          { label: '연면적', value: asset.current_floor_area ? `${asset.current_floor_area.toLocaleString()}㎡` : '-' },
-          { label: '공시지가', value: asset.land_value_per_sqm ? `${asset.land_value_per_sqm.toLocaleString()}원/㎡` : '-' },
-          { label: '인구 추이', value: asset.population_trend ?? '-' },
-          { label: '건물 상태', value: asset.building_condition ?? '-' },
-        ].map((item) => (
-          <Card key={item.label}>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">{item.label}</p>
-              <p className="mt-1 text-lg font-semibold">{item.value}</p>
-            </CardContent>
-          </Card>
-        ))}
+        </div>
+        <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2 border-t border-border/60 pt-4">
+          {[
+            { label: '용도지역', value: asset.zoning ?? '-' },
+            { label: '대지면적', value: asset.land_area ? `${asset.land_area.toLocaleString()}㎡` : '-' },
+            { label: '연면적', value: asset.current_floor_area ? `${asset.current_floor_area.toLocaleString()}㎡` : '-' },
+            { label: '공시지가', value: asset.land_value_per_sqm ? `${asset.land_value_per_sqm.toLocaleString()}원/㎡` : '-' },
+            { label: '인구 추이', value: asset.population_trend ?? '-' },
+            { label: '건물 상태', value: asset.building_condition ?? '-' },
+          ].map((item) => (
+            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-border/40 pb-2">
+              <dt className="text-xs text-muted-foreground">{item.label}</dt>
+              <dd className="text-sm font-semibold text-right">{item.value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
 
       {/* 예상 자산 매도가 (Free) */}
@@ -434,14 +426,14 @@ const AnalysisPage = () => {
         </CardContent>
       </Card>
 
-      {/* 블록별 평가 (5단계 라벨) */}
+      {/* 블록별 평가 (5단계 라벨) — 2x2 */}
       {scoringResult && (
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-lg">COSMO-P 블록별 평가</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4">
               {(() => {
                 const labelClass = (v: BlockLabel) =>
                   v === '우수' ? 'text-[hsl(var(--primary))]'
@@ -455,9 +447,9 @@ const AnalysisPage = () => {
                   { label: 'C. 심미적 가치', value: scoringResult.blockLabels.C },
                   { label: 'D. 사업성', value: scoringResult.blockLabels.D },
                 ].map((item) => (
-                  <div key={item.label} className="text-center">
+                  <div key={item.label} className="border border-border/50 bg-muted/20 py-3 text-center">
                     <p className="text-xs text-muted-foreground">{item.label}</p>
-                    <p className={`mt-1 text-2xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                    <p className={`mt-1 text-xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
                   </div>
                 ));
               })()}
@@ -467,48 +459,38 @@ const AnalysisPage = () => {
       )}
 
 
-      {/* 자산 강점·리스크 요약 (Free) */}
-      {analysis && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg">자산 강점 · 리스크 요약</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-6 sm:grid-cols-2">
-            <div>
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--primary))]">
-                <Sparkles className="h-4 w-4" /> 핵심 강점
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {analysis.recommendation.assetSummary.keyStrengths.length === 0 ? (
-                  <span className="text-xs text-muted-foreground">두드러진 강점 없음</span>
-                ) : (
-                  analysis.recommendation.assetSummary.keyStrengths.map((s, i) => (
-                    <Badge key={i} variant="outline" className="border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.08)] text-[hsl(var(--primary))] dark:bg-[hsl(var(--primary)_/_0.15)] dark:border-[hsl(var(--primary))]">
-                      {s}
-                    </Badge>
-                  ))
-                )}
-              </div>
+      {/* 전문가 의견 (강점/리스크 요약) */}
+      {analysis && (() => {
+        const strengths = analysis.recommendation.assetSummary.keyStrengths;
+        const risks = analysis.recommendation.assetSummary.keyRisks;
+        const sentenceify = (s: string) => {
+          const t = s.trim().replace(/[.。]$/, '');
+          if (/(다|요|음|함|됨|임)$/.test(t)) return `${t}.`;
+          return `${t}합니다.`;
+        };
+        return (
+          <div className="mb-8 border-l-2 border-primary/60 bg-muted/20 p-5 sm:p-6">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
+            <div className="space-y-3 text-sm leading-relaxed text-foreground">
+              {strengths.length > 0 && (
+                <p>
+                  <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
+                  본 자산은 {strengths.map(sentenceify).join(' 또한 ')}
+                </p>
+              )}
+              {risks.length > 0 && (
+                <p>
+                  <span className="font-semibold text-[hsl(var(--accent))]">리스크:</span>{' '}
+                  다만 {risks.map(sentenceify).join(' 아울러 ')}
+                </p>
+              )}
+              {strengths.length === 0 && risks.length === 0 && (
+                <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
+              )}
             </div>
-            <div>
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--accent))]">
-                <ShieldAlert className="h-4 w-4" /> 주요 리스크
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {analysis.recommendation.assetSummary.keyRisks.length === 0 ? (
-                  <span className="text-xs text-muted-foreground">특이 리스크 없음</span>
-                ) : (
-                  analysis.recommendation.assetSummary.keyRisks.map((s, i) => (
-                    <Badge key={i} variant="outline" className="border-[hsl(var(--accent))] bg-[hsl(var(--accent)_/_0.08)] text-[hsl(var(--accent))] dark:bg-[hsl(var(--accent)_/_0.15)] dark:border-[hsl(var(--accent))]">
-                      {s}
-                    </Badge>
-                  ))
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        );
+      })()}
 
       {/* 세부 항목 점수 섹션은 보안상 서버 전용으로 이전되었습니다. */}
 
