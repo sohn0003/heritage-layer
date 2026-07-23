@@ -88,11 +88,11 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
   const Icon = ASSET_ICONS[asset.asset_type] ?? Building;
 
   const gradeStyles: Record<string, string> = {
-    S: 'border-[hsl(var(--grade-s))] text-[hsl(var(--grade-s))] bg-[hsl(var(--grade-s)_/_0.12)] dark:bg-[hsl(var(--grade-s)_/_0.15)] dark:border-[hsl(var(--grade-s))]',
-    A: 'border-[hsl(var(--grade-a))] text-[hsl(var(--grade-a))] bg-[hsl(var(--grade-a)_/_0.12)] dark:bg-[hsl(var(--grade-a)_/_0.15)] dark:border-[hsl(var(--grade-a))]',
-    B: 'border-[hsl(var(--grade-b))] text-[hsl(var(--grade-b))] bg-[hsl(var(--grade-b)_/_0.12)] dark:bg-[hsl(var(--grade-b)_/_0.15)] dark:border-[hsl(var(--grade-b))]',
-    C: 'border-[hsl(var(--grade-c))] text-[hsl(var(--grade-c))] bg-[hsl(var(--grade-c)_/_0.12)] dark:bg-[hsl(var(--grade-c)_/_0.15)] dark:border-[hsl(var(--grade-c))]',
-    D: 'border-[hsl(var(--grade-d))] text-[hsl(var(--grade-d))] bg-[hsl(var(--grade-d)_/_0.12)] dark:bg-[hsl(var(--grade-d)_/_0.15)] dark:border-[hsl(var(--grade-d))]',
+    S: 'border-[hsl(var(--grade-s))] text-[hsl(var(--grade-s))] bg-[hsl(var(--grade-s)_/_0.12)]',
+    A: 'border-[hsl(var(--grade-a))] text-[hsl(var(--grade-a))] bg-[hsl(var(--grade-a)_/_0.12)]',
+    B: 'border-[hsl(var(--grade-b))] text-[hsl(var(--grade-b))] bg-[hsl(var(--grade-b)_/_0.12)]',
+    C: 'border-[hsl(var(--grade-c))] text-[hsl(var(--grade-c))] bg-[hsl(var(--grade-c)_/_0.12)]',
+    D: 'border-[hsl(var(--grade-d))] text-[hsl(var(--grade-d))] bg-[hsl(var(--grade-d)_/_0.12)]',
   };
 
   return (
@@ -103,15 +103,23 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
             <span className="flex h-8 w-8 items-center justify-center rounded-md bg-muted text-foreground">
               <Icon className="h-4 w-4" />
             </span>
-            <Badge variant="secondary" className="text-xs">{asset.asset_type}</Badge>
+            <Badge variant="secondary" className="text-xs font-medium">{asset.asset_type}</Badge>
             {asset.grade && (
-              <Badge variant="outline" className={`text-xs font-bold ${gradeStyles[asset.grade] || ''}`}>
+              <span
+                className={`inline-flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold ${gradeStyles[asset.grade] || ''}`}
+                aria-label={`등급 ${asset.grade}`}
+              >
                 {asset.grade}
-              </Badge>
+              </span>
             )}
           </div>
           {asset.gov_cooperation && (
-            <Badge variant="outline" className="border-[hsl(var(--accent))] text-xs text-[hsl(var(--accent))]">정부협력</Badge>
+            <Badge
+              variant="outline"
+              className="border-foreground/20 bg-background text-xs font-medium text-foreground"
+            >
+              정부협력
+            </Badge>
           )}
         </div>
 
