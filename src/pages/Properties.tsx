@@ -474,18 +474,23 @@ const PropertiesPage = () => {
                 .map((a) => ({ lat: a.latitude!, lng: a.longitude!, title: a.address, id: a.id, address: a.address }))}
               focusedMarkerId={selectedAssetId}
               onMarkerClick={(idx, marker) => {
+                if (mobileListMode === 'collapsed') setMobileListMode('half');
                 if (marker?.id) {
                   setSelectedAssetId(marker.id);
-                  const el = cardRefs.current[marker.id];
-                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  setTimeout(() => {
+                    const el = cardRefs.current[marker.id!];
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }, 320);
                   return;
                 }
                 const validAssets = filtered.filter(hasValidKoreaCoordinate);
                 const picked = validAssets[idx];
                 if (!picked) return;
                 setSelectedAssetId(picked.id);
-                const el = cardRefs.current[picked.id];
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => {
+                  const el = cardRefs.current[picked.id];
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 320);
               }}
             />
           </div>
