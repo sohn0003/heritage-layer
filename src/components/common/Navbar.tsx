@@ -108,15 +108,24 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile right side — Login + menu toggle */}
-          <div className="flex items-center gap-4 md:hidden">
+          {/* Mobile right side — email + Login/Logout + menu toggle */}
+          <div className="flex items-center gap-3 md:hidden">
             {user ? (
-              <button
-                onClick={signOut}
-                className={`text-sm font-light tracking-wide transition-colors ${textMuted}`}
-              >
-                Logout
-              </button>
+              <>
+                <Link
+                  to="/mypage"
+                  className={`max-w-[140px] truncate text-xs font-light tracking-wide transition-colors ${textMuted}`}
+                  title="마이페이지"
+                >
+                  {user.email}
+                </Link>
+                <button
+                  onClick={signOut}
+                  className={`text-sm font-light tracking-wide transition-colors ${textMuted}`}
+                >
+                  Logout
+                </button>
+              </>
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
@@ -135,45 +144,37 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {mobileOpen && (
-          <div className={`px-6 pb-6 pt-2 md:hidden transition-colors duration-300 ${
-            isDark ? 'bg-black/60 backdrop-blur-md' : 'bg-background/95 backdrop-blur-md'
-          }`}>
-            <div className="flex flex-col items-end gap-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={`text-sm font-light tracking-wide ${
-                    location.pathname === item.href ? textColor : textMuted
-                  }`}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              {isAdmin && (
-                <Link
-                  to="/admin/properties"
-                  className={`text-sm font-light tracking-wide ${textMuted}`}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Admin
-                </Link>
-              )}
-              {user && (
-                <Link
-                  to="/mypage"
-                  className={`text-sm font-light tracking-wide ${textMuted}`}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {user.email}
-                </Link>
-              )}
-            </div>
+        {/* Mobile menu — 애니메이션 슬라이드 다운 */}
+        <div
+          className={`overflow-hidden md:hidden transition-[max-height,opacity] duration-200 ease-out ${
+            mobileOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          } ${isDark ? 'bg-black/70 backdrop-blur-md' : 'bg-background/95 backdrop-blur-md'}`}
+        >
+          <div className="flex flex-col items-end gap-4 px-6 pb-6 pt-2">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={`text-sm font-light tracking-wide ${
+                  location.pathname === item.href ? textColor : textMuted
+                }`}
+                onClick={() => setMobileOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+            {isAdmin && (
+              <Link
+                to="/admin/properties"
+                className={`text-sm font-light tracking-wide ${textMuted}`}
+                onClick={() => setMobileOpen(false)}
+              >
+                Admin
+              </Link>
+            )}
           </div>
-        )}
+        </div>
+
       </nav>
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
     </>
