@@ -756,7 +756,10 @@ const AnalysisPage = () => {
                                     return (
                                       <div className="mt-3 grid grid-cols-2 gap-2 rounded-md border border-border/50 bg-background/60 p-3 text-xs">
                                         <div>
-                                          <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
+                                          <div className="flex items-baseline justify-between gap-2">
+                                            <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
+                                            <span className="text-[11px] text-destructive">ex) 5</span>
+                                          </div>
                                           <Input
                                             type="number"
                                             inputMode="decimal"
@@ -772,8 +775,8 @@ const AnalysisPage = () => {
                                                 return next;
                                               });
                                             }}
-                                            placeholder="예: 5 (=5천만원/평)"
-                                            className="mt-1 h-8 text-sm"
+                                            placeholder="직접 입력"
+                                            className="mt-1 h-8 text-sm placeholder:text-destructive/60"
                                           />
                                         </div>
                                         <div>
