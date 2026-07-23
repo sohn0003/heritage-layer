@@ -221,17 +221,17 @@ const PropertiesPage = () => {
             <div className="space-y-1.5">
               <Label className="text-xs">방치 기간 (년)</Label>
               <div className="flex items-center gap-1">
-                <Input className="h-9" type="number" placeholder="최소" value={f.idleMin} onChange={(e) => update('idleMin', e.target.value)} />
+                <Input className="h-9" type="number" placeholder="Min" value={f.idleMin} onChange={(e) => update('idleMin', e.target.value)} />
                 <span className="text-xs text-muted-foreground">~</span>
-                <Input className="h-9" type="number" placeholder="최대" value={f.idleMax} onChange={(e) => update('idleMax', e.target.value)} />
+                <Input className="h-9" type="number" placeholder="Max" value={f.idleMax} onChange={(e) => update('idleMax', e.target.value)} />
               </div>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">대지면적 (㎡)</Label>
               <div className="flex items-center gap-1">
-                <Input className="h-9" type="number" placeholder="최소" value={f.landMin} onChange={(e) => update('landMin', e.target.value)} />
+                <Input className="h-9" type="number" placeholder="Min" value={f.landMin} onChange={(e) => update('landMin', e.target.value)} />
                 <span className="text-xs text-muted-foreground">~</span>
-                <Input className="h-9" type="number" placeholder="최대" value={f.landMax} onChange={(e) => update('landMax', e.target.value)} />
+                <Input className="h-9" type="number" placeholder="Max" value={f.landMax} onChange={(e) => update('landMax', e.target.value)} />
               </div>
             </div>
             <div className="space-y-1.5">

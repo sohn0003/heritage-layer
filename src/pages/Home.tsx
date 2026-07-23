@@ -584,7 +584,7 @@ const Step3Graphic = () => {
   );
 };
 
-const HomePage = () => {
+const HomePage = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const navigate = useNavigate();
   const [markers, setMarkers] = useState<{ lat: number; lng: number; title?: string }[]>([]);
   const scrollP = useScrollProgress();
@@ -605,65 +605,69 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-background" style={{ zoom: 0.8 } as React.CSSProperties}>
-      <Seo
-        title="Heritage Layer — 유휴부지 부동산 재생 솔루션"
-        description="잠든 유휴부지에 생명력을 불어넣다. 한국 유휴 부동산을 발굴·분석·재생하는 데이터 기반 부동산 재생 플랫폼."
-        path="/"
-      />
-      {/* 상단 스크롤 진행 바 (미니멀 — 그라데이션 제거) */}
-      <div
-        className="fixed left-0 top-16 z-40 h-0.5 origin-left"
-        style={{
-          width: '100%',
-          background: 'hsl(var(--foreground) / 0.15)',
-          transform: `scaleX(${scrollP})`,
-          transition: 'transform 100ms linear',
-        }}
-      />
-
-      {/* ── HERO ── */}
-      <section
-        className="relative overflow-hidden"
-        style={{
-          height: '100vh',
-          backgroundImage: `url(${heroBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="absolute inset-0 z-[1]" style={{ background: 'rgba(0, 0, 0, 0.3)' }} />
-        <div className="absolute inset-0 z-10 flex flex-col justify-center px-6 sm:px-12 lg:px-20">
-          <span className="mb-4 text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(220 20% 75%)' }}>
-            Heritage Layer
-          </span>
-          <h1 className="my-0 border-none py-[10px] text-3xl font-medium md:text-5xl" style={{ color: 'hsl(0 0% 95%)' }}>
-            국내 최초 No.1<br />
-            유휴부지를 활용한<br />
-            부동산 재생 솔루션
-          </h1>
-          <p className="mt-6 max-w-xl text-sm md:text-base" style={{ color: 'hsl(0 0% 80%)' }}>
-            폐교부터 빈집까지 — 데이터로 가능성을 발견하고, 알고리즘으로 가치를 평가합니다.
-          </p>
-        </div>
-        <div className="absolute bottom-16 left-1/2 z-30 -translate-x-1/2">
-          <button
-            onClick={() => navigate('/properties')}
-            className="group flex items-center gap-2 rounded-full border px-10 py-4 transition-all duration-300 hover:scale-105"
+    <div className="relative min-h-screen overflow-x-hidden bg-background [word-break:keep-all]">
+      {!embedded && (
+        <>
+          <Seo
+            title="Heritage Layer — 유휴부지 부동산 재생 솔루션"
+            description="잠든 유휴부지에 생명력을 불어넣다. 한국 유휴 부동산을 발굴·분석·재생하는 데이터 기반 부동산 재생 플랫폼."
+            path="/"
+          />
+          {/* 상단 스크롤 진행 바 */}
+          <div
+            className="fixed left-0 top-16 z-40 h-0.5 origin-left"
             style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              borderColor: 'rgba(255, 255, 255, 0.25)',
-              color: 'hsl(0 0% 95%)',
+              width: '100%',
+              background: 'hsl(var(--foreground) / 0.15)',
+              transform: `scaleX(${scrollP})`,
+              transition: 'transform 100ms linear',
+            }}
+          />
+
+          {/* ── HERO ── */}
+          <section
+            className="relative overflow-hidden"
+            style={{
+              height: '100vh',
+              backgroundImage: `url(${heroBg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
             }}
           >
-            <span className="text-sm font-medium tracking-wide">접속하기</span>
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full" style={{ background: 'hsl(var(--accent))' }} />
-          </button>
-        </div>
-        <ChevronDown className="absolute bottom-6 left-1/2 z-30 h-5 w-5 -translate-x-1/2 animate-bounce" style={{ color: 'rgba(255,255,255,0.5)' }} />
-      </section>
+            <div className="absolute inset-0 z-[1]" style={{ background: 'rgba(0, 0, 0, 0.3)' }} />
+            <div className="absolute inset-0 z-10 flex flex-col justify-center px-6 sm:px-12 lg:px-20">
+              <span className="mb-4 text-xs font-medium uppercase tracking-[0.3em]" style={{ color: 'hsl(220 20% 75%)' }}>
+                Heritage Layer
+              </span>
+              <h1 className="my-0 border-none py-[10px] text-3xl font-normal md:text-5xl" style={{ color: 'hsl(0 0% 95%)' }}>
+                국내 최초 No.1<br />
+                유휴부지를 활용한<br />
+                부동산 재생 솔루션
+              </h1>
+              <p className="mt-6 max-w-xl text-sm md:text-base" style={{ color: 'hsl(0 0% 80%)' }}>
+                폐교부터 빈집까지 — 데이터로 가능성을 발견하고, 알고리즘으로 가치를 평가합니다.
+              </p>
+            </div>
+            <div className="absolute bottom-16 left-1/2 z-30 -translate-x-1/2">
+              <button
+                onClick={() => navigate('/properties')}
+                className="group flex items-center gap-2 rounded-full border px-10 py-4 transition-all duration-300 hover:scale-105"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  borderColor: 'rgba(255, 255, 255, 0.25)',
+                  color: 'hsl(0 0% 95%)',
+                }}
+              >
+                <span className="text-sm font-medium tracking-wide">접속하기</span>
+                <span className="inline-block h-2 w-2 animate-pulse rounded-full" style={{ background: 'hsl(var(--accent))' }} />
+              </button>
+            </div>
+            <ChevronDown className="absolute bottom-6 left-1/2 z-30 h-5 w-5 -translate-x-1/2 animate-bounce" style={{ color: 'rgba(255,255,255,0.5)' }} />
+          </section>
+        </>
+      )}
 
       {/* ── PROCESS: 세로 스택, 풀스크린 모션 ── */}
       <section className="relative overflow-hidden px-4 py-20 md:py-28">
@@ -673,7 +677,7 @@ const HomePage = () => {
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-20 text-center">
             <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Our Service</span>
-            <h2 className="mt-3 text-4xl font-bold md:text-5xl">유휴자산 등록부터 매입까지,<br/>매니징해주는 파트너</h2>
+            <h2 className="mt-3 text-3xl font-medium md:text-4xl">유휴자산 등록부터 매입까지,<br/>매니징해주는 파트너</h2>
             <p className="mt-4 text-muted-foreground">
               Heritage Layer는 단순 분석 도구가 아닙니다. 자산 발굴부터 사업화까지 전 과정을 함께 책임지는 엔드투엔드 서비스를 제공합니다.
             </p>
@@ -840,7 +844,7 @@ const HomePage = () => {
       <section className="relative overflow-hidden px-4 py-20 md:py-28">
         <div className="relative mx-auto max-w-5xl text-center text-[hsl(0_0%_96%)]">
           <span className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'hsl(25 55% 62%)' }}>Explore</span>
-          <h2 className="mt-3 text-4xl font-bold md:text-5xl">전국 유휴자산 지도</h2>
+          <h2 className="mt-3 text-3xl font-medium md:text-4xl">전국 유휴자산 지도</h2>
           <p className="mb-10 mt-4 text-[hsl(0_0%_75%)]">데이터 기반으로 전국의 재생 가능 자산을 한눈에 확인하세요</p>
           <button
             onClick={() => navigate('/properties')}
@@ -882,7 +886,7 @@ const HomePage = () => {
           }}
         >
           <Sparkles className="mx-auto mb-4 h-10 w-10" style={{ color: 'hsl(25 55% 62%)' }} />
-          <h2 className="text-3xl font-bold md:text-4xl">유휴 부동산을 새로운 기회로</h2>
+          <h2 className="text-2xl font-medium md:text-3xl">유휴 부동산을 새로운 기회로</h2>
           <p className="mt-4" style={{ color: 'hsl(0 0% 75%)' }}>
             지금 가입하고 전국 자산 데이터와 AI 분석 결과를 확인해보세요.
           </p>
@@ -895,10 +899,11 @@ const HomePage = () => {
       </div>
 
       {/* ── FOOTER ── */}
+      {!embedded && (
       <footer className="border-t bg-card px-4 py-14">
         <div className="mx-auto grid max-w-5xl gap-10 sm:grid-cols-3">
           <div>
-            <h3 className="mb-3 text-base font-bold">더레이어코퍼레이션</h3>
+            <h3 className="mb-3 text-base font-semibold">더레이어코퍼레이션</h3>
             <p className="text-xs leading-relaxed text-muted-foreground">
               유휴 부동산을 새로운 기회로 잇는<br />Heritage Layer
             </p>
@@ -911,14 +916,14 @@ const HomePage = () => {
             </div>
           </div>
           <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-foreground">Contact</p>
             <p className="flex items-center gap-2"><Mail className="h-3.5 w-3.5" /> contact@thelayercorp.com</p>
             <p className="flex items-center gap-2"><Phone className="h-3.5 w-3.5" /> 010-5035-5901</p>
             <p>담당자 : 손성식</p>
           </div>
 
           <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Service</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-foreground">Service</p>
             <button onClick={() => navigate('/properties')} className="block hover:text-foreground">자산 탐색</button>
             <button onClick={() => navigate('/about')} className="block hover:text-foreground">회사 소개</button>
             <button onClick={() => navigate('/contact')} className="block hover:text-foreground">문의하기</button>
@@ -933,6 +938,7 @@ const HomePage = () => {
           <p>© 2025 (주)더레이어코퍼레이션 (The Layer Corporation Co., Ltd.). All rights reserved.</p>
         </div>
       </footer>
+      )}
     </div>
   );
 };
