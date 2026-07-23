@@ -899,10 +899,11 @@ const HomePage = ({ embedded = false }: { embedded?: boolean } = {}) => {
       </div>
 
       {/* ── FOOTER ── */}
+      {!embedded && (
       <footer className="border-t bg-card px-4 py-14">
         <div className="mx-auto grid max-w-5xl gap-10 sm:grid-cols-3">
           <div>
-            <h3 className="mb-3 text-base font-bold">더레이어코퍼레이션</h3>
+            <h3 className="mb-3 text-base font-semibold">더레이어코퍼레이션</h3>
             <p className="text-xs leading-relaxed text-muted-foreground">
               유휴 부동산을 새로운 기회로 잇는<br />Heritage Layer
             </p>
@@ -915,14 +916,14 @@ const HomePage = ({ embedded = false }: { embedded?: boolean } = {}) => {
             </div>
           </div>
           <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Contact</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-foreground">Contact</p>
             <p className="flex items-center gap-2"><Mail className="h-3.5 w-3.5" /> contact@thelayercorp.com</p>
             <p className="flex items-center gap-2"><Phone className="h-3.5 w-3.5" /> 010-5035-5901</p>
             <p>담당자 : 손성식</p>
           </div>
 
           <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-foreground">Service</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-foreground">Service</p>
             <button onClick={() => navigate('/properties')} className="block hover:text-foreground">자산 탐색</button>
             <button onClick={() => navigate('/about')} className="block hover:text-foreground">회사 소개</button>
             <button onClick={() => navigate('/contact')} className="block hover:text-foreground">문의하기</button>
@@ -937,6 +938,7 @@ const HomePage = ({ embedded = false }: { embedded?: boolean } = {}) => {
           <p>© 2025 (주)더레이어코퍼레이션 (The Layer Corporation Co., Ltd.). All rights reserved.</p>
         </div>
       </footer>
+      )}
     </div>
   );
 };
