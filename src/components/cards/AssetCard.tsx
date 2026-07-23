@@ -16,6 +16,7 @@ interface Asset {
   grade: string | null;
   gov_cooperation: boolean | null;
   land_area: number | null;
+  land_value_per_sqm?: number | null;
   recommended_use_type?: string | null;
   recommended_dev_direction?: string | null;
 }
