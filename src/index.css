@@ -104,6 +104,10 @@
     @apply bg-background text-foreground;
     /* 영문은 Space Grotesk, 한국어는 Pretendard 로 자동 폴백 */
     font-family: 'Space Grotesk', 'Pretendard Variable', Pretendard, sans-serif;
+    /* 한글 단어 중간에서 줄바꿈 방지 (모바일 가독성) */
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    line-height: 1.65;
   }
 
   h1, h2, h3, h4, h5, h6 {
