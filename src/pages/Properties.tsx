@@ -456,8 +456,10 @@ const PropertiesPage = () => {
               })}
             </div>
           )}
+          </div>
         </div>
       </div>
+
 
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
     </div>
