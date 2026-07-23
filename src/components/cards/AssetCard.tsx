@@ -126,9 +126,14 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
 
         <p className="mb-1.5 text-sm font-medium leading-snug">{asset.address}</p>
 
-        <div className="mb-3 flex gap-3 text-xs text-muted-foreground">
+        <div className="mb-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {asset.idle_years != null && <span>방치 {asset.idle_years}년</span>}
           {asset.land_area != null && <span>{asset.land_area.toLocaleString()}㎡</span>}
+          {asset.land_value_per_sqm != null && (
+            <span className="text-foreground">
+              공시지가 {Math.round(asset.land_value_per_sqm).toLocaleString()}원/㎡
+            </span>
+          )}
         </div>
 
         <div className="flex gap-2">
