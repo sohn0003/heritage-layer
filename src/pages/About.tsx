@@ -75,10 +75,8 @@ const glassDarkCardStyle: React.CSSProperties = {
 };
 
 
-const Blob = ({ className, color }: { className?: string; color: string }) => (
-  <div aria-hidden className={`pointer-events-none absolute rounded-full blur-3xl ${className ?? ''}`}
-    style={{ background: color, opacity: 0.4 }} />
-);
+// 미니멀 톤: 배경 블롭을 제거합니다.
+const Blob = (_: { className?: string; color: string }) => null;
 
 // ── 플랫폼 기능 카드 데이터 ───────────────────────────────
 const features = [

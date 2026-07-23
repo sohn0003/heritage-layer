@@ -88,13 +88,8 @@ const glassDarkStyle: React.CSSProperties = {
 };
 
 // 부드러운 색상 블롭 (배경 장식)
-const Blob = ({ className, color }: { className?: string; color: string }) => (
-  <div
-    aria-hidden
-    className={`pointer-events-none absolute rounded-full blur-3xl ${className ?? ''}`}
-    style={{ background: color, opacity: 0.45 }}
-  />
-);
+// 미니멀 톤: 배경 블롭을 제거합니다.
+const Blob = (_: { className?: string; color: string }) => null;
 
 // ─── 막대 그래프 (가로) ─ 라인 + 그라데이션 + 트래블 하이라이트 ─
 const InsightBar = ({
