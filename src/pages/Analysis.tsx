@@ -604,7 +604,10 @@ const AnalysisPage = () => {
                           return (
                             <div className="border-t border-border/60 pt-5">
                               <div className="mb-2 flex items-baseline justify-between gap-2">
-                                <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
+                                <div className="flex items-baseline gap-2">
+                                  <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
+                                  <span className="text-[11px] text-destructive">ex) {maxAllowed.toLocaleString()}</span>
+                                </div>
                                 <span className="text-xs text-muted-foreground">
                                   최대 허용: <span className="font-semibold text-foreground tabular-nums">{maxAllowed.toLocaleString()}</span> ㎡
                                 </span>
@@ -631,9 +634,6 @@ const AnalysisPage = () => {
                                 }}
                                 className="h-9 text-sm"
                               />
-                              <p className="mt-1.5 text-xs text-muted-foreground">
-                                실제 사용할 연면적을 입력하면 하단 재무 시나리오 비교표가 비례하여 갱신됩니다.
-                              </p>
                               {usedFloorAreaByRank[scenario.rank] !== undefined &&
                                 usedFloorAreaByRank[scenario.rank] !== maxAllowed && (
                                   <button
