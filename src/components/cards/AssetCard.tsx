@@ -129,33 +129,43 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
         <div className="mb-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {asset.idle_years != null && <span>방치 {asset.idle_years}년</span>}
           {asset.land_area != null && <span>{asset.land_area.toLocaleString()}㎡</span>}
-          {asset.land_value_per_sqm != null && (
-            <span className="text-foreground">
-              공시지가 {Math.round(asset.land_value_per_sqm).toLocaleString()}원/㎡
-            </span>
-          )}
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            className="flex-1"
-            onClick={(e) => { e.stopPropagation(); navigate(`/analysis?id=${asset.id}`); }}
-          >
-            상세 분석 보기 <ArrowRight className="ml-1 h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleSave}
-            disabled={saving}
-            aria-pressed={isSaved}
-            aria-label={isSaved ? '저장 해제' : '자산 저장'}
-            className={isSaved ? 'bg-background text-foreground hover:bg-background/90' : ''}
-          >
-            <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
-          </Button>
+        <div className="flex items-center justify-between gap-3 border-t pt-3">
+          <div className="min-w-0 flex-1">
+            {asset.land_value_per_sqm != null ? (
+              <>
+                <p className="text-[11px] text-muted-foreground">공시지가</p>
+                <p className="truncate text-base font-semibold text-foreground">
+                  {Math.round(asset.land_value_per_sqm).toLocaleString()}
+                  <span className="ml-0.5 text-xs font-normal text-muted-foreground">원/㎡</span>
+                </p>
+              </>
+            ) : (
+              <p className="text-xs text-muted-foreground">공시지가 정보 없음</p>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); navigate(`/analysis?id=${asset.id}`); }}
+              className="text-xs font-medium text-foreground underline underline-offset-4 decoration-foreground/40 hover:decoration-foreground"
+            >
+              상세 분석 보기
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              aria-pressed={isSaved}
+              aria-label={isSaved ? '저장 해제' : '자산 저장'}
+              className="flex h-8 w-8 items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-50"
+            >
+              <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current text-foreground' : ''}`} />
+            </button>
+          </div>
         </div>
+
       </CardContent>
     </Card>
   );
