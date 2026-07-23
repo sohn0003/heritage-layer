@@ -40,7 +40,6 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
   const [saving, setSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  // 저장 여부 초기 조회
   useEffect(() => {
     if (!user) {
       setIsSaved(false);
@@ -97,11 +96,14 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-lg">
+    <Card
+      onClick={() => navigate(`/analysis?id=${asset.id}`)}
+      className="cursor-pointer overflow-hidden rounded-none border-border bg-muted/30 transition-colors hover:bg-white hover:shadow-md"
+    >
       <CardContent className="p-4">
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-muted text-foreground">
+            <span className="flex h-8 w-8 items-center justify-center bg-muted text-foreground">
               <Icon className="h-4 w-4" />
             </span>
             <Badge variant="secondary" className="text-xs font-medium">{asset.asset_type}</Badge>
@@ -145,25 +147,16 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
               <p className="text-xs text-muted-foreground">공시지가 정보 없음</p>
             )}
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); navigate(`/analysis?id=${asset.id}`); }}
-              className="text-xs font-medium text-foreground underline underline-offset-4 decoration-foreground/40 hover:decoration-foreground"
-            >
-              상세 분석 보기
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={saving}
-              aria-pressed={isSaved}
-              aria-label={isSaved ? '저장 해제' : '자산 저장'}
-              className="flex h-8 w-8 items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-50"
-            >
-              <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current text-foreground' : ''}`} />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            aria-pressed={isSaved}
+            aria-label={isSaved ? '저장 해제' : '자산 저장'}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground disabled:opacity-50"
+          >
+            <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current text-foreground' : ''}`} />
+          </button>
         </div>
 
       </CardContent>
