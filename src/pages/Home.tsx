@@ -611,12 +611,12 @@ const HomePage = () => {
         description="잠든 유휴부지에 생명력을 불어넣다. 한국 유휴 부동산을 발굴·분석·재생하는 데이터 기반 부동산 재생 플랫폼."
         path="/"
       />
-      {/* 페이지 진행 바 */}
+      {/* 상단 스크롤 진행 바 (미니멀 — 그라데이션 제거) */}
       <div
         className="fixed left-0 top-16 z-40 h-0.5 origin-left"
         style={{
           width: '100%',
-          background: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)))',
+          background: 'hsl(var(--foreground) / 0.15)',
           transform: `scaleX(${scrollP})`,
           transition: 'transform 100ms linear',
         }}
