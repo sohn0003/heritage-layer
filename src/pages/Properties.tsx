@@ -384,14 +384,14 @@ const PropertiesPage = () => {
             {FilterPanel}
           </aside>
         )}
-        {/* Desktop filter toggle arrow */}
+        {/* Desktop filter toggle arrow — 반투명 얇은 띠 */}
         <button
           type="button"
           onClick={() => setFilterOpen((v) => !v)}
           aria-label={filterOpen ? '필터 숨기기' : '필터 펼치기'}
-          className="hidden h-16 w-6 shrink-0 items-center justify-center self-center border-y border-r bg-background text-muted-foreground transition-colors hover:bg-muted md:flex"
+          className="hidden h-16 w-4 shrink-0 items-center justify-center self-center text-muted-foreground/70 transition-colors hover:text-foreground md:flex"
         >
-          {filterOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          {filterOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
         </button>
 
         {/* Map area — 데스크톱 */}
