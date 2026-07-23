@@ -314,9 +314,9 @@ const AnalysisPage = () => {
       />
       {/* 자산 핵심 정보 헤더 */}
       <div className="border-b bg-background">
-        <div className="mx-auto max-w-5xl px-5 sm:px-6 py-5">
+        <div className="mx-auto max-w-5xl px-6 sm:px-8 py-6">
           <div className="mb-2 flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-foreground">
+            <span className="flex h-9 w-9 items-center justify-center bg-muted text-foreground">
               <AssetIcon className="h-5 w-5" />
             </span>
             <Badge variant="secondary">{asset.asset_type}</Badge>
@@ -324,13 +324,13 @@ const AnalysisPage = () => {
               <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
             )}
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold leading-tight">{asset.address}</h1>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+          <h1 className="text-xl sm:text-2xl font-bold leading-snug">{asset.address}</h1>
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground leading-relaxed">
             <span>방치 기간: {asset.idle_years ?? '-'}년</span>
-            <span>·</span>
+            <span className="opacity-40">·</span>
             <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
-            <span>·</span>
-            <span className="flex items-center gap-1">
+            <span className="opacity-40">·</span>
+            <span className="inline-flex items-center gap-1">
               활용 상태:
               {(() => {
                 const s = asset.utilization_status ?? 'unutilized';
@@ -344,34 +344,60 @@ const AnalysisPage = () => {
               })()}
             </span>
           </div>
-          {/* 등급 계기판 — 주소/활용상태 아래 */}
-          {scoringResult && (
-            <div className="mt-5 flex justify-center">
-              <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={180} />
-            </div>
-          )}
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-5 sm:px-6 py-8">
-      {/* 분석 가정 안내 — 빨간 테두리 */}
-      {true && (
-        <div className="mb-6 border border-destructive/70 bg-destructive/5 p-4 text-xs text-muted-foreground">
-          <strong className="text-destructive">분석 가정:</strong>{' '}
-          공시지가{' '}
-          <span className="text-foreground">
-            {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
-          </span>{' '}
-          · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
-          {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
-          {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
+      <div className="mx-auto max-w-5xl px-6 sm:px-8 py-8">
+
+      {/* 등급 계기판 + 블록별 평가 — 2단 */}
+      {scoringResult && (
+        <div className="mb-10 grid grid-cols-2 gap-6 border-b border-border/60 pb-8">
+          <div className="flex items-center justify-center">
+            <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={110} />
+          </div>
+          <div>
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">COSMO-P 블록별 평가</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              {(() => {
+                const labelClass = (v: BlockLabel) =>
+                  v === '우수' ? 'text-[hsl(var(--primary))]'
+                    : v === '양호' ? 'text-[hsl(var(--primary))]'
+                    : v === '보통' ? 'text-foreground'
+                    : v === '미흡' ? 'text-[hsl(var(--accent))]'
+                    : 'text-[hsl(var(--grade-d))]';
+                return [
+                  { label: '입지·규제', value: scoringResult.blockLabels.A },
+                  { label: '수요·환경', value: scoringResult.blockLabels.B },
+                  { label: '심미적 가치', value: scoringResult.blockLabels.C },
+                  { label: '사업성', value: scoringResult.blockLabels.D },
+                ].map((item) => (
+                  <div key={item.label} className="flex flex-col">
+                    <p className="text-[11px] text-muted-foreground">{item.label}</p>
+                    <p className={`mt-0.5 text-base font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
         </div>
       )}
 
-      {/* 기본 정보 — 박스 없이 통합 리스트 (건폐/용적 + 기본 항목) */}
-      <div className="mb-8 bg-muted/30 p-5 sm:p-6">
-        <h2 className="mb-4 text-base font-semibold">기본 정보</h2>
-        <div className="mb-5 grid gap-5 sm:grid-cols-2">
+      {/* 분석 가정 안내 — 빨간 테두리 */}
+      <div className="mb-8 border border-destructive/70 bg-destructive/5 p-4 text-xs leading-relaxed text-muted-foreground">
+        <strong className="text-destructive">분석 가정:</strong>{' '}
+        공시지가{' '}
+        <span className="text-foreground">
+          {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
+        </span>{' '}
+        · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
+        {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
+        {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
+      </div>
+
+      {/* 기본 정보 — 박스 없이 선으로 구분 */}
+      <section className="mb-10 border-b border-border/60 pb-8">
+        <h2 className="mb-5 text-base font-semibold">기본 정보</h2>
+        <div className="mb-6 grid gap-5 sm:grid-cols-2">
           <RatioBar
             label="건폐율"
             current={asset.current_building_coverage ?? asset.building_coverage}
@@ -383,7 +409,7 @@ const AnalysisPage = () => {
             legalMax={asset.legal_max_floor_area_ratio}
           />
         </div>
-        <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2 border-t border-border/60 pt-4">
+        <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
           {[
             { label: '용도지역', value: asset.zoning ?? '-' },
             { label: '대지면적', value: asset.land_area ? `${asset.land_area.toLocaleString()}㎡` : '-' },
@@ -398,66 +424,29 @@ const AnalysisPage = () => {
             </div>
           ))}
         </dl>
-      </div>
+      </section>
 
-      {/* 예상 자산 매도가 (Free) */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-lg">예상 자산 매도가</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-md border bg-muted/20 p-4">
-              <p className="text-xs text-muted-foreground">토지 매도가 (매도자 희망)</p>
-              <p className="mt-1 text-xl font-semibold">
-                {((askingLandPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
-              </p>
-            </div>
-            <div className="rounded-md border bg-muted/20 p-4">
-              <p className="text-xs text-muted-foreground">건물 매도가 (매도자 희망)</p>
-              <p className="mt-1 text-xl font-semibold">
-                {((askingBuildingPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
-              </p>
-            </div>
+      {/* 예상 자산 매도가 — 박스 없이 */}
+      <section className="mb-10 border-b border-border/60 pb-8">
+        <h2 className="mb-5 text-base font-semibold">예상 자산 매도가</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div>
+            <p className="text-xs text-muted-foreground">토지 매도가 (매도자 희망)</p>
+            <p className="mt-1 text-xl font-semibold tabular-nums">
+              {((askingLandPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
+            </p>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            * 가격이 없는 경우 매도자 미제시, 공시지가 기준 적용
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* 블록별 평가 (5단계 라벨) — 2x2 */}
-      {scoringResult && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg">COSMO-P 블록별 평가</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              {(() => {
-                const labelClass = (v: BlockLabel) =>
-                  v === '우수' ? 'text-[hsl(var(--primary))]'
-                    : v === '양호' ? 'text-[hsl(var(--primary))]'
-                    : v === '보통' ? 'text-foreground'
-                    : v === '미흡' ? 'text-[hsl(var(--accent))]'
-                    : 'text-[hsl(var(--grade-d))]';
-                return [
-                  { label: 'A. 입지·규제', value: scoringResult.blockLabels.A },
-                  { label: 'B. 수요·환경', value: scoringResult.blockLabels.B },
-                  { label: 'C. 심미적 가치', value: scoringResult.blockLabels.C },
-                  { label: 'D. 사업성', value: scoringResult.blockLabels.D },
-                ].map((item) => (
-                  <div key={item.label} className="border border-border/50 bg-muted/20 py-3 text-center">
-                    <p className="text-xs text-muted-foreground">{item.label}</p>
-                    <p className={`mt-1 text-xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
-                  </div>
-                ));
-              })()}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
+          <div>
+            <p className="text-xs text-muted-foreground">건물 매도가 (매도자 희망)</p>
+            <p className="mt-1 text-xl font-semibold tabular-nums">
+              {((askingBuildingPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
+            </p>
+          </div>
+        </div>
+        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+          * 가격이 없는 경우 매도자 미제시, 공시지가 기준 적용
+        </p>
+      </section>
 
       {/* 전문가 의견 (강점/리스크 요약) */}
       {analysis && (() => {
@@ -469,9 +458,9 @@ const AnalysisPage = () => {
           return `${t}합니다.`;
         };
         return (
-          <div className="mb-8 border-l-2 border-primary/60 bg-muted/20 p-5 sm:p-6">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
-            <div className="space-y-3 text-sm leading-relaxed text-foreground">
+          <section className="mb-10 border-l-2 border-primary/60 pl-5">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
+            <div className="space-y-3 text-sm leading-[1.8] text-foreground">
               {strengths.length > 0 && (
                 <p>
                   <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
@@ -488,7 +477,7 @@ const AnalysisPage = () => {
                 <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
               )}
             </div>
-          </div>
+          </section>
         );
       })()}
 
