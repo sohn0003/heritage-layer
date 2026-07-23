@@ -336,7 +336,9 @@ const PropertiesPage = () => {
   );
 
   return (
-    <div className="flex h-screen flex-col pt-16">
+    <div className="flex min-h-screen flex-col pt-16">
+      <div className="flex h-[calc(100vh-4rem)] flex-col">
+      </div>
       <Seo
         title="매물 탐색 — Heritage Layer"
         description="전국 유휴 부동산 매물을 지도와 필터로 탐색하세요. 폐교, 종교시설, 유휴 자산 등 다양한 유형의 재생 가능한 부동산을 확인할 수 있습니다."
