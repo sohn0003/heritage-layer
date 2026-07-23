@@ -349,10 +349,10 @@ const PropertiesPage = () => {
           />
         </div>
 
-        {/* Mobile filter trigger */}
+        {/* Mobile filter trigger (md 미만에서만 노출) */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="lg:hidden">
+            <Button variant="outline" size="sm" className="md:hidden">
               <SlidersHorizontal className="mr-1 h-4 w-4" />
               필터 {activeCount > 0 && <Badge variant="secondary" className="ml-1">{activeCount}</Badge>}
             </Button>
@@ -370,8 +370,8 @@ const PropertiesPage = () => {
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Desktop filter sidebar */}
-        <aside className="hidden w-[280px] shrink-0 overflow-y-auto border-r bg-muted/20 p-4 lg:block">
+        {/* Desktop filter sidebar — md 이상에서 좌측 상시 노출 */}
+        <aside className="hidden w-[280px] shrink-0 overflow-y-auto border-r bg-muted/20 p-4 md:block">
           {FilterPanel}
         </aside>
 

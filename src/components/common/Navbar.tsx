@@ -9,7 +9,6 @@ import logo from '@/assets/logo.svg';
 const navItems = [
   { label: 'About', href: '/about' },
   { label: 'Properties', href: '/properties' },
-  { label: '컨설팅 의뢰', href: '/bridge' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -40,9 +39,9 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${borderColor} ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isAdminPage
-            ? 'bg-background/95 backdrop-blur-lg shadow-sm'
+            ? 'bg-background/95 backdrop-blur-lg'
             : isDark
             ? 'bg-transparent'
             : 'bg-background/40 backdrop-blur-md'
@@ -50,21 +49,21 @@ const Navbar = () => {
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Heritage Layer" className="h-8 w-8 rounded-md object-contain" />
-            <span className={`text-lg tracking-tight font-medium transition-colors duration-300 ${textColor}`}>
+            <img src={logo} alt="Heritage Layer" className="h-7 w-7 rounded-md object-contain" />
+            <span className={`text-base tracking-[0.02em] font-light transition-colors duration-300 ${textColor}`}>
               Heritage Layer
             </span>
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden items-center gap-1 md:flex">
+          <div className="hidden items-center gap-6 md:flex">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
-                className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
-                  location.pathname === item.href ? activeStyle : textMuted
-                }`}
+                className={`text-sm font-light tracking-wide transition-colors ${
+                  location.pathname === item.href ? textColor : textMuted
+                } hover:${textColor}`}
               >
                 {item.label}
               </Link>
@@ -72,8 +71,8 @@ const Navbar = () => {
             {isAdmin && (
               <Link
                 to="/admin/properties"
-                className={`px-3 py-2 text-sm font-medium ${hoverStyle} ${
-                  location.pathname === '/admin/properties' ? activeStyle : textMuted
+                className={`text-sm font-light tracking-wide transition-colors ${
+                  location.pathname === '/admin/properties' ? textColor : textMuted
                 }`}
               >
                 Admin
@@ -81,31 +80,30 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-4 md:flex">
             {user ? (
-              <div className="flex items-center gap-2">
+              <>
                 <Link
                   to="/mypage"
-                  className={`text-sm transition-colors duration-300 ${textMuted} relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left ${isDark ? 'after:bg-white' : 'after:bg-foreground'}`}
+                  className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
                   title="마이페이지로 이동"
                 >
                   {user.email}
                 </Link>
-                <Button variant="ghost" size="icon" onClick={signOut} className={`transition-colors duration-300 ${textMuted}`}>
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </div>
+                <button
+                  onClick={signOut}
+                  className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
+                >
+                  Logout
+                </button>
+              </>
             ) : (
-              <Button
+              <button
                 onClick={() => setAuthOpen(true)}
-                className={`transition-colors duration-300 ${
-                  isDark
-                    ? 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
-                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
-                }`}
+                className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
               >
-                로그인
-              </Button>
+                Login
+              </button>
             )}
           </div>
 
