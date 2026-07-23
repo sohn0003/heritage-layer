@@ -104,22 +104,22 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
               <Icon className="h-4 w-4" />
             </span>
             <Badge variant="secondary" className="text-xs font-medium">{asset.asset_type}</Badge>
-            {asset.grade && (
-              <span
-                className={`inline-flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold ${gradeStyles[asset.grade] || ''}`}
-                aria-label={`등급 ${asset.grade}`}
+            {asset.gov_cooperation && (
+              <Badge
+                variant="outline"
+                className="border-foreground/20 bg-background text-xs font-medium text-foreground"
               >
-                {asset.grade}
-              </span>
+                정부협력
+              </Badge>
             )}
           </div>
-          {asset.gov_cooperation && (
-            <Badge
-              variant="outline"
-              className="border-foreground/20 bg-background text-xs font-medium text-foreground"
+          {asset.grade && (
+            <span
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-full border text-base font-semibold ${gradeStyles[asset.grade] || ''}`}
+              aria-label={`등급 ${asset.grade}`}
             >
-              정부협력
-            </Badge>
+              {asset.grade}
+            </span>
           )}
         </div>
 
@@ -128,21 +128,6 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
         <div className="mb-3 flex gap-3 text-xs text-muted-foreground">
           {asset.idle_years != null && <span>방치 {asset.idle_years}년</span>}
           {asset.land_area != null && <span>{asset.land_area.toLocaleString()}㎡</span>}
-        </div>
-
-        <div className="mb-3 space-y-1 rounded-md bg-muted/40 p-2 text-xs">
-          <div className="flex gap-1.5">
-            <span className="shrink-0 font-medium text-muted-foreground">추천 용도</span>
-            <span className="font-medium text-foreground">
-              {asset.recommended_use_type?.trim() || <span className="text-muted-foreground">분석 중</span>}
-            </span>
-          </div>
-          <div className="flex gap-1.5">
-            <span className="shrink-0 font-medium text-muted-foreground">개발 방향</span>
-            <span className="font-medium text-foreground">
-              {asset.recommended_dev_direction?.trim() || <span className="text-muted-foreground">분석 중</span>}
-            </span>
-          </div>
         </div>
 
         <div className="flex gap-2">

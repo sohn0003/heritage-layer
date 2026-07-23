@@ -108,37 +108,68 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile toggle */}
-          <button className={`md:hidden transition-colors duration-300 ${textColor}`} onClick={() => setMobileOpen(!mobileOpen)}>
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Mobile right side — Login + menu toggle */}
+          <div className="flex items-center gap-4 md:hidden">
+            {user ? (
+              <button
+                onClick={signOut}
+                className={`text-sm font-light tracking-wide transition-colors ${textMuted}`}
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => setAuthOpen(true)}
+                className={`text-sm font-light tracking-wide transition-colors ${textMuted}`}
+              >
+                Login
+              </button>
+            )}
+            <button
+              className={`transition-colors duration-300 ${textColor}`}
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="menu"
+            >
+              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className={`border-t px-4 pb-4 pt-2 md:hidden transition-colors duration-300 ${borderColor} ${
+          <div className={`px-6 pb-6 pt-2 md:hidden transition-colors duration-300 ${
             isDark ? 'bg-black/60 backdrop-blur-md' : 'bg-background/95 backdrop-blur-md'
           }`}>
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`}
-                onClick={() => setMobileOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
-            {isAdmin && (
-              <Link to="/admin/properties" className={`block px-3 py-2 text-sm font-medium ${textMuted} ${hoverStyle}`} onClick={() => setMobileOpen(false)}>Admin</Link>
-            )}
-            <div className={`mt-2 border-t pt-2 ${borderColor}`}>
-              {user ? (
-                <Button variant="ghost" className={`w-full justify-start ${textMuted}`} onClick={() => { signOut(); setMobileOpen(false); }}>
-                  <LogOut className="mr-2 h-4 w-4" /> 로그아웃
-                </Button>
-              ) : (
-                <Button className={`w-full ${isDark ? 'bg-white/10 text-white border border-white/20 hover:bg-white/20' : ''}`} onClick={() => { setAuthOpen(true); setMobileOpen(false); }}>로그인</Button>
+            <div className="flex flex-col items-end gap-4">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={`text-sm font-light tracking-wide ${
+                    location.pathname === item.href ? textColor : textMuted
+                  }`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              {isAdmin && (
+                <Link
+                  to="/admin/properties"
+                  className={`text-sm font-light tracking-wide ${textMuted}`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Admin
+                </Link>
+              )}
+              {user && (
+                <Link
+                  to="/mypage"
+                  className={`text-sm font-light tracking-wide ${textMuted}`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {user.email}
+                </Link>
               )}
             </div>
           </div>
