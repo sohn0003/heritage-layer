@@ -705,12 +705,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── DARK BLOCK: INSIGHT + METRICS (연속 단일 배경) ── */}
-      <div
-        aria-hidden
-        className="h-40 -mb-px"
-        style={{ background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(226 35% 12%) 100%)' }}
-      />
+      {/* ── DARK BLOCK: INSIGHT + METRICS (미니멀 톤: 그라데이션 제거) ── */}
       <div
         className="relative overflow-hidden"
         style={{ background: 'hsl(226 35% 12%)' }}
