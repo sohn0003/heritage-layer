@@ -343,35 +343,36 @@ const PropertiesPage = () => {
         description="전국 유휴 부동산 매물을 지도와 필터로 탐색하세요. 폐교, 종교시설, 유휴 자산 등 다양한 유형의 재생 가능한 부동산을 확인할 수 있습니다."
         path="/properties"
       />
-      {/* Top search bar */}
-      <div className="flex items-center gap-2 border-b bg-background px-4 py-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="주소로 검색하세요..."
-            className="pl-9"
-            value={f.search}
-            onChange={(e) => update('search', e.target.value)}
-          />
+      {/* Floating search / filter / count pill */}
+      <div className="pointer-events-none absolute inset-x-0 top-20 z-40 flex justify-center px-4">
+        <div className="pointer-events-auto flex items-center gap-2 rounded-md bg-background/60 px-3 py-2 backdrop-blur-md shadow-sm">
+          <div className="relative w-44 sm:w-52 md:w-64">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="주소로 검색하세요..."
+              className="pl-9 bg-background/80"
+              value={f.search}
+              onChange={(e) => update('search', e.target.value)}
+            />
+          </div>
+          <Badge variant="secondary" className="shrink-0">{filtered.length}건</Badge>
+
+          {/* Mobile filter trigger (md 미만에서만 노출) */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="md:hidden">
+                <SlidersHorizontal className="mr-1 h-4 w-4" />
+                필터 {activeCount > 0 && <Badge variant="secondary" className="ml-1">{activeCount}</Badge>}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[320px] overflow-y-auto sm:w-[380px]">
+              <SheetHeader>
+                <SheetTitle>필터</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4">{FilterPanel}</div>
+            </SheetContent>
+          </Sheet>
         </div>
-
-        {/* Mobile filter trigger (md 미만에서만 노출) */}
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="md:hidden">
-              <SlidersHorizontal className="mr-1 h-4 w-4" />
-              필터 {activeCount > 0 && <Badge variant="secondary" className="ml-1">{activeCount}</Badge>}
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[320px] overflow-y-auto sm:w-[380px]">
-            <SheetHeader>
-              <SheetTitle>필터</SheetTitle>
-            </SheetHeader>
-            <div className="mt-4">{FilterPanel}</div>
-          </SheetContent>
-        </Sheet>
-
-        <Badge variant="secondary" className="ml-auto">{filtered.length}건</Badge>
       </div>
 
       {/* Main content */}
