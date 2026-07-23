@@ -83,21 +83,12 @@ const Navbar = () => {
 
           <div className="hidden items-center gap-4 md:flex">
             {user ? (
-              <>
-                <Link
-                  to="/mypage"
-                  className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
-                  title="마이페이지로 이동"
-                >
-                  {user.email}
-                </Link>
-                <button
-                  onClick={signOut}
-                  className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
-                >
-                  Logout
-                </button>
-              </>
+              <Link
+                to="/mypage"
+                className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
+              >
+                Mypage
+              </Link>
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
@@ -108,24 +99,15 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile right side — email + Login/Logout + menu toggle */}
+          {/* Mobile right side */}
           <div className="flex items-center gap-3 md:hidden">
             {user ? (
-              <>
-                <Link
-                  to="/mypage"
-                  className={`max-w-[140px] truncate text-xs font-light tracking-wide transition-colors ${textMuted}`}
-                  title="마이페이지"
-                >
-                  {user.email}
-                </Link>
-                <button
-                  onClick={signOut}
-                  className={`text-sm font-light tracking-wide transition-colors ${textMuted}`}
-                >
-                  Logout
-                </button>
-              </>
+              <Link
+                to="/mypage"
+                className={`text-sm font-light tracking-wide transition-colors ${textMuted}`}
+              >
+                Mypage
+              </Link>
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
