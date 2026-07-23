@@ -323,7 +323,7 @@ const AnalysisPage = () => {
                 </span>
                 <Badge variant="secondary">{asset.asset_type}</Badge>
                 {asset.gov_cooperation && (
-                  <Badge variant="outline" className="border-[hsl(var(--accent))] text-[hsl(var(--accent))]">정부협력</Badge>
+                  <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
                 )}
               </div>
               <h1 className="text-2xl font-bold leading-tight">{asset.address}</h1>
