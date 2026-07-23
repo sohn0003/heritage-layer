@@ -210,12 +210,6 @@ const AboutPage = () => {
         className="relative overflow-hidden px-4 py-14 sm:py-20 md:py-28"
         style={{ background: 'hsl(226 35% 12%)' }}
       >
-        {/* 상단 연결 그라데이션: 상위 섹션의 어두운 배경에서 현재 배경으로 자연스럽게 전환 */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-32"
-          style={{ background: 'linear-gradient(180deg, hsl(226 35% 8%) 0%, transparent 100%)' }}
-        />
         <Blob className="left-[-10%] top-1/3 h-96 w-96" color="hsl(25 55% 55% / 0.18)" />
         <Blob className="right-[-10%] top-2/3 h-96 w-96" color="hsl(210 45% 55% / 0.18)" />
 
