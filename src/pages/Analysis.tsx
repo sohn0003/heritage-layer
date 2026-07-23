@@ -569,25 +569,23 @@ const AnalysisPage = () => {
                         </div>
 
                         {/* 금융 구조 추천 */}
-                        <Card className="bg-muted/40">
-                          <CardContent className="space-y-2 p-4 text-sm">
-                            <div className="font-semibold text-foreground">금융 구조 추천</div>
-                            <div className="grid gap-2 sm:grid-cols-3">
-                              <div>
-                                <p className="text-xs text-muted-foreground">추천 자기자본 비율</p>
-                                <p className="text-lg font-bold">{scenario.recommendedEquityRatio}%</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground">대출 방식</p>
-                                <p className="text-lg font-bold">{scenario.loanStructureLabel}</p>
-                              </div>
-                              <div className="sm:col-span-3">
-                                <p className="text-xs text-muted-foreground">선정 이유</p>
-                                <p className="text-sm">{scenario.loanReason}</p>
-                              </div>
+                        <div className="border-t border-border/60 pt-5">
+                          <p className="mb-3 text-sm font-semibold">금융 구조 추천</p>
+                          <div className="grid gap-4 sm:grid-cols-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground">추천 자기자본 비율</p>
+                              <p className="mt-1 text-lg font-bold tabular-nums">{scenario.recommendedEquityRatio}%</p>
                             </div>
-                          </CardContent>
-                        </Card>
+                            <div>
+                              <p className="text-xs text-muted-foreground">대출 방식</p>
+                              <p className="mt-1 text-lg font-bold">{scenario.loanStructureLabel}</p>
+                            </div>
+                            <div className="sm:col-span-3">
+                              <p className="text-xs text-muted-foreground">선정 이유</p>
+                              <p className="mt-1 text-sm leading-relaxed">{scenario.loanReason}</p>
+                            </div>
+                          </div>
+                        </div>
 
                         {/* 사용 연면적 입력 (탭별 개별) */}
                         {(() => {
