@@ -175,12 +175,12 @@ const PropertiesPage = () => {
           <AccordionContent className="space-y-3 pt-2">
             <div className="space-y-1.5">
               <Label className="text-xs">자산 등급</Label>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1.5">
                 {grades.map((g) => (
                   <button
                     key={g}
                     onClick={() => toggleGrade(g)}
-                    className={`rounded-md px-2.5 py-1 text-xs font-bold transition-colors ${
+                    className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors ${
                       f.gradeFilter.includes(g) ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
                     }`}
                   >
