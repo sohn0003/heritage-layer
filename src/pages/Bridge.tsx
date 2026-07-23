@@ -1,80 +1,104 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Check, ArrowRight, Compass, Wrench, Crown, CheckCircle2 } from 'lucide-react';
+import {
+  Map, FileText, LineChart, ClipboardCheck, ArrowRight, CheckCircle2,
+  Compass, Wrench, Crown,
+} from 'lucide-react';
 import BridgeInquiryForm, { type BridgeLevel } from '@/components/common/BridgeInquiryForm';
 import Seo from '@/components/common/Seo';
 
-interface Level {
-  key: 'L1' | 'L2' | 'L3';
-  name: string;
-  title: string;
-  role: string;
-  Icon: React.ComponentType<{ className?: string }>;
-  items: string[];
-  highlight?: boolean;
-}
+// ── Scroll reveal 훅 ──────────────────────────
+const useInView = <T extends Element>(threshold = 0.25) => {
+  const ref = useRef<T | null>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } },
+      { threshold }
+    );
+    obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, inView };
+};
 
-const levels: Level[] = [
+// ── Process step: 좌측 큰 아이콘, 우측 텍스트 — 스크롤 시 페이드+슬라이드 ──
+const ProcessStep = ({
+  num, icon: Icon, title, desc, isLast = false,
+}: {
+  num: string; icon: any; title: string; desc: string; isLast?: boolean;
+}) => {
+  const { ref, inView } = useInView<HTMLDivElement>(0.3);
+  return (
+    <div
+      ref={ref}
+      className="relative flex gap-6 pb-16 transition-all duration-700 ease-out sm:gap-10"
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'translateY(0)' : 'translateY(30px)',
+      }}
+    >
+      {/* 아이콘 + 세로 연결선 */}
+      <div className="relative flex shrink-0 flex-col items-center">
+        <div
+          className="flex h-16 w-16 items-center justify-center rounded-2xl border sm:h-20 sm:w-20"
+          style={{ borderColor: 'hsl(var(--border))', background: 'hsl(var(--background))' }}
+        >
+          <Icon className="h-7 w-7 text-foreground sm:h-9 sm:w-9" strokeWidth={1.5} />
+        </div>
+        {!isLast && (
+          <div
+            className="mt-2 w-px flex-1"
+            style={{ background: 'hsl(var(--border))', minHeight: '48px' }}
+          />
+        )}
+      </div>
+      <div className="flex-1 pt-1">
+        <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-muted-foreground">
+          Step {num}
+        </p>
+        <h3 className="mt-2 text-xl font-semibold sm:text-2xl">{title}</h3>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+          {desc}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// ── 유료 서비스 카드 ──
+const ServiceCard = ({
+  icon: Icon, title, desc,
+}: { icon: any; title: string; desc: string }) => (
+  <div className="rounded-2xl border p-6 transition-colors hover:bg-muted/40 sm:p-7">
+    <Icon className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+    <h4 className="mt-4 text-base font-semibold sm:text-lg">{title}</h4>
+    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{desc}</p>
+  </div>
+);
+
+// ── 3단계 레벨 카드 ──
+const levels = [
   {
-    key: 'L1',
-    name: 'Level 1',
-    title: '사업성 검토 자문',
-    role: '판단 지원 — 숫자 너머의 맥락을 더합니다',
+    key: 'L1' as BridgeLevel, name: 'Level 1', title: '사업성 검토 자문',
     Icon: Compass,
-    items: [
-      '알고리즘 분석 해설 (전문가 해석 추가)',
-      '개발 방향 타당성 검토',
-      '투자비 개략 산출 (공사비·인허가비·금융비용)',
-      '우선협상 전략 제안 (소유자 접촉·협상 방향)',
-      '검토 보고서 제출 (A4 10~15장)',
-    ],
+    items: ['알고리즘 분석 해설', '개발 방향 타당성 검토', '투자비 개략 산출', '검토 보고서 제출'],
   },
   {
-    key: 'L2',
-    name: 'Level 2',
-    title: '착수 지원',
-    role: '실제 인허가·금융 준비 단계까지 함께 갑니다',
-    Icon: Wrench,
-    highlight: true,
-    items: [
-      'Level 1 전체 포함',
-      '인허가 사전 검토 (건축사 협업, 용도변경·종상향)',
-      '지자체 사전 협의 동행 (변호사·건축사 동행)',
-      '사업 제안서 작성',
-      'PF·자본조달 구조 설계 초안',
-      '금융기관 제안서 작성 및 파트너 금융기관 소개',
-    ],
+    key: 'L2' as BridgeLevel, name: 'Level 2', title: '착수 지원',
+    Icon: Wrench, highlight: true,
+    items: ['Level 1 전체 포함', '인허가 사전 검토', '지자체 사전 협의', '사업 제안서 작성', 'PF·자본조달 설계'],
   },
   {
-    key: 'L3',
-    name: 'Level 3',
-    title: '전체 PM',
-    role: '전 과정 책임 관리 — 시간 없는 자본을 위해',
+    key: 'L3' as BridgeLevel, name: 'Level 3', title: '전체 PM',
     Icon: Crown,
-    items: [
-      '예산 수립 및 관리 (공사비·부대비·예비비, 월별 보고)',
-      '공정 스케줄 관리 (마일스톤·지연 리스크 대응)',
-      '업체 선정 및 관리 (시공·설계·CM, 품질 감독)',
-      '인허가 컨설팅 (모니터링·이슈 대응)',
-      'PF·자본조달 구조 관리',
-      'Level 2 연계 (실행이 필요한 항목은 별도 계약)',
-    ],
+    items: ['예산 수립·관리', '공정 스케줄 관리', '업체 선정·감독', '인허가 컨설팅', 'PF 구조 관리'],
   },
-];
-
-const processSteps = [
-  { n: '01', title: '상담 신청', desc: '프로젝트 개요·자산 정보 공유. 초기 적합도 확인.' },
-  { n: '02', title: '자산·사업성 검토', desc: '알고리즘 분석 + 전문가 해석. 적정 레벨 제안.' },
-  { n: '03', title: '계약·착수', desc: '레벨별 계약 체결. 인허가·금융·PM 실행 시작.' },
-  { n: '04', title: '실행·정산', desc: '진행 보고 및 마일스톤 정산.' },
 ];
 
 const Bridge = () => {
-  const navigate = useNavigate();
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [inquiryLevel, setInquiryLevel] = useState<BridgeLevel>('L1');
   const [successOpen, setSuccessOpen] = useState(false);
@@ -85,152 +109,173 @@ const Bridge = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen bg-background pt-16">
       <Seo
-        title="Bridge Solution — Heritage Layer"
-        description="자산 보유자와 개발사를 연결하는 Heritage Layer Bridge. 단계별 컨설팅과 매칭 서비스를 제공합니다."
+        title="컨설팅 의뢰 — Heritage Layer"
+        description="지도 열람은 무료, 사업계획서·레포트·타당성 검토는 유료 컨설팅으로 지원합니다."
         path="/bridge"
       />
-      {/* Hero */}
-      <section className="bg-primary text-primary-foreground">
-        <div className="mx-auto max-w-5xl px-4 py-20 text-center md:py-28">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-            Bridge Solution
-          </p>
-          <h1 className="font-serif text-4xl font-semibold leading-tight md:text-5xl">
-            정보를 넘어, 실행까지
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base text-primary-foreground/80 md:text-lg">
-            Heritage Layer의 데이터 플랫폼은 무료로 열려 있으며, Bridge Solution은 실제 프로젝트 단위의 실행 지원입니다.
-            <br className="hidden md:block" />
-            사업성 검토부터 인허가·금융 조달, 전체 PM까지 — 필요한 만큼 선택하세요.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" variant="secondary" onClick={() => openInquiry('L1')}>
-              프로젝트 상담 신청
-            </Button>
-          </div>
+
+      {/* ── HERO ── */}
+      <section className="mx-auto max-w-4xl px-4 pt-20 pb-16 text-center sm:pt-28">
+        <p className="mb-4 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
+          Consulting
+        </p>
+        <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl md:text-6xl">
+          지도는 무료,<br />실행은 컨설팅으로.
+        </h1>
+        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Heritage Layer의 유휴자산 지도와 데이터 분석은 누구나 무료로 이용할 수 있습니다.<br className="hidden sm:inline" />
+          사업계획서·레포트·타당성 검토가 필요할 때, 컨설팅을 요청하세요.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <Button size="lg" onClick={() => openInquiry('L1')}>
+            컨설팅 의뢰하기 <ArrowRight className="ml-1.5 h-4 w-4" />
+          </Button>
         </div>
       </section>
 
-      {/* 데이터 플랫폼 vs Bridge */}
-      <section className="mx-auto max-w-5xl px-4 py-16">
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Heritage Layer 데이터 플랫폼</CardTitle>
-              <p className="text-sm text-muted-foreground">정보 접근권 · 완전 무료</p>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>· 전국 유휴자산 지도와 데이터 분석 결과 열람</p>
-              <p>· IRR·DSCR 시뮬레이션과 시나리오 비교</p>
-              <p>· 사용자가 직접 판단 · 외부 실행</p>
-            </CardContent>
-          </Card>
-          <Card className="border-accent">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                Bridge Solution
-                <Badge className="bg-accent text-accent-foreground">실행 지원</Badge>
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">프로젝트 단위 계약</p>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>· 인허가·지자체 협의·PF 구조화 등 실제 실행 지원</p>
-              <p>· 변호사·건축사·금융 파트너 네트워크 활용</p>
-              <p>· 프로젝트 단위 별도 계약</p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* 3 Levels */}
-      <section className="bg-muted/30 py-16">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="mb-10 text-center">
-            <h2 className="font-serif text-3xl font-semibold">3개 레벨</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              필요한 깊이만큼 선택하세요. Level 1은 단독 계약도 가능합니다.
+      {/* ── 무료 vs 유료 비교 (아이콘 2블록) ── */}
+      <section className="mx-auto max-w-5xl px-4 py-12">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border p-7">
+            <div className="mb-4 flex items-center gap-2">
+              <Map className="h-5 w-5" strokeWidth={1.5} />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Free</span>
+            </div>
+            <h3 className="text-xl font-semibold">지도 · 데이터 열람</h3>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              전국 유휴자산 지도, 등급 조회, 기본 재무 시뮬레이션까지 — 회원가입만으로 무료 이용.
             </p>
           </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {levels.map(({ key, name, title, role, Icon, items, highlight }) => (
-              <Card
-                key={key}
-                className={`flex flex-col transition-all hover:-translate-y-1 hover:shadow-lg ${
-                  highlight ? 'border-accent shadow-md' : ''
-                }`}
-              >
-                <CardHeader className="pb-4">
-                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {name}
-                  </p>
-                  <CardTitle className="mt-1 text-xl">{title}</CardTitle>
-                  <p className="mt-3 text-sm text-muted-foreground">{role}</p>
-                  
-                </CardHeader>
-                <CardContent className="flex flex-1 flex-col">
-                  <ul className="space-y-2 text-sm">
-                    {items.map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                        <span className="leading-snug">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="rounded-2xl border p-7" style={{ borderColor: 'hsl(var(--foreground) / 0.6)' }}>
+            <div className="mb-4 flex items-center gap-2">
+              <ClipboardCheck className="h-5 w-5" strokeWidth={1.5} />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.2em]">Paid Consulting</span>
+            </div>
+            <h3 className="text-xl font-semibold">사업계획서 · 레포트 · 타당성 검토</h3>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              프로젝트 단위 계약. 실제 사업 실행에 필요한 문서 작성부터 인허가·자본조달·PM까지.
+            </p>
           </div>
+        </div>
+      </section>
 
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            ※ Level 3은 PM 프레임워크 계약입니다. 인허가 실행·PF 구조화 등 특정 실행 항목은 Level 2 용역을 별도 추가 계약하는 방식으로 운영합니다.
+      {/* ── 프로세스 (모션 스크롤) ── */}
+      <section className="mx-auto max-w-3xl px-4 py-16 sm:py-24">
+        <div className="mb-14 text-center">
+          <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-muted-foreground">Process</p>
+          <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">진행 프로세스</h2>
+        </div>
+
+        <div>
+          <ProcessStep
+            num="01" icon={Map}
+            title="지도에서 관심 자산 확인"
+            desc="Heritage Layer 지도에서 유휴자산과 등급, 기본 정보를 무료로 확인합니다."
+          />
+          <ProcessStep
+            num="02" icon={FileText}
+            title="컨설팅 의뢰 제출"
+            desc="자산 주소와 프로젝트 개요를 남겨주세요. 필요한 문서·검토 범위를 함께 알려주시면 됩니다."
+          />
+          <ProcessStep
+            num="03" icon={LineChart}
+            title="사업성 검토 · 문서 작성"
+            desc="사업계획서, 투자자용 레포트, 타당성 검토 보고서를 프로젝트 단위로 작성해 드립니다."
+          />
+          <ProcessStep
+            num="04" icon={ClipboardCheck}
+            title="실행 지원"
+            desc="필요 시 인허가·PF·PM까지 확장 컨설팅으로 연계합니다."
+            isLast
+          />
+        </div>
+      </section>
+
+      {/* ── 유료 서비스 목록 (아이콘 그리드) ── */}
+      <section className="mx-auto max-w-5xl px-4 py-16">
+        <div className="mb-10 text-center">
+          <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-muted-foreground">Paid Services</p>
+          <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">제공 서비스</h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <ServiceCard
+            icon={FileText}
+            title="사업계획서 작성"
+            desc="투자자·금융기관 제출용 사업계획서를 자산 데이터 기반으로 작성합니다."
+          />
+          <ServiceCard
+            icon={LineChart}
+            title="레포트 작성"
+            desc="시장·경쟁·수익성 분석을 담은 프로젝트 레포트를 제공합니다."
+          />
+          <ServiceCard
+            icon={ClipboardCheck}
+            title="타당성 검토"
+            desc="용도·인허가·재무 관점에서 사업 실행 가능성을 종합 검토합니다."
+          />
+        </div>
+      </section>
+
+      {/* ── 3 Levels — 심화 컨설팅 ── */}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <div className="mb-10 text-center">
+          <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-muted-foreground">Deeper Engagement</p>
+          <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">심화 컨설팅 3단계</h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
+            필요한 깊이만큼 선택하세요. 검토 자문부터 전체 PM까지.
           </p>
         </div>
-      </section>
-
-      {/* Process */}
-      <section className="py-16">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="mb-10 text-center">
-            <h2 className="font-serif text-3xl font-semibold">진행 프로세스</h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-4">
-            {processSteps.map((step) => (
-              <Card key={step.n} className="border-border/60">
-                <CardContent className="p-5">
-                  <p className="font-serif text-2xl text-accent">{step.n}</p>
-                  <h3 className="mt-2 text-base font-semibold">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-snug text-muted-foreground">{step.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {levels.map(({ key, name, title, Icon, items, highlight }) => (
+            <div
+              key={key}
+              className="flex flex-col rounded-2xl border p-6 transition-colors hover:bg-muted/40"
+              style={highlight ? { borderColor: 'hsl(var(--foreground) / 0.6)' } : undefined}
+            >
+              <Icon className="h-6 w-6" strokeWidth={1.5} />
+              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{name}</p>
+              <h3 className="mt-1 text-lg font-semibold">{title}</h3>
+              <ul className="mt-4 flex-1 space-y-2 text-sm text-muted-foreground">
+                {items.map((it) => (
+                  <li key={it} className="flex items-start gap-2">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-foreground/40" />
+                    <span>{it}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-6"
+                onClick={() => openInquiry(key)}
+              >
+                {name} 문의하기
+              </Button>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="mx-auto max-w-4xl px-4 py-20 text-center">
-        <h2 className="font-serif text-3xl font-semibold">프로젝트가 있으신가요?</h2>
-        <p className="mt-3 text-muted-foreground">
-          자산 주소와 개요만 알려주시면, 가장 적합한 레벨을 제안드립니다.
+      {/* ── CTA ── */}
+      <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:py-28">
+        <h2 className="text-3xl font-semibold sm:text-4xl">프로젝트가 있으신가요?</h2>
+        <p className="mt-4 text-muted-foreground">
+          자산 주소와 개요만 남겨주시면, 적합한 컨설팅 범위를 제안해 드립니다.
         </p>
-        <Button size="lg" className="mt-6" onClick={() => openInquiry('L1')}>
-          상담 신청하기 <ArrowRight className="ml-1 h-4 w-4" />
+        <Button size="lg" className="mt-8" onClick={() => openInquiry('L1')}>
+          컨설팅 의뢰하기 <ArrowRight className="ml-1.5 h-4 w-4" />
         </Button>
       </section>
 
-      {/* Bridge Solution 의뢰 Dialog */}
+      {/* Inquiry Dialog */}
       <Dialog open={inquiryOpen} onOpenChange={setInquiryOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl">Bridge Solution 의뢰</DialogTitle>
+            <DialogTitle className="text-xl">컨설팅 의뢰</DialogTitle>
             <DialogDescription>
-              희망 레벨과 프로젝트 정보를 알려주시면 담당자가 빠르게 안내드립니다.
+              희망 서비스와 프로젝트 정보를 알려주시면 담당자가 빠르게 안내드립니다.
             </DialogDescription>
           </DialogHeader>
           <BridgeInquiryForm
@@ -247,8 +292,8 @@ const Bridge = () => {
       <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-accent/15">
-              <CheckCircle2 className="h-8 w-8 text-accent" />
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+              <CheckCircle2 className="h-8 w-8" strokeWidth={1.5} />
             </div>
             <DialogTitle className="text-center text-xl">문의가 접수되었습니다</DialogTitle>
             <DialogDescription className="text-center">
