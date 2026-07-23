@@ -996,7 +996,6 @@ const AnalysisPage = () => {
                 </Tabs>
               )}
             </div>
-          </div>
         </section>
 
         <section>
