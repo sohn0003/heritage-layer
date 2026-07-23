@@ -800,7 +800,10 @@ const AnalysisPage = () => {
                               <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
                                   <div className="mb-2 flex items-baseline justify-between gap-2">
-                                    <Label className="text-sm font-semibold">연간 매출 (억원)</Label>
+                                    <div className="flex items-baseline gap-2">
+                                      <Label className="text-sm font-semibold">연간 매출 (억원)</Label>
+                                      <span className="text-[11px] text-destructive">ex) {(recommendedRevenue / 100_000_000).toFixed(1)}</span>
+                                    </div>
                                     <span className="text-xs text-muted-foreground">
                                       권장: {(recommendedRevenue / 100_000_000).toFixed(1)}억
                                     </span>
