@@ -592,7 +592,7 @@ const AnalysisPage = () => {
                           const maxAllowed = Math.round(scenario.irrResult.base.usableFloorArea ?? 0);
                           const usedVal = usedFloorAreaByRank[scenario.rank] ?? maxAllowed;
                           return (
-                            <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
+                            <div className="border-t border-border/60 pt-5">
                               <div className="mb-2 flex items-baseline justify-between gap-2">
                                 <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
                                 <span className="text-xs text-muted-foreground">
