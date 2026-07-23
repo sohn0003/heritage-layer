@@ -312,72 +312,66 @@ const AnalysisPage = () => {
         description="입지·법규·수익성 시나리오를 데이터 기반으로 분석하는 Heritage Layer 분석 도구."
         path="/analysis"
       />
-      {/* 자산 핵심 정보 헤더 (스크롤 시 함께 이동) */}
+      {/* 자산 핵심 정보 헤더 */}
       <div className="border-b bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <div className="mb-2 flex items-center gap-2">
-                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-foreground">
-                  <AssetIcon className="h-5 w-5" />
-                </span>
-                <Badge variant="secondary">{asset.asset_type}</Badge>
-                {asset.gov_cooperation && (
-                  <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
-                )}
-              </div>
-              <h1 className="text-2xl font-bold leading-tight">{asset.address}</h1>
-              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-                <span>방치 기간: {asset.idle_years ?? '-'}년</span>
-                <span>·</span>
-                <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
-                <span>·</span>
-                <span className="flex items-center gap-1">
-                  활용 상태:
-                  {(() => {
-                    const s = asset.utilization_status ?? 'unutilized';
-                    const map: Record<string, { label: string; cls: string }> = {
-                      unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
-                      in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
-                      utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
-                    };
-                    const v = map[s] ?? map.unutilized;
-                    return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
-                  })()}
-                </span>
-              </div>
-            </div>
-            {/* 우측 상단 등급 계기판 */}
-            {scoringResult && (
-              <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={170} />
+        <div className="mx-auto max-w-5xl px-5 sm:px-6 py-5">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-foreground">
+              <AssetIcon className="h-5 w-5" />
+            </span>
+            <Badge variant="secondary">{asset.asset_type}</Badge>
+            {asset.gov_cooperation && (
+              <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
             )}
           </div>
+          <h1 className="text-xl sm:text-2xl font-bold leading-tight">{asset.address}</h1>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+            <span>방치 기간: {asset.idle_years ?? '-'}년</span>
+            <span>·</span>
+            <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
+            <span>·</span>
+            <span className="flex items-center gap-1">
+              활용 상태:
+              {(() => {
+                const s = asset.utilization_status ?? 'unutilized';
+                const map: Record<string, { label: string; cls: string }> = {
+                  unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
+                  in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
+                  utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
+                };
+                const v = map[s] ?? map.unutilized;
+                return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
+              })()}
+            </span>
+          </div>
+          {/* 등급 계기판 — 주소/활용상태 아래 */}
+          {scoringResult && (
+            <div className="mt-5 flex justify-center">
+              <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={180} />
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-8">
-      {/* 분석 가정 안내 */}
+      <div className="mx-auto max-w-5xl px-5 sm:px-6 py-8">
+      {/* 분석 가정 안내 — 빨간 테두리 */}
       {true && (
-        <Card className="mb-6 border-dashed bg-muted/30">
-          <CardContent className="p-4 text-xs text-muted-foreground">
-            <strong className="text-foreground">분석 가정:</strong>{' '}
-            공시지가{' '}
-            <span className="text-foreground">
-              {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
-            </span>{' '}
-            · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
-            {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
-            {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
-          </CardContent>
-        </Card>
+        <div className="mb-6 border border-destructive/70 bg-destructive/5 p-4 text-xs text-muted-foreground">
+          <strong className="text-destructive">분석 가정:</strong>{' '}
+          공시지가{' '}
+          <span className="text-foreground">
+            {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
+          </span>{' '}
+          · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
+          {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
+          {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
+        </div>
       )}
 
-      {/* 건폐율 / 용적률 — 법정 한도 대비 시각화 */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">건폐율 / 용적률</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-6 sm:grid-cols-2">
+      {/* 기본 정보 — 박스 없이 통합 리스트 (건폐/용적 + 기본 항목) */}
+      <div className="mb-8 bg-muted/30 p-5 sm:p-6">
+        <h2 className="mb-4 text-base font-semibold">기본 정보</h2>
+        <div className="mb-5 grid gap-5 sm:grid-cols-2">
           <RatioBar
             label="건폐율"
             current={asset.current_building_coverage ?? asset.building_coverage}
@@ -388,26 +382,22 @@ const AnalysisPage = () => {
             current={asset.current_floor_area_ratio ?? asset.floor_area_ratio}
             legalMax={asset.legal_max_floor_area_ratio}
           />
-        </CardContent>
-      </Card>
-
-      {/* Free section — 기본 자산 정보 */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[
-          { label: '용도지역', value: asset.zoning ?? '-' },
-          { label: '대지면적', value: asset.land_area ? `${asset.land_area.toLocaleString()}㎡` : '-' },
-          { label: '연면적', value: asset.current_floor_area ? `${asset.current_floor_area.toLocaleString()}㎡` : '-' },
-          { label: '공시지가', value: asset.land_value_per_sqm ? `${asset.land_value_per_sqm.toLocaleString()}원/㎡` : '-' },
-          { label: '인구 추이', value: asset.population_trend ?? '-' },
-          { label: '건물 상태', value: asset.building_condition ?? '-' },
-        ].map((item) => (
-          <Card key={item.label}>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">{item.label}</p>
-              <p className="mt-1 text-lg font-semibold">{item.value}</p>
-            </CardContent>
-          </Card>
-        ))}
+        </div>
+        <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2 border-t border-border/60 pt-4">
+          {[
+            { label: '용도지역', value: asset.zoning ?? '-' },
+            { label: '대지면적', value: asset.land_area ? `${asset.land_area.toLocaleString()}㎡` : '-' },
+            { label: '연면적', value: asset.current_floor_area ? `${asset.current_floor_area.toLocaleString()}㎡` : '-' },
+            { label: '공시지가', value: asset.land_value_per_sqm ? `${asset.land_value_per_sqm.toLocaleString()}원/㎡` : '-' },
+            { label: '인구 추이', value: asset.population_trend ?? '-' },
+            { label: '건물 상태', value: asset.building_condition ?? '-' },
+          ].map((item) => (
+            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-border/40 pb-2">
+              <dt className="text-xs text-muted-foreground">{item.label}</dt>
+              <dd className="text-sm font-semibold text-right">{item.value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
 
       {/* 예상 자산 매도가 (Free) */}
@@ -436,14 +426,14 @@ const AnalysisPage = () => {
         </CardContent>
       </Card>
 
-      {/* 블록별 평가 (5단계 라벨) */}
+      {/* 블록별 평가 (5단계 라벨) — 2x2 */}
       {scoringResult && (
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-lg">COSMO-P 블록별 평가</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4">
               {(() => {
                 const labelClass = (v: BlockLabel) =>
                   v === '우수' ? 'text-[hsl(var(--primary))]'
@@ -457,9 +447,9 @@ const AnalysisPage = () => {
                   { label: 'C. 심미적 가치', value: scoringResult.blockLabels.C },
                   { label: 'D. 사업성', value: scoringResult.blockLabels.D },
                 ].map((item) => (
-                  <div key={item.label} className="text-center">
+                  <div key={item.label} className="border border-border/50 bg-muted/20 py-3 text-center">
                     <p className="text-xs text-muted-foreground">{item.label}</p>
-                    <p className={`mt-1 text-2xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                    <p className={`mt-1 text-xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
                   </div>
                 ));
               })()}
@@ -469,48 +459,38 @@ const AnalysisPage = () => {
       )}
 
 
-      {/* 자산 강점·리스크 요약 (Free) */}
-      {analysis && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg">자산 강점 · 리스크 요약</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-6 sm:grid-cols-2">
-            <div>
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--primary))]">
-                <Sparkles className="h-4 w-4" /> 핵심 강점
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {analysis.recommendation.assetSummary.keyStrengths.length === 0 ? (
-                  <span className="text-xs text-muted-foreground">두드러진 강점 없음</span>
-                ) : (
-                  analysis.recommendation.assetSummary.keyStrengths.map((s, i) => (
-                    <Badge key={i} variant="outline" className="border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.08)] text-[hsl(var(--primary))] dark:bg-[hsl(var(--primary)_/_0.15)] dark:border-[hsl(var(--primary))]">
-                      {s}
-                    </Badge>
-                  ))
-                )}
-              </div>
+      {/* 전문가 의견 (강점/리스크 요약) */}
+      {analysis && (() => {
+        const strengths = analysis.recommendation.assetSummary.keyStrengths;
+        const risks = analysis.recommendation.assetSummary.keyRisks;
+        const sentenceify = (s: string) => {
+          const t = s.trim().replace(/[.。]$/, '');
+          if (/(다|요|음|함|됨|임)$/.test(t)) return `${t}.`;
+          return `${t}합니다.`;
+        };
+        return (
+          <div className="mb-8 border-l-2 border-primary/60 bg-muted/20 p-5 sm:p-6">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
+            <div className="space-y-3 text-sm leading-relaxed text-foreground">
+              {strengths.length > 0 && (
+                <p>
+                  <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
+                  본 자산은 {strengths.map(sentenceify).join(' 또한 ')}
+                </p>
+              )}
+              {risks.length > 0 && (
+                <p>
+                  <span className="font-semibold text-[hsl(var(--accent))]">리스크:</span>{' '}
+                  다만 {risks.map(sentenceify).join(' 아울러 ')}
+                </p>
+              )}
+              {strengths.length === 0 && risks.length === 0 && (
+                <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
+              )}
             </div>
-            <div>
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[hsl(var(--accent))]">
-                <ShieldAlert className="h-4 w-4" /> 주요 리스크
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {analysis.recommendation.assetSummary.keyRisks.length === 0 ? (
-                  <span className="text-xs text-muted-foreground">특이 리스크 없음</span>
-                ) : (
-                  analysis.recommendation.assetSummary.keyRisks.map((s, i) => (
-                    <Badge key={i} variant="outline" className="border-[hsl(var(--accent))] bg-[hsl(var(--accent)_/_0.08)] text-[hsl(var(--accent))] dark:bg-[hsl(var(--accent)_/_0.15)] dark:border-[hsl(var(--accent))]">
-                      {s}
-                    </Badge>
-                  ))
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        );
+      })()}
 
       {/* 세부 항목 점수 섹션은 보안상 서버 전용으로 이전되었습니다. */}
 
@@ -518,17 +498,14 @@ const AnalysisPage = () => {
       {/* 상세 분석 섹션 */}
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingUp className="h-5 w-5 text-accent" /> 개발 시나리오 추천
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!scenarios ? (
-                <p className="text-sm text-muted-foreground">분석 결과를 불러오는 중...</p>
-              ) : (
+        <section>
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+            <TrendingUp className="h-5 w-5 text-accent" /> 개발 시나리오 추천
+          </h2>
+          <div>
+            {!scenarios ? (
+              <p className="text-sm text-muted-foreground">분석 결과를 불러오는 중...</p>
+            ) : (
                 <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as '1' | '2' | '3')}>
                   <TabsList className="grid w-full grid-cols-3">
                     {scenarios.map((s) => (
@@ -1018,64 +995,59 @@ const AnalysisPage = () => {
                   })}
                 </Tabs>
               )}
-            </CardContent>
-          </Card>
-        </>
+            </div>
+        </section>
 
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Building2 className="h-5 w-5 text-accent" /> 딜 시그널 현황
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {signalSummary ? (
-                <>
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <div>
-                      <p className="flex items-center gap-1 text-xs">
-                        종합 신호 점수
-                        <TooltipProvider delayDuration={100}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="max-w-xs">
-                              <p>저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs">관심 유저 수</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.uniqueUsers}명</p>
-                    </div>
-                    <div>
-                      <p className="text-xs">저장 / 열람 / 반복열람</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">
-                        {signalSummary.savedCount} / {signalSummary.viewCount} / {signalSummary.repeatedViewCount}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs">관심 상담 신청</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
-                    </div>
+        <section>
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+            <Building2 className="h-5 w-5 text-accent" /> 딜 시그널 현황
+          </h2>
+          <div className="space-y-3 text-sm text-muted-foreground">
+            {signalSummary ? (
+              <>
+                <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <p className="flex items-center gap-1 text-xs">
+                      종합 신호 점수
+                      <TooltipProvider delayDuration={100}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs">
+                            <p>저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2 pt-2">
-                    {signalSummary.clusterDetected && (
-                      <Badge variant="default">클러스터 감지</Badge>
-                    )}
+                  <div>
+                    <p className="text-xs">관심 유저 수</p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.uniqueUsers}명</p>
                   </div>
-                </>
-              ) : (
-                <p>신호 데이터를 불러오는 중...</p>
-              )}
-            </CardContent>
-          </Card>
-        </>
+                  <div>
+                    <p className="text-xs">저장 / 열람 / 반복열람</p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">
+                      {signalSummary.savedCount} / {signalSummary.viewCount} / {signalSummary.repeatedViewCount}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs">관심 상담 신청</p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 pt-2">
+                  {signalSummary.clusterDetected && (
+                    <Badge variant="default">클러스터 감지</Badge>
+                  )}
+                </div>
+              </>
+            ) : (
+              <p>신호 데이터를 불러오는 중...</p>
+            )}
+          </div>
+        </section>
       </div>
 
       {/* Bottom buttons */}
