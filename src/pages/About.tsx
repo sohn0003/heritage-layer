@@ -103,24 +103,15 @@ const AboutPage = () => {
       />
       {/* 홈 콘텐츠 (히어로/푸터 제외) 를 About 상단에 통합 */}
       <HomeSections embedded />
-      {/* ── HERO ── */}
-      <section
-        className="relative flex items-center justify-center px-4 text-center"
-        style={{
-          backgroundImage: `url(${aboutHeroBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          minHeight: '70vh',
-        }}
-      >
-        <div className="absolute inset-0" style={{ background: 'rgba(0, 0, 0, 0.55)' }} />
-        <div className="relative z-10 mx-auto max-w-3xl">
-          <Badge variant="secondary" className="mb-4">THE LAYER</Badge>
-          <h1 className="mb-6 text-2xl font-medium sm:text-4xl" style={{ color: 'hsl(0 0% 95%)' }}>
+      {/* ── INTRO (얇은 전환 밴드) ── */}
+      <section className="relative px-6 py-20 sm:px-10 md:px-16 md:py-28">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">THE LAYER</span>
+          <h1 className="mt-4 text-2xl font-normal leading-[1.5] text-foreground sm:text-3xl md:text-4xl">
             방치된 공간이 지역의 미래입니다
           </h1>
-          <p className="leading-relaxed" style={{ color: 'hsl(0 0% 85%)' }}>
-            Heritage Layer는 데이터로 유휴 부동산의 가능성을 발견하고<br />
+          <p className="mx-auto mt-6 max-w-xl text-sm leading-[1.9] text-muted-foreground md:text-base">
+            Heritage Layer는 데이터로 유휴 부동산의 가능성을 발견하고,
             지자체와 시행사를 연결해 실제 재생 사업으로 이어줍니다.
           </p>
         </div>
