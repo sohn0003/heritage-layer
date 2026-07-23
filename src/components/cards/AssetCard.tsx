@@ -98,19 +98,19 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
   return (
     <Card
       onClick={() => navigate(`/analysis?id=${asset.id}`)}
-      className="cursor-pointer overflow-hidden rounded-none border-border bg-muted/30 transition-colors hover:bg-white hover:shadow-md"
+      className="group cursor-pointer overflow-hidden rounded-none border-border bg-muted/30 transition-colors hover:bg-white hover:shadow-md"
     >
       <CardContent className="p-4">
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center bg-muted text-foreground">
+            <span className="flex h-8 w-8 items-center justify-center bg-muted text-foreground transition-colors group-hover:bg-slate-200 group-hover:text-slate-900">
               <Icon className="h-4 w-4" />
             </span>
-            <Badge variant="secondary" className="text-xs font-medium">{asset.asset_type}</Badge>
+            <Badge variant="secondary" className="text-xs font-medium transition-colors group-hover:bg-slate-200 group-hover:text-slate-900">{asset.asset_type}</Badge>
             {asset.gov_cooperation && (
               <Badge
                 variant="outline"
-                className="border-foreground/20 bg-background text-xs font-medium text-foreground"
+                className="border-foreground/20 bg-background text-xs font-medium text-foreground transition-colors group-hover:border-slate-300 group-hover:bg-slate-100 group-hover:text-slate-900"
               >
                 정부협력
               </Badge>
@@ -126,25 +126,25 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
           )}
         </div>
 
-        <p className="mb-1.5 text-sm font-medium leading-snug">{asset.address}</p>
+        <p className="mb-1.5 text-sm font-medium leading-snug text-foreground transition-colors group-hover:text-slate-900">{asset.address}</p>
 
-        <div className="mb-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+        <div className="mb-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground transition-colors group-hover:text-slate-600">
           {asset.idle_years != null && <span>방치 {asset.idle_years}년</span>}
           {asset.land_area != null && <span>{asset.land_area.toLocaleString()}㎡</span>}
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-t pt-3">
+        <div className="flex items-center justify-between gap-3 border-t border-border pt-3 transition-colors group-hover:border-slate-200">
           <div className="min-w-0 flex-1">
             {asset.land_value_per_sqm != null ? (
               <>
-                <p className="text-[11px] text-muted-foreground">공시지가</p>
-                <p className="truncate text-base font-semibold text-foreground">
+                <p className="text-[11px] text-muted-foreground transition-colors group-hover:text-slate-500">공시지가</p>
+                <p className="truncate text-base font-semibold text-foreground transition-colors group-hover:text-slate-900">
                   {Math.round(asset.land_value_per_sqm).toLocaleString()}
-                  <span className="ml-0.5 text-xs font-normal text-muted-foreground">원/㎡</span>
+                  <span className="ml-0.5 text-xs font-normal text-muted-foreground transition-colors group-hover:text-slate-500">원/㎡</span>
                 </p>
               </>
             ) : (
-              <p className="text-xs text-muted-foreground">공시지가 정보 없음</p>
+              <p className="text-xs text-muted-foreground transition-colors group-hover:text-slate-600">공시지가 정보 없음</p>
             )}
           </div>
           <button
@@ -153,9 +153,9 @@ const AssetCard = ({ asset, onAuthRequired }: AssetCardProps) => {
             disabled={saving}
             aria-pressed={isSaved}
             aria-label={isSaved ? '저장 해제' : '자산 저장'}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-slate-400 hover:text-slate-900 disabled:opacity-50 group-hover:border-slate-300 group-hover:text-slate-700"
           >
-            <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current text-foreground' : ''}`} />
+            <Bookmark className={`h-4 w-4 transition-colors ${isSaved ? 'fill-current text-foreground group-hover:text-slate-900' : ''}`} />
           </button>
         </div>
 
