@@ -347,7 +347,9 @@ const AnalysisPage = () => {
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-6 sm:px-8 py-8">
+      {/* 등급/블록/분석가정 밴드 */}
+      <div className="bg-background">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-8">
 
       {/* 등급 계기판 + 블록별 평가 — 2단 */}
       {scoringResult && (
