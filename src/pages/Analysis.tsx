@@ -959,27 +959,45 @@ const AnalysisPage = () => {
                             ];
 
                             const renderList = (rows: ReturnType<typeof buildRows>) => (
-                              <dl className="mt-4 divide-y divide-border/40">
+                              <dl className="mt-4 divide-y divide-border/20">
                                 {rows.map((r) => (
-                                  <div key={r.label} className="flex items-baseline justify-between gap-3 py-2.5">
-                                    <dt className="text-sm text-muted-foreground leading-relaxed">{r.label}</dt>
+                                  <div key={r.label} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 py-2.5">
+                                    <dt className="text-sm text-muted-foreground leading-snug">{r.label}</dt>
                                     <dd className={`text-sm tabular-nums text-right ${r.highlight ? 'font-bold text-primary' : 'font-semibold'}`}>{r.value}</dd>
                                   </div>
                                 ))}
                               </dl>
                             );
 
+                            const levelCard = (title: string, rows: ReturnType<typeof buildRows>, tone: string) => (
+                              <div className="border border-border/40 bg-background/60 p-4">
+                                <p className={`text-xs font-semibold uppercase tracking-wider ${tone}`}>{title}</p>
+                                {renderList(rows)}
+                              </div>
+                            );
+
                             return (
-                              <Tabs defaultValue="base">
-                                <TabsList className="grid w-full grid-cols-3">
-                                  <TabsTrigger value="conservative">보수적</TabsTrigger>
-                                  <TabsTrigger value="base">기본</TabsTrigger>
-                                  <TabsTrigger value="optimistic">낙관적</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="conservative">{renderList(buildRows(levelsData.conservative))}</TabsContent>
-                                <TabsContent value="base">{renderList(buildRows(levelsData.base))}</TabsContent>
-                                <TabsContent value="optimistic">{renderList(buildRows(levelsData.optimistic))}</TabsContent>
-                              </Tabs>
+                              <>
+                                {/* PC: 3열 나란히 */}
+                                <div className="hidden md:grid md:grid-cols-3 md:gap-4 mt-4">
+                                  {levelCard('보수적', buildRows(levelsData.conservative), 'text-muted-foreground')}
+                                  {levelCard('기본', buildRows(levelsData.base), 'text-primary')}
+                                  {levelCard('낙관적', buildRows(levelsData.optimistic), 'text-[hsl(var(--accent))]')}
+                                </div>
+                                {/* 모바일: 탭 전환 */}
+                                <div className="md:hidden">
+                                  <Tabs defaultValue="base">
+                                    <TabsList className="grid w-full grid-cols-3">
+                                      <TabsTrigger value="conservative">보수적</TabsTrigger>
+                                      <TabsTrigger value="base">기본</TabsTrigger>
+                                      <TabsTrigger value="optimistic">낙관적</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="conservative">{renderList(buildRows(levelsData.conservative))}</TabsContent>
+                                    <TabsContent value="base">{renderList(buildRows(levelsData.base))}</TabsContent>
+                                    <TabsContent value="optimistic">{renderList(buildRows(levelsData.optimistic))}</TabsContent>
+                                  </Tabs>
+                                </div>
+                              </>
                             );
                           })()}
                         </div>
