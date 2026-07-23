@@ -366,13 +366,14 @@ const PropertiesPage = () => {
                 필터 {activeCount > 0 && <Badge variant="secondary" className="ml-1">{activeCount}</Badge>}
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[320px] overflow-y-auto sm:w-[380px]">
+            <SheetContent side="bottom" className="h-[65vh] overflow-y-auto rounded-t-2xl">
               <SheetHeader>
                 <SheetTitle>필터</SheetTitle>
               </SheetHeader>
-              <div className="mt-4">{FilterPanel}</div>
+              <div className="mt-4 pb-6">{FilterPanel}</div>
             </SheetContent>
           </Sheet>
+
         </div>
       </div>
 
@@ -492,13 +493,13 @@ const PropertiesPage = () => {
           {/* 바텀시트 */}
           <div
             className={`absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl border-t bg-background shadow-2xl transition-[height] duration-300 ease-out ${
-              mobileListMode === 'full' ? 'h-[calc(100vh-4rem)]' : mobileListMode === 'half' ? 'h-[55vh]' : 'h-14'
+              mobileListMode === 'full' ? 'h-[calc(100vh-4rem)]' : mobileListMode === 'half' ? 'h-[55vh]' : 'h-20'
             }`}
           >
-            <div
-              className="flex shrink-0 cursor-grab touch-none flex-col items-center justify-center py-2 active:cursor-grabbing"
+            <button
+              type="button"
+              className="flex shrink-0 touch-none flex-col items-center justify-center py-3 select-none"
               onPointerDown={(e) => {
-                (e.target as Element).setPointerCapture?.(e.pointerId);
                 dragStartY.current = e.clientY;
                 dragStartMode.current = mobileListMode;
               }}
@@ -508,19 +509,24 @@ const PropertiesPage = () => {
                 if (Math.abs(dy) < 30) return;
                 const order: Array<'full' | 'half' | 'collapsed'> = ['full', 'half', 'collapsed'];
                 const startIdx = order.indexOf(dragStartMode.current);
-                // 아래로 드래그 → collapsed 방향, 위로 드래그 → full 방향
                 const steps = Math.min(2, Math.max(-2, Math.round(dy / 80)));
                 const nextIdx = Math.min(2, Math.max(0, startIdx + steps));
                 setMobileListMode(order[nextIdx]);
               }}
-              onPointerUp={() => { dragStartY.current = null; }}
-              onClick={() => {
+              onPointerUp={(e) => {
+                const moved = dragStartY.current != null && Math.abs(e.clientY - dragStartY.current) >= 30;
+                dragStartY.current = null;
+                if (moved) return;
                 setMobileListMode((m) => (m === 'collapsed' ? 'half' : m === 'half' ? 'full' : 'collapsed'));
               }}
+              aria-label="리스트 토글"
             >
               <span className="h-1 w-10 rounded-full bg-muted-foreground/40" />
-              <span className="mt-1.5 text-[11px] text-muted-foreground">전체 매물 {filtered.length}건</span>
-            </div>
+              <span className="mt-1.5 text-[11px] text-muted-foreground">
+                {mobileListMode === 'collapsed' ? `매물 ${filtered.length}건 · 위로 스와이프` : `전체 매물 ${filtered.length}건`}
+              </span>
+            </button>
+
 
             <div className={`flex-1 overflow-y-auto px-4 pb-4 ${mobileListMode === 'collapsed' ? 'hidden' : ''}`}>
               {filtered.length === 0 ? (
