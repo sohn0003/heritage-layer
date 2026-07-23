@@ -375,12 +375,23 @@ const PropertiesPage = () => {
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Desktop filter sidebar — md 이상에서 좌측 상시 노출 */}
-        <aside className="hidden w-[280px] shrink-0 overflow-y-auto border-r bg-muted/20 p-4 md:block">
-          {FilterPanel}
-        </aside>
+        {/* Desktop filter sidebar — 접기/펼치기 가능 */}
+        {filterOpen && (
+          <aside className="relative hidden w-[280px] shrink-0 overflow-y-auto border-r bg-muted/20 p-4 md:block">
+            {FilterPanel}
+          </aside>
+        )}
+        {/* Desktop filter toggle arrow */}
+        <button
+          type="button"
+          onClick={() => setFilterOpen((v) => !v)}
+          aria-label={filterOpen ? '필터 숨기기' : '필터 펼치기'}
+          className="hidden h-16 w-6 shrink-0 items-center justify-center self-center border-y border-r bg-background text-muted-foreground transition-colors hover:bg-muted md:flex"
+        >
+          {filterOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+        </button>
 
-        {/* Map area — 모바일에서는 리스트 위에 지도 표시 (네이버 지도 스타일) */}
+        {/* Map area — 데스크톱 */}
         <div className="hidden flex-1 md:flex">
           <NaverMap
             markers={filtered
@@ -404,10 +415,20 @@ const PropertiesPage = () => {
           />
         </div>
 
-        {/* 우측(데스크톱) / 하단(모바일) 컬럼 — 모바일에서는 지도+리스트 스택 */}
-        <div className="flex w-full flex-col overflow-hidden md:w-[400px] md:border-l">
-          {/* 모바일 전용 지도 (상단 고정 높이) */}
-          <div className="h-[45vh] w-full shrink-0 border-b md:hidden">
+        {/* Desktop list toggle arrow */}
+        <button
+          type="button"
+          onClick={() => setListOpen((v) => !v)}
+          aria-label={listOpen ? '리스트 숨기기' : '리스트 펼치기'}
+          className="hidden h-16 w-6 shrink-0 items-center justify-center self-center border-y border-l bg-background text-muted-foreground transition-colors hover:bg-muted md:flex"
+        >
+          {listOpen ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </button>
+
+        {/* 우측(데스크톱) / 하단(모바일) 컬럼 */}
+        <div className={`flex w-full flex-col overflow-hidden md:border-l ${listOpen ? 'md:w-[400px]' : 'md:w-0 md:border-l-0'}`}>
+          {/* 모바일 전용 지도 — 리스트 접힘 여부에 따라 높이 변경 */}
+          <div className={`w-full shrink-0 border-b md:hidden ${mobileListOpen ? 'h-[45vh]' : 'h-[calc(100vh-8rem)]'}`}>
             <NaverMap
               markers={filtered
                 .filter(hasValidKoreaCoordinate)
@@ -430,40 +451,57 @@ const PropertiesPage = () => {
             />
           </div>
 
+          {/* 모바일 전용 리스트 토글 바 */}
+          <button
+            type="button"
+            onClick={() => setMobileListOpen((v) => !v)}
+            aria-label={mobileListOpen ? '리스트 숨기기' : '리스트 펼치기'}
+            className="flex w-full items-center justify-center gap-1 border-b bg-background py-1.5 text-xs text-muted-foreground md:hidden"
+          >
+            {mobileListOpen ? '리스트 숨기기' : `리스트 펼치기 (${filtered.length}건)`}
+            <ChevronRight className={`h-3.5 w-3.5 transition-transform ${mobileListOpen ? 'rotate-90' : '-rotate-90'}`} />
+          </button>
+
           {/* Asset list */}
-          <div className="w-full flex-1 overflow-y-auto p-4">
-          {filtered.length === 0 ? (
-            <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-              <p className="text-sm">조건에 맞는 자산이 없습니다</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filtered.map((asset) => {
-                const isSelected = selectedAssetId === asset.id;
-                const hasCoords = hasValidKoreaCoordinate(asset);
-                return (
-                  <div
-                    key={asset.id}
-                    ref={(el) => { cardRefs.current[asset.id] = el; }}
-                    onClick={() => {
-                      setSelectedAssetId(asset.id);
-                      if (!hasCoords) {
-                        // 좌표 없음 — 사용자에게 조용히 무시 (지도 이동 없음)
-                      }
-                    }}
-                    className={`cursor-pointer rounded-lg transition-all ${
-                      isSelected ? 'ring-2 ring-accent ring-offset-2 ring-offset-background' : ''
-                    }`}
-                  >
-                    <AssetCard asset={asset} onAuthRequired={() => setAuthOpen(true)} />
-                  </div>
-                );
-              })}
+          {(listOpen || mobileListOpen) && (
+            <div className={`w-full flex-1 overflow-y-auto p-4 ${!mobileListOpen ? 'hidden md:block' : ''}`}>
+              {filtered.length === 0 ? (
+                <div className="flex h-full items-center justify-center text-center text-muted-foreground">
+                  <p className="text-sm">조건에 맞는 자산이 없습니다</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filtered.map((asset) => {
+                    const isSelected = selectedAssetId === asset.id;
+                    const hasCoords = hasValidKoreaCoordinate(asset);
+                    return (
+                      <div
+                        key={asset.id}
+                        ref={(el) => { cardRefs.current[asset.id] = el; }}
+                        onClick={() => {
+                          setSelectedAssetId(asset.id);
+                          if (!hasCoords) {
+                            // 좌표 없음 — 사용자에게 조용히 무시
+                          }
+                        }}
+                        className={`cursor-pointer transition-all ${
+                          isSelected ? 'ring-2 ring-accent ring-offset-2 ring-offset-background' : ''
+                        }`}
+                      >
+                        <AssetCard asset={asset} onAuthRequired={() => setAuthOpen(true)} />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
-          </div>
         </div>
       </div>
+
+      <Footer />
+
+
 
 
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
