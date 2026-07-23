@@ -7,7 +7,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/common/Navbar";
 import Properties from "@/pages/Properties";
-import Properties from "@/pages/Properties";
 import Analysis from "@/pages/Analysis";
 import About from "@/pages/About";
 import Mypage from "@/pages/Mypage";
