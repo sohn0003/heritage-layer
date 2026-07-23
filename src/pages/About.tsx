@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import aboutHeroBg from '@/assets/about-hero-bg.png';
 import Seo from '@/components/common/Seo';
+import { HomeSections } from './Home';
 
 // ── Hooks ───────────────────────────────────────
 const useInView = <T extends Element>(threshold = 0.2) => {

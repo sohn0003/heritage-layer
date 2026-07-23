@@ -954,3 +954,5 @@ const HomePage = () => {
 };
 
 export default HomePage;
+export { HomePage as HomeSections };
+
