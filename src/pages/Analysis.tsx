@@ -505,9 +505,7 @@ const AnalysisPage = () => {
           <div>
             {!scenarios ? (
               <p className="text-sm text-muted-foreground">분석 결과를 불러오는 중...</p>
-              {!scenarios ? (
-                <p className="text-sm text-muted-foreground">분석 결과를 불러오는 중...</p>
-              ) : (
+            ) : (
                 <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as '1' | '2' | '3')}>
                   <TabsList className="grid w-full grid-cols-3">
                     {scenarios.map((s) => (
