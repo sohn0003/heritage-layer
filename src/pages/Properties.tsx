@@ -378,18 +378,22 @@ const PropertiesPage = () => {
 
       {/* Main content */}
       <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
-        {/* Desktop filter sidebar — 접기/펼치기 가능 */}
-        {filterOpen && (
-          <aside className="relative hidden w-[280px] shrink-0 overflow-y-auto border-r bg-muted/20 p-4 md:block">
+        {/* Desktop filter sidebar — 부드러운 슬라이드 */}
+        <aside
+          className={`relative hidden shrink-0 overflow-hidden border-r bg-muted/20 transition-[width] duration-300 ease-in-out md:block ${
+            filterOpen ? 'w-[280px]' : 'w-0 border-r-0'
+          }`}
+        >
+          <div className="h-full w-[280px] overflow-y-auto p-4">
             {FilterPanel}
-          </aside>
-        )}
-        {/* Desktop filter toggle arrow — 반투명 얇은 띠 */}
+          </div>
+        </aside>
+        {/* Desktop filter toggle arrow — chevron only, no background band */}
         <button
           type="button"
           onClick={() => setFilterOpen((v) => !v)}
           aria-label={filterOpen ? '필터 숨기기' : '필터 펼치기'}
-          className="hidden h-16 w-4 shrink-0 items-center justify-center self-center text-muted-foreground/70 transition-colors hover:text-foreground md:flex"
+          className="hidden h-8 w-5 shrink-0 items-center justify-center self-center text-muted-foreground/70 transition-colors hover:text-foreground md:flex"
         >
           {filterOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
         </button>
@@ -418,18 +422,18 @@ const PropertiesPage = () => {
           />
         </div>
 
-        {/* Desktop list toggle arrow — 반투명 얇은 띠 */}
+        {/* Desktop list toggle arrow — chevron only */}
         <button
           type="button"
           onClick={() => setListOpen((v) => !v)}
           aria-label={listOpen ? '리스트 숨기기' : '리스트 펼치기'}
-          className="hidden h-16 w-4 shrink-0 items-center justify-center self-center text-muted-foreground/70 transition-colors hover:text-foreground md:flex"
+          className="hidden h-8 w-5 shrink-0 items-center justify-center self-center text-muted-foreground/70 transition-colors hover:text-foreground md:flex"
         >
           {listOpen ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
         </button>
 
-        {/* 데스크톱 우측 리스트 */}
-        <div className={`hidden flex-col overflow-hidden md:flex md:border-l ${listOpen ? 'md:w-[400px]' : 'md:w-0 md:border-l-0'}`}>
+        {/* 데스크톱 우측 리스트 — 부드러운 슬라이드 */}
+        <div className={`hidden flex-col overflow-hidden transition-[width] duration-300 ease-in-out md:flex ${listOpen ? 'md:w-[400px] md:border-l' : 'md:w-0'}`}>
           <div className="flex items-center justify-end border-b bg-background px-4 py-2">
             <span className="text-xs text-muted-foreground">전체 매물 {filtered.length}건</span>
           </div>
