@@ -103,6 +103,8 @@ const AboutPage = () => {
         description="(주)더레이어코퍼레이션이 운영하는 Heritage Layer의 비전, 팀, 그리고 유휴 부동산 재생 접근법을 소개합니다."
         path="/about"
       />
+      {/* 기존 홈 콘텐츠를 About 상단으로 이전 */}
+      <HomeSections />
       {/* ── HERO ── */}
       <section
         className="relative flex items-center justify-center px-4 text-center"
