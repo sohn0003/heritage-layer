@@ -347,7 +347,9 @@ const AnalysisPage = () => {
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-6 sm:px-8 py-8">
+      {/* 등급/블록/분석가정 밴드 */}
+      <div className="bg-background">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-8">
 
       {/* 등급 계기판 + 블록별 평가 — 2단 */}
       {scoringResult && (
@@ -382,8 +384,7 @@ const AnalysisPage = () => {
         </div>
       )}
 
-      {/* 분석 가정 안내 — 빨간 테두리 */}
-      <div className="mb-8 border border-destructive/70 bg-destructive/5 p-4 text-xs leading-relaxed text-muted-foreground">
+      <div className="border border-destructive/70 bg-destructive/5 p-4 text-xs leading-relaxed text-muted-foreground">
         <strong className="text-destructive">분석 가정:</strong>{' '}
         공시지가{' '}
         <span className="text-foreground">
@@ -393,9 +394,13 @@ const AnalysisPage = () => {
         {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
         {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
       </div>
+        </div>
+      </div>
 
-      {/* 기본 정보 — 박스 없이 선으로 구분 */}
-      <section className="mb-10 border-b border-border/60 pb-8">
+      {/* 기본 정보 + 예상 매도가 — 흰색 밴드 */}
+      <div className="bg-card text-card-foreground">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
+      <section className="mb-8">
         <h2 className="mb-5 text-base font-semibold">기본 정보</h2>
         <div className="mb-6 grid gap-5 sm:grid-cols-2">
           <RatioBar
@@ -426,8 +431,8 @@ const AnalysisPage = () => {
         </dl>
       </section>
 
-      {/* 예상 자산 매도가 — 박스 없이 */}
-      <section className="mb-10 border-b border-border/60 pb-8">
+      {/* 예상 자산 매도가 */}
+      <section>
         <h2 className="mb-5 text-base font-semibold">예상 자산 매도가</h2>
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
@@ -447,8 +452,10 @@ const AnalysisPage = () => {
           * 가격이 없는 경우 매도자 미제시, 공시지가 기준 적용
         </p>
       </section>
+        </div>
+      </div>
 
-      {/* 전문가 의견 (강점/리스크 요약) */}
+      {/* 전문가 의견 밴드 */}
       {analysis && (() => {
         const strengths = analysis.recommendation.assetSummary.keyStrengths;
         const risks = analysis.recommendation.assetSummary.keyRisks;
@@ -458,33 +465,36 @@ const AnalysisPage = () => {
           return `${t}합니다.`;
         };
         return (
-          <section className="mb-10 border-l-2 border-primary/60 pl-5">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
-            <div className="space-y-3 text-sm leading-[1.8] text-foreground">
-              {strengths.length > 0 && (
-                <p>
-                  <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
-                  본 자산은 {strengths.map(sentenceify).join(' 또한 ')}
-                </p>
-              )}
-              {risks.length > 0 && (
-                <p>
-                  <span className="font-semibold text-[hsl(var(--accent))]">리스크:</span>{' '}
-                  다만 {risks.map(sentenceify).join(' 아울러 ')}
-                </p>
-              )}
-              {strengths.length === 0 && risks.length === 0 && (
-                <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
-              )}
+          <div className="bg-background">
+            <div className="mx-auto max-w-5xl px-5 sm:px-10 py-8">
+              <section className="border-l-2 border-primary/60 pl-5">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
+                <div className="space-y-3 text-sm leading-[1.8] text-foreground">
+                  {strengths.length > 0 && (
+                    <p>
+                      <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
+                      본 자산은 {strengths.map(sentenceify).join(' 또한 ')}
+                    </p>
+                  )}
+                  {risks.length > 0 && (
+                    <p>
+                      <span className="font-semibold text-[hsl(var(--accent))]">리스크:</span>{' '}
+                      다만 {risks.map(sentenceify).join(' 아울러 ')}
+                    </p>
+                  )}
+                  {strengths.length === 0 && risks.length === 0 && (
+                    <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
+                  )}
+                </div>
+              </section>
             </div>
-          </section>
+          </div>
         );
       })()}
 
-      {/* 세부 항목 점수 섹션은 보안상 서버 전용으로 이전되었습니다. */}
-
-
-      {/* 상세 분석 섹션 */}
+      {/* 개발 시나리오 — 회색 밴드 */}
+      <div className="bg-muted/60">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
         <section>
@@ -594,7 +604,10 @@ const AnalysisPage = () => {
                           return (
                             <div className="border-t border-border/60 pt-5">
                               <div className="mb-2 flex items-baseline justify-between gap-2">
-                                <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
+                                <div className="flex items-baseline gap-2">
+                                  <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
+                                  <span className="text-[11px] text-destructive">ex) {maxAllowed.toLocaleString()}</span>
+                                </div>
                                 <span className="text-xs text-muted-foreground">
                                   최대 허용: <span className="font-semibold text-foreground tabular-nums">{maxAllowed.toLocaleString()}</span> ㎡
                                 </span>
@@ -621,9 +634,6 @@ const AnalysisPage = () => {
                                 }}
                                 className="h-9 text-sm"
                               />
-                              <p className="mt-1.5 text-xs text-muted-foreground">
-                                실제 사용할 연면적을 입력하면 하단 재무 시나리오 비교표가 비례하여 갱신됩니다.
-                              </p>
                               {usedFloorAreaByRank[scenario.rank] !== undefined &&
                                 usedFloorAreaByRank[scenario.rank] !== maxAllowed && (
                                   <button
@@ -746,7 +756,10 @@ const AnalysisPage = () => {
                                     return (
                                       <div className="mt-3 grid grid-cols-2 gap-2 rounded-md border border-border/50 bg-background/60 p-3 text-xs">
                                         <div>
-                                          <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
+                                          <div className="flex items-baseline justify-between gap-2">
+                                            <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
+                                            <span className="text-[11px] text-destructive">ex) 5</span>
+                                          </div>
                                           <Input
                                             type="number"
                                             inputMode="decimal"
@@ -762,8 +775,8 @@ const AnalysisPage = () => {
                                                 return next;
                                               });
                                             }}
-                                            placeholder="예: 5 (=5천만원/평)"
-                                            className="mt-1 h-8 text-sm"
+                                            placeholder="직접 입력"
+                                            className="mt-1 h-8 text-sm placeholder:text-destructive/60"
                                           />
                                         </div>
                                         <div>
@@ -787,7 +800,10 @@ const AnalysisPage = () => {
                               <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
                                   <div className="mb-2 flex items-baseline justify-between gap-2">
-                                    <Label className="text-sm font-semibold">연간 매출 (억원)</Label>
+                                    <div className="flex items-baseline gap-2">
+                                      <Label className="text-sm font-semibold">연간 매출 (억원)</Label>
+                                      <span className="text-[11px] text-destructive">ex) {(recommendedRevenue / 100_000_000).toFixed(1)}</span>
+                                    </div>
                                     <span className="text-xs text-muted-foreground">
                                       권장: {(recommendedRevenue / 100_000_000).toFixed(1)}억
                                     </span>
@@ -943,27 +959,45 @@ const AnalysisPage = () => {
                             ];
 
                             const renderList = (rows: ReturnType<typeof buildRows>) => (
-                              <dl className="mt-4 divide-y divide-border/40">
+                              <dl className="mt-4 divide-y divide-border/20">
                                 {rows.map((r) => (
-                                  <div key={r.label} className="flex items-baseline justify-between gap-3 py-2.5">
-                                    <dt className="text-sm text-muted-foreground leading-relaxed">{r.label}</dt>
+                                  <div key={r.label} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 py-2.5">
+                                    <dt className="text-sm text-muted-foreground leading-snug">{r.label}</dt>
                                     <dd className={`text-sm tabular-nums text-right ${r.highlight ? 'font-bold text-primary' : 'font-semibold'}`}>{r.value}</dd>
                                   </div>
                                 ))}
                               </dl>
                             );
 
+                            const levelCard = (title: string, rows: ReturnType<typeof buildRows>, tone: string) => (
+                              <div className="border border-border/40 bg-background/60 p-4">
+                                <p className={`text-xs font-semibold uppercase tracking-wider ${tone}`}>{title}</p>
+                                {renderList(rows)}
+                              </div>
+                            );
+
                             return (
-                              <Tabs defaultValue="base">
-                                <TabsList className="grid w-full grid-cols-3">
-                                  <TabsTrigger value="conservative">보수적</TabsTrigger>
-                                  <TabsTrigger value="base">기본</TabsTrigger>
-                                  <TabsTrigger value="optimistic">낙관적</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="conservative">{renderList(buildRows(levelsData.conservative))}</TabsContent>
-                                <TabsContent value="base">{renderList(buildRows(levelsData.base))}</TabsContent>
-                                <TabsContent value="optimistic">{renderList(buildRows(levelsData.optimistic))}</TabsContent>
-                              </Tabs>
+                              <>
+                                {/* PC: 3열 나란히 */}
+                                <div className="hidden md:grid md:grid-cols-3 md:gap-4 mt-4">
+                                  {levelCard('보수적', buildRows(levelsData.conservative), 'text-muted-foreground')}
+                                  {levelCard('기본', buildRows(levelsData.base), 'text-primary')}
+                                  {levelCard('낙관적', buildRows(levelsData.optimistic), 'text-[hsl(var(--accent))]')}
+                                </div>
+                                {/* 모바일: 탭 전환 */}
+                                <div className="md:hidden">
+                                  <Tabs defaultValue="base">
+                                    <TabsList className="grid w-full grid-cols-3">
+                                      <TabsTrigger value="conservative">보수적</TabsTrigger>
+                                      <TabsTrigger value="base">기본</TabsTrigger>
+                                      <TabsTrigger value="optimistic">낙관적</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="conservative">{renderList(buildRows(levelsData.conservative))}</TabsContent>
+                                    <TabsContent value="base">{renderList(buildRows(levelsData.base))}</TabsContent>
+                                    <TabsContent value="optimistic">{renderList(buildRows(levelsData.optimistic))}</TabsContent>
+                                  </Tabs>
+                                </div>
+                              </>
                             );
                           })()}
                         </div>
@@ -974,71 +1008,77 @@ const AnalysisPage = () => {
               )}
             </div>
         </section>
+      </div>
+        </div>
+      </div>
 
-        <section>
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-            <Building2 className="h-5 w-5 text-accent" /> 딜 시그널 현황
-          </h2>
-          <div className="space-y-3 text-sm text-muted-foreground">
-            {signalSummary ? (
-              <>
-                <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                  <div>
-                    <p className="flex items-center gap-1 text-xs">
-                      종합 신호 점수
-                      <TooltipProvider delayDuration={100}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-xs">
-                            <p>저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </p>
-                    <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
+      {/* 딜 시그널 밴드 — 흰색으로 구분 */}
+      <div className="bg-card text-card-foreground border-t border-border/40">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
+          <section>
+            <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+              <Building2 className="h-5 w-5 text-accent" /> 딜 시그널 현황
+            </h2>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              {signalSummary ? (
+                <>
+                  <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <p className="flex items-center gap-1 text-xs">
+                        종합 신호 점수
+                        <TooltipProvider delayDuration={100}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                              <p>저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </p>
+                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs">관심 유저 수</p>
+                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.uniqueUsers}명</p>
+                    </div>
+                    <div>
+                      <p className="text-xs">저장 / 열람 / 반복열람</p>
+                      <p className="mt-1 text-xl font-semibold text-foreground">
+                        {signalSummary.savedCount} / {signalSummary.viewCount} / {signalSummary.repeatedViewCount}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs">관심 상담 신청</p>
+                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs">관심 유저 수</p>
-                    <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.uniqueUsers}명</p>
+                  <div className="flex flex-wrap items-center gap-2 pt-2">
+                    {signalSummary.clusterDetected && (
+                      <Badge variant="default">클러스터 감지</Badge>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-xs">저장 / 열람 / 반복열람</p>
-                    <p className="mt-1 text-xl font-semibold text-foreground">
-                      {signalSummary.savedCount} / {signalSummary.viewCount} / {signalSummary.repeatedViewCount}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs">관심 상담 신청</p>
-                    <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 pt-2">
-                  {signalSummary.clusterDetected && (
-                    <Badge variant="default">클러스터 감지</Badge>
-                  )}
-                </div>
-              </>
-            ) : (
-              <p>신호 데이터를 불러오는 중...</p>
+                </>
+              ) : (
+                <p>신호 데이터를 불러오는 중...</p>
+              )}
+            </div>
+          </section>
+
+          {/* Bottom buttons */}
+          <div className="mt-8 flex flex-wrap gap-3">
+            {user && (
+              <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
             )}
+            {user && (
+              <Button onClick={handleDealInterest}>관심 상담 신청</Button>
+            )}
+            <Button variant="outline" onClick={() => navigate('/properties')}>
+              목록으로 돌아가기
+            </Button>
           </div>
-        </section>
-      </div>
-
-      {/* Bottom buttons */}
-      <div className="mt-8 flex flex-wrap gap-3">
-        {user && (
-          <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
-        )}
-        {user && (
-          <Button onClick={handleDealInterest}>관심 상담 신청</Button>
-        )}
-        <Button variant="outline" onClick={() => navigate('/properties')}>
-          목록으로 돌아가기
-        </Button>
-      </div>
+        </div>
       </div>
     </div>
   );
