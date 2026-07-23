@@ -376,7 +376,7 @@ const PropertiesPage = () => {
       </div>
 
       {/* Main content */}
-      <div className="flex h-[calc(100vh-8rem)] overflow-hidden">
+      <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
         {/* Desktop filter sidebar — 접기/펼치기 가능 */}
         {filterOpen && (
           <aside className="relative hidden w-[280px] shrink-0 overflow-y-auto border-r bg-muted/20 p-4 md:block">
