@@ -498,14 +498,13 @@ const AnalysisPage = () => {
       {/* 상세 분석 섹션 */}
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingUp className="h-5 w-5 text-accent" /> 개발 시나리오 추천
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+        <section>
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+            <TrendingUp className="h-5 w-5 text-accent" /> 개발 시나리오 추천
+          </h2>
+          <div>
+            {!scenarios ? (
+              <p className="text-sm text-muted-foreground">분석 결과를 불러오는 중...</p>
               {!scenarios ? (
                 <p className="text-sm text-muted-foreground">분석 결과를 불러오는 중...</p>
               ) : (
