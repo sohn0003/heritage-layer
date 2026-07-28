@@ -371,15 +371,17 @@ const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => {
 
       {features.map((f, i) => {
         const angle = (i / features.length) * 2 * Math.PI - Math.PI / 2;
-        const left = 50 + 50 * Math.cos(angle);
-        const top = 50 + 50 * Math.sin(angle);
+        const radius = 37;
+        const left = 50 + radius * Math.cos(angle);
+        const top = 50 + radius * Math.sin(angle);
         const Icon = f.icon;
         const isHover = hover === i;
         return (
           <div
             key={f.title}
             className="absolute -translate-x-1/2 -translate-y-1/2"
-            style={{ left: `${left}%`, top: `${top}%`, width: 'min(28%, 128px)' }}
+            style={{ left: `${left}%`, top: `${top}%`, width: 'min(26%, 120px)' }}
+
           >
             <div
               className="flex flex-col items-center"
