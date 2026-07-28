@@ -493,7 +493,35 @@ const AboutPage = () => {
         <FeatureWheel onExplore={() => navigate('/properties')} />
       </Section>
 
+      {/* 07. 지도 CTA */}
+      <section className="px-6 py-20 text-center sm:px-10 md:px-16 md:py-28" style={{ background: DARK, color: DARK_TEXT }}>
+        <div className="mx-auto max-w-5xl">
+          <Reveal>
+            <p className="font-display text-[11px] uppercase tracking-[0.35em]" style={{ color: DARK_SUB }}>Explore</p>
+            <h2 className="mx-auto mt-6 max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
+              잠든 유휴부지의 가치를 탐색하세요
+            </h2>
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="mt-12 h-[320px] w-full overflow-hidden sm:h-[440px]" style={{ border: `1px solid ${LINE_DARK}` }}>
+              <NaverMap markers={mapMarkers} className="h-full w-full" />
+            </div>
+          </Reveal>
+          <Reveal delay={200}>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="mt-10 h-11 px-8 text-sm font-light transition-colors hover:bg-white/10"
+              style={{ border: `1px solid ${LINE_DARK}`, color: DARK_TEXT }}
+            >
+              지금 확인하기
+            </button>
+          </Reveal>
+        </div>
+      </section>
+
       <Footer />
+
     </div>
   );
 };
