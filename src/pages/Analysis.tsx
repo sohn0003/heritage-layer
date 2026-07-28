@@ -517,8 +517,8 @@ const AnalysisPage = () => {
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
         <section>
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-            <TrendingUp className="h-5 w-5 text-accent" /> 개발 시나리오 추천
+          <h2 className="mb-5 flex items-center gap-2 text-2xl font-semibold">
+            <TrendingUp className="h-5 w-5 text-primary" /> 개발 시나리오 추천
           </h2>
           <div>
             {!scenarios ? (
@@ -598,8 +598,8 @@ const AnalysisPage = () => {
                         </div>
 
                         {/* 금융 구조 추천 */}
-                        <div className="border-t border-border/25 pt-5">
-                          <p className="mb-3 text-sm font-semibold">금융 구조 추천</p>
+                        <div className="border-t border-border/20 pt-5">
+                          <p className="mb-4 text-xl font-semibold">금융 구조 추천</p>
                           <div className="grid gap-4 sm:grid-cols-3">
                             <div>
                               <p className="text-xs text-muted-foreground">추천 자기자본 비율</p>
@@ -616,7 +616,7 @@ const AnalysisPage = () => {
                           </div>
                         </div>
 
-                        <div className="grid gap-6 border-t border-border/25 pt-5 sm:grid-cols-2">
+                        <div className="grid gap-6 border-t border-border/20 pt-5 sm:grid-cols-2">
                         {/* 사용 연면적 입력 (탭별 개별) */}
                         {(() => {
                           const maxAllowed = Math.round(scenario.irrResult.base.usableFloorArea ?? 0);
@@ -739,7 +739,7 @@ const AnalysisPage = () => {
                             : (recommendedRevenue / 100_000_000).toFixed(1);
                           const marginVal = marginByRank[scenario.rank] ?? 40;
                           return (
-                            <div className="space-y-5 border-t border-border/25 pt-5">
+                            <div className="space-y-5 border-t border-border/20 pt-5">
                               {hasPresale && (
                                 <div>
                                   <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -912,8 +912,8 @@ const AnalysisPage = () => {
                         {/* 재무 지표: 보수적 / 기본 / 낙관적 — 탭 방식 */}
                         <div>
                           <div className="mb-3 flex items-center gap-2">
-                            <BarChart3 className="h-4 w-4 text-accent" />
-                            <h4 className="text-sm font-semibold">재무 시나리오</h4>
+                            <BarChart3 className="h-5 w-5 text-primary" />
+                            <h4 className="text-xl font-semibold">재무 시나리오</h4>
                             <Badge variant="outline" className={`ml-auto ${feasibilityClass}`}>
                               투자 타당성: {feasibility}
                             </Badge>
@@ -983,46 +983,42 @@ const AnalysisPage = () => {
                                 value: Number.isFinite(lv.paybackYears) && lv.paybackYears > 0 ? `${lv.paybackYears}년` : '--' },
                             ];
 
-                            const renderList = (rows: ReturnType<typeof buildRows>) => (
-                              <dl className="mt-4 divide-y divide-border/20">
-                                {rows.map((r) => (
-                                  <div key={r.label} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 py-2.5">
-                                    <dt className="text-sm text-muted-foreground leading-snug">{r.label}</dt>
-                                    <dd className={`text-sm tabular-nums text-right ${r.highlight ? 'font-bold text-primary' : 'font-semibold'}`}>{r.value}</dd>
-                                  </div>
-                                ))}
-                              </dl>
-                            );
-
-                            const levelCard = (title: string, rows: ReturnType<typeof buildRows>, tone: string) => (
-                              <div className="border border-border/25 bg-background/60 p-4">
-                                <p className={`text-xs font-semibold uppercase tracking-wider ${tone}`}>{title}</p>
-                                {renderList(rows)}
-                              </div>
-                            );
+                            const scenarioColumns = [
+                              { key: 'conservative', title: '보수적', rows: buildRows(levelsData.conservative) },
+                              { key: 'base', title: '기본', rows: buildRows(levelsData.base) },
+                              { key: 'optimistic', title: '낙관적', rows: buildRows(levelsData.optimistic) },
+                            ];
+                            const labels = scenarioColumns[0].rows;
 
                             return (
-                              <>
-                                {/* PC: 3열 나란히 */}
-                                <div className="hidden md:grid md:grid-cols-3 md:gap-4 mt-4">
-                                  {levelCard('보수적', buildRows(levelsData.conservative), 'text-muted-foreground')}
-                                  {levelCard('기본', buildRows(levelsData.base), 'text-primary')}
-                                  {levelCard('낙관적', buildRows(levelsData.optimistic), 'text-[hsl(var(--accent))]')}
+                              <div className="mt-4 overflow-x-auto border border-border/20">
+                                <div className="min-w-[680px]">
+                                  <div className="grid grid-cols-[1.15fr_repeat(3,1fr)] border-b border-border/20 bg-muted/40 text-xs font-semibold text-muted-foreground">
+                                    <div className="px-4 py-3">항목</div>
+                                    {scenarioColumns.map((col) => (
+                                      <div key={col.key} className="border-l border-border/20 px-4 py-3 text-right">{col.title}</div>
+                                    ))}
+                                  </div>
+                                  <div className="divide-y divide-border/20">
+                                    {labels.map((row, rowIndex) => (
+                                      <div key={row.label} className="grid grid-cols-[1.15fr_repeat(3,1fr)] items-center">
+                                        <div className="px-4 py-3 text-sm text-muted-foreground leading-snug">{row.label}</div>
+                                        {scenarioColumns.map((col) => {
+                                          const value = col.rows[rowIndex];
+                                          return (
+                                            <div
+                                              key={`${col.key}-${row.label}`}
+                                              className={`border-l border-border/20 px-4 py-3 text-right text-sm tabular-nums ${value.highlight ? 'font-bold text-primary' : 'font-semibold'}`}
+                                            >
+                                              {value.value}
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                                {/* 모바일: 탭 전환 */}
-                                <div className="md:hidden">
-                                  <Tabs defaultValue="base">
-                                    <TabsList className="grid w-full grid-cols-3">
-                                      <TabsTrigger value="conservative">보수적</TabsTrigger>
-                                      <TabsTrigger value="base">기본</TabsTrigger>
-                                      <TabsTrigger value="optimistic">낙관적</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="conservative">{renderList(buildRows(levelsData.conservative))}</TabsContent>
-                                    <TabsContent value="base">{renderList(buildRows(levelsData.base))}</TabsContent>
-                                    <TabsContent value="optimistic">{renderList(buildRows(levelsData.optimistic))}</TabsContent>
-                                  </Tabs>
-                                </div>
-                              </>
+                              </div>
                             );
                           })()}
                         </div>
