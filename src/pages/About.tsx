@@ -82,50 +82,115 @@ const Section = ({
 );
 
 
-// ── 정적 가로 막대 그래프 ──
-const BarChart = ({ items, max, unit }: { items: { label: string; value: number }[]; max: number; unit: string }) => (
-  <div className="mx-auto max-w-2xl space-y-5 text-left">
-    {items.map((it, i) => (
-      <Reveal key={it.label} delay={i * 80}>
-        <div className="mb-1.5 flex items-baseline justify-between">
-          <span className="text-sm" style={{ color: LIGHT_SUB }}>{it.label}</span>
-          <span className="font-display text-sm tabular-nums">{it.value.toLocaleString()}{unit}</span>
-        </div>
-        <div className="h-[6px] w-full" style={{ background: 'hsl(226 20% 88%)' }}>
-          <div className="h-full" style={{ width: `${(it.value / max) * 100}%`, background: 'hsl(210 45% 55%)' }} />
-        </div>
-      </Reveal>
-    ))}
-  </div>
-);
+// ── 지도 기반 권역별 분포 ──
+const REGION_PINS = [
+  { label: '강원', value: 476, x: 56, y: 45, lx: 88, ly: 34 },
+  { label: '경북', value: 745, x: 58, y: 58, lx: 90, ly: 55 },
+  { label: '경남', value: 584, x: 52, y: 70, lx: 88, ly: 76 },
+  { label: '전북', value: 329, x: 45, y: 63, lx: 12, ly: 55 },
+  { label: '전남', value: 839, x: 43, y: 74, lx: 10, ly: 78 },
+];
 
-// ── 정적 도넛 차트 ──
+const KoreaMapChart = () => {
+  const [hover, setHover] = useState<string | null>(null);
+  return (
+    <div className="relative mx-auto aspect-[736/680] w-full max-w-[420px]">
+      <img
+        src={koreaMap.url}
+        alt="대한민국 권역별 폐교 분포 지도"
+        className="absolute inset-0 h-full w-full object-contain opacity-70"
+        style={{ mixBlendMode: 'multiply' }}
+        loading="lazy"
+      />
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+        {REGION_PINS.map((p) => (
+          <line
+            key={p.label}
+            x1={p.x} y1={p.y} x2={p.lx > 50 ? p.lx - 2 : p.lx + 8} y2={p.ly}
+            stroke={hover === p.label ? 'hsl(210 45% 45%)' : LINE_LIGHT}
+            strokeWidth="0.35"
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+      </svg>
+      {REGION_PINS.map((p) => (
+        <span
+          key={`${p.label}-dot`}
+          className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ left: `${p.x}%`, top: `${p.y}%`, background: 'hsl(210 45% 45%)' }}
+        />
+      ))}
+      {REGION_PINS.map((p) => (
+        <div
+          key={`${p.label}-label`}
+          onMouseEnter={() => setHover(p.label)}
+          onMouseLeave={() => setHover(null)}
+          className="absolute -translate-y-1/2 whitespace-nowrap text-left transition-opacity"
+          style={{
+            left: p.lx > 50 ? `${p.lx}%` : undefined,
+            right: p.lx > 50 ? undefined : `${100 - p.lx}%`,
+            top: `${p.ly}%`,
+          }}
+        >
+          <span className="text-xs" style={{ color: LIGHT_SUB }}>{p.label}</span>
+          <span className="ml-2 font-display text-sm tabular-nums" style={{ color: hover === p.label ? 'hsl(210 45% 45%)' : LIGHT_TEXT }}>
+            {p.value.toLocaleString()}개
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ── 도넛 차트 (선만 사용) ──
 const Donut = ({ segments }: { segments: { label: string; value: number; shade: string }[] }) => {
   const r = 58, c = 2 * Math.PI * r;
+  const [hover, setHover] = useState<string | null>(null);
   let offset = 0;
   return (
     <div className="flex flex-col items-center gap-8 sm:flex-row sm:justify-center sm:gap-12">
-      <svg width="170" height="170" viewBox="0 0 170 170" className="-rotate-90 shrink-0">
-        <circle cx="85" cy="85" r={r} fill="none" stroke="hsl(226 20% 88%)" strokeWidth="16" />
-        {segments.map((s) => {
-          const len = (s.value / 100) * c;
-          const node = (
-            <circle
-              key={s.label}
-              cx="85" cy="85" r={r} fill="none"
-              stroke={s.shade} strokeWidth="16"
-              strokeDasharray={`${Math.max(len - 1.5, 0)} ${c - len + 1.5}`}
-              strokeDashoffset={-offset}
-            />
-          );
-          offset += len;
-          return node;
-        })}
-      </svg>
+      <div className="relative shrink-0">
+        <svg width="170" height="170" viewBox="0 0 170 170" className="-rotate-90">
+          <circle cx="85" cy="85" r={r} fill="none" stroke={LINE_LIGHT} strokeWidth="1" />
+          {segments.map((s) => {
+            const len = (s.value / 100) * c;
+            const node = (
+              <circle
+                key={s.label}
+                cx="85" cy="85" r={r} fill="none"
+                stroke={s.shade}
+                strokeWidth={hover === s.label ? 8 : 2}
+                strokeDasharray={`${Math.max(len - 2, 0)} ${c - len + 2}`}
+                strokeDashoffset={-offset}
+                className="transition-all duration-300"
+                onMouseEnter={() => setHover(s.label)}
+                onMouseLeave={() => setHover(null)}
+              />
+            );
+            offset += len;
+            return node;
+          })}
+        </svg>
+        <div
+          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center transition-opacity duration-300"
+          style={{ opacity: hover ? 1 : 0 }}
+        >
+          <span className="text-xs" style={{ color: LIGHT_SUB }}>{hover}</span>
+          <span className="font-display text-lg tabular-nums">
+            {segments.find((s) => s.label === hover)?.value}%
+          </span>
+        </div>
+      </div>
       <div className="space-y-3 text-left">
         {segments.map((s) => (
-          <div key={s.label} className="flex items-center gap-3 text-sm">
-            <span className="h-2.5 w-2.5 shrink-0" style={{ background: s.shade }} />
+          <div
+            key={s.label}
+            className="flex cursor-default items-center gap-3 text-sm transition-opacity"
+            style={{ opacity: hover && hover !== s.label ? 0.45 : 1 }}
+            onMouseEnter={() => setHover(s.label)}
+            onMouseLeave={() => setHover(null)}
+          >
+            <span className="h-2.5 w-2.5 shrink-0" style={{ border: `1px solid ${s.shade}` }} />
             <span style={{ color: LIGHT_SUB }}>{s.label}</span>
             <span className="ml-6 font-display tabular-nums">{s.value}%</span>
           </div>
@@ -134,6 +199,7 @@ const Donut = ({ segments }: { segments: { label: string; value: number; shade: 
     </div>
   );
 };
+
 
 // ── 정적 라인(추이) 차트 ──
 const TrendChart = ({ data, labels }: { data: number[]; labels: string[] }) => {
