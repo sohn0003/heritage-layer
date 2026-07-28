@@ -322,7 +322,7 @@ const AnalysisPage = () => {
         path="/analysis"
       />
       {/* 자산 핵심 정보 헤더 */}
-      <div className="border-b border-primary-foreground/10 bg-primary text-primary-foreground">
+      <div className="section-navy border-b border-primary-foreground/10 bg-primary text-primary-foreground">
         <div className="mx-auto max-w-5xl px-6 sm:px-8 py-12 sm:py-16">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
@@ -369,7 +369,7 @@ const AnalysisPage = () => {
       </div>
 
       {/* 등급/블록/기본 정보 — 블루 밴드 */}
-      <div className="bg-primary text-primary-foreground">
+      <div className="section-navy bg-primary text-primary-foreground">
         <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10 sm:py-14">
 
       {/* 블록별 평가(좌) + 등급 계기판(우) */}
@@ -407,7 +407,7 @@ const AnalysisPage = () => {
                   <span className="mt-3 border border-primary-foreground/20 px-3 py-1 text-xs text-primary-foreground/70">분석 가정</span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent side="bottom" align="center" className="w-72 rounded-none border-primary-foreground/10 bg-primary text-primary-foreground shadow-xl">
+              <TooltipContent side="bottom" align="center" className="section-navy w-72 rounded-none border-primary-foreground/10 bg-primary text-primary-foreground shadow-xl">
                 <div className="space-y-2 py-1 text-xs leading-relaxed">
                   {assumptionItems.map((item) => (
                     <div key={item.label} className="grid grid-cols-[72px_1fr] gap-3">
