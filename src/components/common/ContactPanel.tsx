@@ -134,7 +134,7 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
                 <FieldLabel ko="문의 항목" en="Inquiry type" required />
                 <Select value={type} onValueChange={setType}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-[200]">
                     {inquiryTypes.map((t) => (
                       <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>
                     ))}
@@ -179,7 +179,7 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
                           <FieldLabel ko="유형" en="Type" htmlFor="cp-atype" required />
                           <Select value={assetType} onValueChange={setAssetType}>
                             <SelectTrigger id="cp-atype"><SelectValue placeholder="유형 선택" /></SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="z-[200]">
                               <SelectItem value="토지">토지</SelectItem>
                               <SelectItem value="단독주택">단독주택</SelectItem>
                               <SelectItem value="상가/근린생활시설">상가/근린생활시설</SelectItem>
@@ -193,7 +193,7 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
                           <FieldLabel ko="소유자" en="Owner" htmlFor="cp-owner" required />
                           <Select value={ownerType} onValueChange={setOwnerType}>
                             <SelectTrigger id="cp-owner"><SelectValue placeholder="소유자 구분" /></SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="z-[200]">
                               <SelectItem value="기관">기관</SelectItem>
                               <SelectItem value="개인">개인</SelectItem>
                             </SelectContent>
