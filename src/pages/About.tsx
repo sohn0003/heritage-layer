@@ -102,7 +102,6 @@ const KoreaMapChart = () => {
         alt="대한민국 권역별 폐교 분포 지도"
         className="absolute inset-0 h-full w-full object-contain opacity-70"
         style={{ mixBlendMode: 'multiply' }}
-        loading="lazy"
       />
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
         {REGION_PINS.map((p) => (
