@@ -1029,15 +1029,6 @@ const AnalysisPage = () => {
         </div>
       </div>
 
-      {/* 하단 액션 */}
-      <div className="border-t border-border/25 bg-background">
-        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
-          <Button variant="outline" onClick={() => navigate('/properties')}>
-            목록으로 돌아가기
-          </Button>
-        </div>
-      </div>
-
     </div>
   );
 };
