@@ -74,6 +74,24 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
 
   return (
     <div className={`fixed inset-0 z-[120] ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
+      <style>{`
+        .cp-fields input,
+        .cp-fields textarea,
+        .cp-fields [role="combobox"] {
+          background: transparent !important;
+          border: 0 !important;
+          border-bottom: 1px solid rgba(0,0,0,0.14) !important;
+          border-radius: 0 !important;
+          padding-left: 0 !important;
+          box-shadow: none !important;
+        }
+        .cp-fields input:focus,
+        .cp-fields textarea:focus,
+        .cp-fields [role="combobox"]:focus {
+          border-bottom-color: rgba(0,0,0,0.5) !important;
+          outline: none !important;
+        }
+      `}</style>
       {/* backdrop */}
       <div
         className="absolute inset-0 bg-black/50 transition-opacity duration-300"
