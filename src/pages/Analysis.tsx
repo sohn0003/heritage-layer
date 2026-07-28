@@ -82,6 +82,83 @@ const formatPercent = (n: number | null | undefined) =>
 const formatNumber = (n: number | null | undefined) =>
   n == null || !Number.isFinite(n) ? '--' : Math.round(n).toLocaleString();
 
+/**
+ * 재무 시나리오 표.
+ * 데스크톱: 3열 비교표 / 모바일: 시나리오 선택 버튼 + 단일 열
+ */
+type ScenarioRow = { label: string; value: string; highlight?: boolean };
+type ScenarioColumn = { key: string; title: string; rows: ScenarioRow[] };
+
+const ScenarioTable = ({ columns, labels }: { columns: ScenarioColumn[]; labels: ScenarioRow[] }) => {
+  const [active, setActive] = useState(1);
+  const activeCol = columns[active] ?? columns[0];
+
+  return (
+    <div className="mt-4">
+      {/* 모바일 — 시나리오 선택 */}
+      <div className="md:hidden">
+        <div className="grid grid-cols-3 border border-border/20">
+          {columns.map((col, i) => (
+            <button
+              key={col.key}
+              type="button"
+              onClick={() => setActive(i)}
+              className={`px-2 py-2.5 text-xs font-medium transition-colors ${i > 0 ? 'border-l border-border/20' : ''} ${
+                i === active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+              }`}
+            >
+              {col.title}
+            </button>
+          ))}
+        </div>
+        <div className="divide-y divide-border/20 border border-t-0 border-border/20">
+          {labels.map((row, rowIndex) => {
+            const value = activeCol.rows[rowIndex];
+            return (
+              <div key={row.label} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                <span className="text-xs leading-snug text-muted-foreground">{row.label}</span>
+                <span className={`text-sm tabular-nums ${value.highlight ? 'font-bold text-primary' : 'font-semibold'}`}>
+                  {value.value}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 데스크톱 — 3열 비교 */}
+      <div className="hidden overflow-x-auto border border-border/20 md:block">
+        <div className="min-w-[680px]">
+          <div className="grid grid-cols-[1.15fr_repeat(3,1fr)] border-b border-border/20 bg-muted/40 text-xs font-semibold text-muted-foreground">
+            <div className="px-4 py-3">항목</div>
+            {columns.map((col) => (
+              <div key={col.key} className="border-l border-border/20 px-4 py-3 text-right">{col.title}</div>
+            ))}
+          </div>
+          <div className="divide-y divide-border/20">
+            {labels.map((row, rowIndex) => (
+              <div key={row.label} className="grid grid-cols-[1.15fr_repeat(3,1fr)] items-center">
+                <div className="px-4 py-3 text-sm leading-snug text-muted-foreground">{row.label}</div>
+                {columns.map((col) => {
+                  const value = col.rows[rowIndex];
+                  return (
+                    <div
+                      key={`${col.key}-${row.label}`}
+                      className={`border-l border-border/20 px-4 py-3 text-right text-sm tabular-nums ${value.highlight ? 'font-bold text-primary' : 'font-semibold'}`}
+                    >
+                      {value.value}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AnalysisPage = () => {
   const [searchParams] = useSearchParams();
   const assetId = searchParams.get('id');
