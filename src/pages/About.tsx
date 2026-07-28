@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Seo from '@/components/common/Seo';
 import Footer from '@/components/layout/Footer';
+import NaverMap from '@/components/map/NaverMap';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Search, FileText, Award, Lightbulb, BarChart3, GitCompare,
-  Landmark, HandCoins, Bookmark,
+  Landmark, HandCoins, Bookmark, ChevronDown,
 } from 'lucide-react';
 
 // ── 톤: 다크 네이비 / 라이트 블루 2단계 대비만 사용 ──
@@ -304,6 +306,25 @@ const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => (
 
 const AboutPage = () => {
   const navigate = useNavigate();
+  const [trendOpen, setTrendOpen] = useState(false);
+  const [mapMarkers, setMapMarkers] = useState<{ lat: number; lng: number; title?: string; id?: string }[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from('assets_public')
+        .select('id, address, latitude, longitude')
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null)
+        .limit(200);
+      if (data) {
+        setMapMarkers(
+          data.map((a: any) => ({ lat: a.latitude, lng: a.longitude, title: a.address, id: a.id }))
+        );
+      }
+    })();
+  }, []);
+
 
   return (
     <div className="min-h-screen [word-break:keep-all]" style={{ background: DARK }}>
@@ -336,55 +357,69 @@ const AboutPage = () => {
           ]}
         />
 
-        <div className="mt-16">
-          <Reveal>
-            <h3 className="text-base font-light md:text-lg">권역별 폐교 분포 (Top 5)</h3>
-          </Reveal>
-          <div className="mt-8">
-            <BarChart
-              unit="개"
-              max={1000}
-              items={[
-                { label: '전남', value: 839 },
-                { label: '경북', value: 745 },
-                { label: '경남', value: 584 },
-                { label: '강원', value: 476 },
-                { label: '전북', value: 329 },
-              ]}
-            />
-          </div>
-        </div>
-
-        <div className="mt-16">
-          <Reveal>
-            <h3 className="text-base font-light md:text-lg">소유 구분 비율</h3>
-            <p className="mt-3 text-xs" style={{ color: LIGHT_SUB }}>국·공유 자산이 절반 이상 — 민관협력 기회가 큽니다.</p>
-          </Reveal>
-          <Reveal delay={100}>
+        <div className="mt-16 grid grid-cols-1 gap-14 md:grid-cols-2 md:gap-10">
+          <div>
+            <Reveal>
+              <h3 className="text-base font-light md:text-lg">권역별 폐교 분포 (Top 5)</h3>
+            </Reveal>
             <div className="mt-8">
-              <Donut
-                segments={[
-                  { label: '국·공유', value: 62, shade: 'hsl(210 45% 45%)' },
-                  { label: '사유', value: 28, shade: 'hsl(210 40% 68%)' },
-                  { label: '기타', value: 10, shade: 'hsl(210 25% 84%)' },
+              <BarChart
+                unit="개"
+                max={1000}
+                items={[
+                  { label: '전남', value: 839 },
+                  { label: '경북', value: 745 },
+                  { label: '경남', value: 584 },
+                  { label: '강원', value: 476 },
+                  { label: '전북', value: 329 },
                 ]}
               />
             </div>
-          </Reveal>
-        </div>
 
-        <div className="mt-16">
-          <Reveal>
-            <h3 className="text-base font-light md:text-lg">연도별 신규 폐교 발생 추이</h3>
-          </Reveal>
-          <Reveal delay={100}>
-            <div className="mt-8">
-              <TrendChart
-                data={[112, 138, 165, 190, 224, 261]}
-                labels={['2019', '2020', '2021', '2022', '2023', '2024']}
-              />
+            <div className="mx-auto mt-10 max-w-2xl">
+              <button
+                type="button"
+                onClick={() => setTrendOpen((v) => !v)}
+                className="flex w-full items-center justify-between py-3 text-left text-sm font-light"
+                style={{ borderTop: `1px solid ${LINE_LIGHT}`, borderBottom: `1px solid ${LINE_LIGHT}`, color: LIGHT_TEXT }}
+              >
+                <span>연도별 신규 폐교 발생 추이</span>
+                <ChevronDown
+                  className="h-4 w-4 transition-transform duration-300"
+                  style={{ color: LIGHT_SUB, transform: trendOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                />
+              </button>
+              <div
+                className="overflow-hidden transition-all duration-500"
+                style={{ maxHeight: trendOpen ? 320 : 0, opacity: trendOpen ? 1 : 0 }}
+              >
+                <div className="pt-8">
+                  <TrendChart
+                    data={[112, 138, 165, 190, 224, 261]}
+                    labels={['2019', '2020', '2021', '2022', '2023', '2024']}
+                  />
+                </div>
+              </div>
             </div>
-          </Reveal>
+          </div>
+
+          <div>
+            <Reveal>
+              <h3 className="text-base font-light md:text-lg">소유 구분 비율</h3>
+              <p className="mt-3 text-xs" style={{ color: LIGHT_SUB }}>국·공유 자산이 절반 이상 — 민관협력 기회가 큽니다.</p>
+            </Reveal>
+            <Reveal delay={100}>
+              <div className="mt-8">
+                <Donut
+                  segments={[
+                    { label: '국·공유', value: 62, shade: 'hsl(210 45% 45%)' },
+                    { label: '사유', value: 28, shade: 'hsl(210 40% 68%)' },
+                    { label: '기타', value: 10, shade: 'hsl(210 25% 84%)' },
+                  ]}
+                />
+              </div>
+            </Reveal>
+          </div>
         </div>
       </Section>
 
@@ -458,7 +493,35 @@ const AboutPage = () => {
         <FeatureWheel onExplore={() => navigate('/properties')} />
       </Section>
 
+      {/* 07. 지도 CTA */}
+      <section className="px-6 py-20 text-center sm:px-10 md:px-16 md:py-28" style={{ background: DARK, color: DARK_TEXT }}>
+        <div className="mx-auto max-w-5xl">
+          <Reveal>
+            <p className="font-display text-[11px] uppercase tracking-[0.35em]" style={{ color: DARK_SUB }}>Explore</p>
+            <h2 className="mx-auto mt-6 max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
+              잠든 유휴부지의 가치를 탐색하세요
+            </h2>
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="mt-12 h-[320px] w-full overflow-hidden sm:h-[440px]" style={{ border: `1px solid ${LINE_DARK}` }}>
+              <NaverMap markers={mapMarkers} className="h-full w-full" />
+            </div>
+          </Reveal>
+          <Reveal delay={200}>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="mt-10 h-11 px-8 text-sm font-light transition-colors hover:bg-white/10"
+              style={{ border: `1px solid ${LINE_DARK}`, color: DARK_TEXT }}
+            >
+              지금 확인하기
+            </button>
+          </Reveal>
+        </div>
+      </section>
+
       <Footer />
+
     </div>
   );
 };
