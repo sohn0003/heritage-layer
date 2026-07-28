@@ -187,8 +187,11 @@ const steps = [
   { step: 'STEP 05', title: '딜 연결', desc: '브릿지 솔루션으로 기회 발굴부터 PM까지 지원합니다.' },
 ];
 
-const StepCircles = () => {
+const StepCircles = ({ tone = 'dark' as Tone }: { tone?: Tone }) => {
   const [active, setActive] = useState<number | null>(null);
+  const line = tone === 'dark' ? LINE_DARK : LINE_LIGHT;
+  const sub = tone === 'dark' ? DARK_SUB : LIGHT_SUB;
+  const activeBg = tone === 'dark' ? 'hsl(0 0% 100% / 0.08)' : 'hsl(0 0% 100%)';
   return (
     <div>
       <div className="relative mx-auto flex max-w-4xl flex-wrap items-start justify-center gap-x-4 gap-y-8 sm:flex-nowrap">
@@ -196,7 +199,7 @@ const StepCircles = () => {
           <Reveal key={s.step} delay={i * 120} className="flex-1">
             <div className="flex flex-col items-center">
               <div className="flex w-full items-center">
-                <div className="hidden h-px flex-1 sm:block" style={{ background: i === 0 ? 'transparent' : LINE_DARK }} />
+                <div className="hidden h-px flex-1 sm:block" style={{ background: i === 0 ? 'transparent' : line }} />
                 <button
                   type="button"
                   onMouseEnter={() => setActive(i)}
@@ -206,19 +209,19 @@ const StepCircles = () => {
                   onClick={() => setActive(active === i ? null : i)}
                   className="flex h-24 w-24 shrink-0 flex-col items-center justify-center rounded-full transition-all duration-300 sm:h-28 sm:w-28"
                   style={{
-                    border: `1px solid ${active === i ? 'hsl(210 45% 72%)' : LINE_DARK}`,
-                    background: active === i ? 'hsl(0 0% 100% / 0.08)' : 'transparent',
+                    border: `1px solid ${active === i ? 'hsl(210 45% 55%)' : line}`,
+                    background: active === i ? activeBg : 'transparent',
                     transform: active === i ? 'scale(1.06)' : 'scale(1)',
                   }}
                 >
-                  <span className="font-display text-[9px] tracking-[0.2em]" style={{ color: DARK_SUB }}>{s.step}</span>
+                  <span className="font-display text-[9px] tracking-[0.2em]" style={{ color: sub }}>{s.step}</span>
                   <span className="mt-1.5 text-sm font-light">{s.title}</span>
                 </button>
-                <div className="hidden h-px flex-1 sm:block" style={{ background: i === steps.length - 1 ? 'transparent' : LINE_DARK }} />
+                <div className="hidden h-px flex-1 sm:block" style={{ background: i === steps.length - 1 ? 'transparent' : line }} />
               </div>
               <p
                 className="mt-3 min-h-[3.5rem] px-1 text-center text-[11px] leading-[1.7] transition-opacity duration-300 sm:min-h-[4.5rem]"
-                style={{ color: DARK_SUB, opacity: active === i ? 1 : 0 }}
+                style={{ color: sub, opacity: active === i ? 1 : 0 }}
               >
                 {s.desc}
               </p>
@@ -226,10 +229,11 @@ const StepCircles = () => {
           </Reveal>
         ))}
       </div>
-      <p className="mt-2 text-xs" style={{ color: DARK_SUB }}>각 단계를 마우스로 올려보세요</p>
+      <p className="mt-2 text-xs" style={{ color: sub }}>각 단계를 마우스로 올려보세요</p>
     </div>
   );
 };
+
 
 // ── 플랫폼 기능 원형 다이어그램 ──
 const features = [
