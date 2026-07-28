@@ -125,6 +125,30 @@
   }
 }
 
+@layer components {
+  /* 다크 페이지 안에서 밝은 배경으로 반전되는 섹션 */
+  .section-light {
+    --background: 0 0% 100%;
+    --foreground: 226 35% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 226 35% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 226 35% 12%;
+    --primary: 226 40% 18%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 35% 92%;
+    --secondary-foreground: 226 35% 12%;
+    --muted: 210 30% 96%;
+    --muted-foreground: 210 15% 45%;
+    --accent: 25 55% 45%;
+    --accent-foreground: 0 0% 100%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 226 40% 18%;
+    @apply bg-background text-foreground;
+  }
+}
+
 @keyframes barShine {
   0%   { transform: translateX(-100%); }
   60%  { transform: translateX(400%); }
