@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
 import ContactPanel from './ContactPanel';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import logo from '@/assets/logo.svg';
 
 const navItems = [
