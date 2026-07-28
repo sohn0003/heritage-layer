@@ -504,7 +504,7 @@ const AnalysisPage = () => {
       })()}
 
       {/* 개발 시나리오 — 회색 밴드 */}
-      <div className="bg-muted/60">
+      <div className="section-light">
         <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
