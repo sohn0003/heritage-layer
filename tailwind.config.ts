@@ -14,7 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["'Pretendard Variable'", "Pretendard", "sans-serif"],
+        sans: ["'Pretendard Variable'", "Pretendard", "'Space Grotesk'", "system-ui", "sans-serif"],
+        display: ["'Space Grotesk'", "'Pretendard Variable'", "Pretendard", "sans-serif"],
+        mono: ["'JetBrains Mono'", "ui-monospace", "'SF Mono'", "Menlo", "monospace"],
         serif: ["'Pretendard Variable'", "Pretendard", "sans-serif"],
       },
       colors: {

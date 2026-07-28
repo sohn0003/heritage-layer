@@ -1,72 +1,42 @@
-## 목표
-플랫폼을 완전 무료로 전환. 구독 3단계(Free/Pro/Enterprise) 및 상세 보고서 건별 결제 시스템을 전부 제거하고, 모든 사용자에게 상세 분석 접근 권한 부여.
+## 1. 차이점 분석
 
-## 제거 대상
+### Cosmo Platform UX (https://preview--cosmos-pulse-ui.lovable.app/)
+- **Body 폰트 순서**: Pretendard → Space Grotesk → 시스템 폰트
+  - 한글/영문/숫자 모두 Pretendard를 우선으로 렌더링
+- **Display/Heading**: Space Grotesk는 큰 타이틀에만 사용
+- **Heading 스타일**: `font-weight: 300`, `letter-spacing: -0.02em`
+- **Body 스타일**: `letter-spacing: -0.01em`, `font-weight: 400`
+- **렌더링 보정**: `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, `text-rendering: optimizeLegibility`
+- **Mono**: JetBrains Mono
+- **결과**: 전체적으로 얇고, 타이트한 글자간격, 부드러운 안티앨리어싱 느낌
 
-### 1. 페이지 & 라우트 (`src/App.tsx`)
-- `/pricing` (Pricing 페이지)
-- `/checkout/toss`, `/checkout/toss/success`, `/checkout/toss/fail`, `/checkout/toss/demo`
-- `/checkout/toss/unlock`, `/checkout/toss/unlock/success`
-- 관련 파일 삭제: `src/pages/Pricing.tsx`, `src/pages/checkout/*` 전체
-- `PaymentTestModeBanner` 제거
+### Heritage Layer (현재)
+- `src/index.css`에서 body/heading에 `Space Grotesk`를 **먼저** 나열
+  - 영문/숫자는 Space Grotesk로, 한글만 Pretendard 폴백
+- Heading은 `font-semibold`/`font-bold` 중심, 기본 letter-spacing
+- 폰트 스무딩/렌더링 보정 미적용
+- Space Grotesk 300 weight는 로드하지 않음
+- **결과**: 더 굵고 기하학적인(Geometric) 느낌, 상대적으로 넓고 둔탁한 텍스트
 
-### 2. 결제 관련 컴포넌트/훅/라이브러리
-- `src/components/payments/` (PaymentMethodModal, UnlockReportModal)
-- `src/components/common/UnlockOverlay.tsx`, `ProLockOverlay.tsx`
-- `src/components/common/PaymentTestModeBanner.tsx`
-- `src/components/mypage/SubscriptionCard.tsx`
-- `src/hooks/usePaddleCheckout.ts`, `src/hooks/useAssetUnlock.ts`
-- `src/lib/paddle.ts`, `src/lib/toss.ts`, `src/lib/entitlements.ts`
-- `src/assets/paddle-logo*`, `src/assets/toss-payments-logo*`
+## 2. 구현 내용
 
-### 3. Edge Functions (`supabase/functions/`)
-- `payments-webhook`, `get-paddle-price`, `paddle-customer-portal`
-- `toss-confirm-unlock`, `toss-issue-billing-key`, `toss-cancel-subscription`
-- `_shared/paddle.ts`
+- **Global font-family 조정** (`src/index.css`)
+  - Body: `Pretendard Variable`, `Pretendard`, `Space Grotesk`, system-ui, sans-serif
+  - Display/Heading: `Space Grotesk`, `Pretendard`, sans-serif
+- **Typography 세팅**
+  - `body`: `letter-spacing: -0.01em`, `font-weight: 400`
+  - `h1~h6`: `font-weight: 300` (너무 얇다면 `400`), `letter-spacing: -0.02em`
+  - `html/body`: `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, `text-rendering: optimizeLegibility`
+- **Google Fonts import** (`index.html`)
+  - Space Grotesk 300 weight 추가 (`wght@300;400;500;600`)
+- **(선택) Mono 폰트** — JetBrains Mono 추가
+- **Tailwind config** (`tailwind.config.ts`)
+  - `fontFamily`에 `display` 토큰 추가, `sans`는 Pretendard 우선으로 재정의
+- **검증**
+  - Preview에서 `/analysis`, `/properties`, `/about`의 한글/영문/숫자 혼용 텍스트 확인
+  - Heading이 너무 얇지 않은지 모바일/데스크톱에서 확인
 
-### 4. AuthContext 정리 (`src/contexts/AuthContext.tsx`)
-- `subscriptionTier`, `hasProAccess`, `refreshTier` 제거 또는 모두 무료/full access로 고정
-- 안전한 방식: `hasProAccess`를 항상 `true` 반환하도록 하고 `subscriptionTier`를 `'pro'` 고정으로 유지 → 다른 컴포넌트 파급 최소화
-- 그러나 요청이 "완전 제거"이므로, 사용처를 모두 제거하는 방향 선호
-
-### 5. 네비게이션 & 링크 정리
-- `Navbar` 에서 요금제 링크 제거
-- `Home`, `Bridge`, `Mypage` 등에서 `/pricing`, `Pro 잠금 오버레이`, `구독 카드` 참조 제거
-- `Analysis.tsx`에서 상세 보고서 잠금(UnlockOverlay/ProLockOverlay) 제거 → 모든 사용자에게 전체 분석 노출
-- `Properties.tsx`, `AssetCard.tsx` 등의 잠금 UI 제거
-- `AuthModal`의 결제 관련 문구 정리
-
-### 6. DB & 마이그레이션
-- 기존 `subscriptions`, `asset_unlocks`(있다면) 테이블은 그대로 두되 코드 참조만 제거 (데이터 보존).
-- 신규 마이그레이션은 만들지 않음 (요청 범위 밖의 파괴적 변경 회피).
-
-### 7. 환경 변수 / 시크릿
-- `.env*` 에서 `VITE_TOSS_CLIENT_KEY`, `VITE_PADDLE_*` 관련 항목 제거
-- Supabase 시크릿(Paddle/Toss)은 사용자에게 안내만 하고 직접 삭제하지 않음
-
-### 8. 문서 / 메모리
-- `mem://index.md`에서 결제 관련 Core 항목(`hasProAccess`, 카카오 로그인 관련 등) 정리
-- `mem://features/payments`, `mem://features/pro-lock` 메모리 항목 제거 (index에서도 삭제)
-
-## 기술 세부
-
-### AuthContext 처리 방안
-두 가지 선택:
-- **A. 완전 삭제**: `subscriptionTier`, `hasProAccess`, `refreshTier`, `isAdmin` 중 결제 관련만 제거. 모든 사용처(수십 곳 예상)를 수정.
-- **B. 스텁 유지**: 하위호환 위해 `hasProAccess: true` 고정, `subscriptionTier: 'pro'` 고정으로 유지. 사용처 수정 최소화.
-
-→ **A(완전 삭제)** 권장: 사용자 요청이 "완전 제거"이며 장기 유지보수 관점에서 깔끔.
-
-### 잠금 UI가 있는 곳 처리
-- `<UnlockOverlay>`, `<ProLockOverlay>` 래퍼 제거 → 자식 컴포넌트를 그대로 노출
-- `hasProAccess` 조건 분기 제거 → 조건 없는 렌더링
-
-## 확인 필요 사항
-1. **Mypage의 구독 카드**를 완전히 제거해도 되는지 (사용자 계정 정보 카드는 유지)
-2. **결제 관련 시크릿/DB 테이블**은 그대로 두는 방향이 맞는지 (나중에 되돌릴 여지 확보)
-3. **Bridge Solution 페이지**(`/bridge`)는 유지하는지 — 이는 프로젝트 단위 유료 실행 지원이라 구독과는 별개인데, 함께 없앨지 유지할지
-
-## 산출물
-- 삭제/수정된 파일 목록
-- 빌드 & 타입체크 통과
-- 앱 전역에서 요금제/결제/잠금 UI 완전 부재 확인
+## 3. 변경하지 않는 것
+- 컬러 팔레트 (navy/gold) 및 다크 테마 유지
+- Pretendard Variable 사용 유지 — 별도 static 파일 교체 없음
+- 페이지별 추가 폰트 오버라이드는 하지 않음 (한 곳에서 통제)
