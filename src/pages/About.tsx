@@ -266,22 +266,22 @@ const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => (
       const top = 50 + 50 * Math.sin(angle);
       const Icon = f.icon;
       return (
-        <Reveal key={f.title} delay={i * 70}>
+        <div
+          key={f.title}
+          className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center animate-fade-in"
+          style={{ left: `${left}%`, top: `${top}%`, width: 'min(28%, 128px)', animationDelay: `${i * 70}ms`, animationFillMode: 'both' }}
+        >
           <div
-            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"
-            style={{ left: `${left}%`, top: `${top}%`, width: 'min(28%, 128px)' }}
+            className="flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14"
+            style={{ background: LIGHT, border: `1px solid ${LINE_LIGHT}` }}
           >
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14"
-              style={{ background: LIGHT, border: `1px solid ${LINE_LIGHT}` }}
-            >
-              <Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: 'hsl(210 45% 45%)' }} />
-            </div>
-            <p className="mt-2 text-center text-[10px] leading-tight sm:text-xs" style={{ color: LIGHT_SUB }}>
-              {f.title}
-            </p>
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: 'hsl(210 45% 45%)' }} />
           </div>
-        </Reveal>
+          <p className="mt-2 text-center text-[10px] leading-tight sm:text-xs" style={{ color: LIGHT_SUB }}>
+            {f.title}
+          </p>
+        </div>
+
       );
     })}
   </div>
