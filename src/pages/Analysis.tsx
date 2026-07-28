@@ -412,7 +412,7 @@ const AnalysisPage = () => {
                   <Badge variant="outline" className="border-primary-foreground/25 bg-primary-foreground/10 text-primary-foreground">정부협력</Badge>
                 )}
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold leading-snug">{asset.address}</h1>
+              <h1 className="text-base sm:text-3xl font-bold leading-snug">{asset.address}</h1>
               <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-primary-foreground/70 leading-relaxed">
                 <span>방치 기간: {asset.idle_years ?? '-'}년</span>
                 <span className="opacity-40">·</span>
@@ -597,7 +597,7 @@ const AnalysisPage = () => {
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
         <section>
-          <h2 className="mb-5 flex items-center gap-2 text-2xl font-semibold">
+          <h2 className="mb-5 flex items-center gap-2 text-base sm:text-2xl font-semibold">
             <TrendingUp className="h-5 w-5 text-primary" /> 개발 시나리오 추천
           </h2>
           <div>
@@ -628,7 +628,7 @@ const AnalysisPage = () => {
                       <TabsContent key={scenario.rank} value={String(scenario.rank)} className="mt-6 space-y-6">
                         {/* 시나리오 헤더 */}
                         <div>
-                          <h3 className="text-xl font-bold leading-tight">
+                          <h3 className="text-xs sm:text-xl font-bold leading-tight">
                             {scenario.rank}순위 · {scenario.concept.replace(/^\d+순위:\s*/, '')}
                           </h3>
                           <div className="mt-2 flex flex-wrap gap-2">
@@ -679,7 +679,7 @@ const AnalysisPage = () => {
 
                         {/* 금융 구조 추천 */}
                         <div className="border-t border-border/20 pt-5">
-                          <p className="mb-4 text-xl font-semibold">금융 구조 추천</p>
+                          <p className="mb-4 text-xs sm:text-xl font-semibold">금융 구조 추천</p>
                           <div className="grid gap-4 sm:grid-cols-3">
                             <div>
                               <p className="text-xs text-muted-foreground">추천 자기자본 비율</p>
@@ -993,7 +993,7 @@ const AnalysisPage = () => {
                         <div>
                           <div className="mb-3 flex items-center gap-2">
                             <BarChart3 className="h-5 w-5 text-primary" />
-                            <h4 className="text-xl font-semibold">재무 시나리오</h4>
+                            <h4 className="text-xs sm:text-xl font-semibold">재무 시나리오</h4>
                             <Badge variant="outline" className={`ml-auto ${feasibilityClass}`}>
                               투자 타당성: {feasibility}
                             </Badge>
