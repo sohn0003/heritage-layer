@@ -750,58 +750,60 @@ const AnalysisPage = () => {
                                   <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
                                     <span>0%</span><span>50%</span><span>100%</span>
                                   </div>
-                                  <div className="mt-3 grid grid-cols-2 gap-2 rounded-md border border-border/50 bg-background/60 p-3 text-xs">
-                                    <div>
-                                      <p className="text-muted-foreground">최대 분양가능 면적</p>
-                                      <p className="mt-0.5 text-sm font-semibold tabular-nums">
-                                        {maxPresaleArea.toLocaleString()} ㎡
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <p className="text-muted-foreground">현재 분양면적</p>
-                                      <p className="mt-0.5 text-sm font-semibold tabular-nums text-primary">
-                                        {currentPresaleArea.toLocaleString()} ㎡
-                                      </p>
-                                    </div>
-                                  </div>
                                   {(() => {
                                     const currentPyeong = currentPresaleArea / 3.305785;
                                     const pricePerPyeong = presalePriceByRank[scenario.rank] ?? 0; // 천만원
                                     const presaleRevenue = currentPyeong * pricePerPyeong; // 천만원 단위
                                     return (
-                                      <div className="mt-3 grid grid-cols-2 gap-2 rounded-md border border-border/50 bg-background/60 p-3 text-xs">
-                                        <div>
-                                          <div className="flex items-baseline justify-between gap-2">
-                                            <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
-                                            <span className="text-[11px] text-destructive">ex) 5</span>
+                                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                                        <div className="space-y-3 border border-border/40 p-3 text-xs">
+                                          <div>
+                                            <p className="text-muted-foreground">최대 분양가능 면적</p>
+                                            <p className="mt-0.5 text-sm font-semibold tabular-nums">
+                                              {maxPresaleArea.toLocaleString()} ㎡
+                                            </p>
                                           </div>
-                                          <Input
-                                            type="number"
-                                            inputMode="decimal"
-                                            step="0.1"
-                                            min={0}
-                                            value={presalePriceByRank[scenario.rank] ?? ''}
-                                            onChange={(e) => {
-                                              const raw = e.target.value;
-                                              setPresalePriceByRank((prev) => {
-                                                const next = { ...prev };
-                                                if (raw === '') delete next[scenario.rank];
-                                                else next[scenario.rank] = Math.max(0, Number(raw));
-                                                return next;
-                                              });
-                                            }}
-                                            placeholder="직접 입력"
-                                            className="mt-1 h-8 text-sm placeholder:text-destructive/60"
-                                          />
+                                          <div>
+                                            <p className="text-muted-foreground">현재 분양면적</p>
+                                            <p className="mt-0.5 text-sm font-semibold tabular-nums text-primary">
+                                              {currentPresaleArea.toLocaleString()} ㎡
+                                            </p>
+                                          </div>
                                         </div>
-                                        <div>
-                                          <p className="text-muted-foreground">분양매출</p>
-                                          <p className="mt-2 text-sm font-semibold tabular-nums text-primary">
-                                            {(presaleRevenue / 10).toLocaleString(undefined, { maximumFractionDigits: 1 })} 억원
-                                          </p>
-                                          <p className="mt-0.5 text-[10px] text-muted-foreground tabular-nums">
-                                            ≈ {currentPyeong.toLocaleString(undefined, { maximumFractionDigits: 1 })} 평
-                                          </p>
+                                        <div className="space-y-3 border border-border/40 p-3 text-xs">
+                                          <div>
+                                            <div className="flex items-baseline justify-between gap-2">
+                                              <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
+                                              <span className="text-[11px] text-destructive">ex) 5</span>
+                                            </div>
+                                            <Input
+                                              type="number"
+                                              inputMode="decimal"
+                                              step="0.1"
+                                              min={0}
+                                              value={presalePriceByRank[scenario.rank] ?? ''}
+                                              onChange={(e) => {
+                                                const raw = e.target.value;
+                                                setPresalePriceByRank((prev) => {
+                                                  const next = { ...prev };
+                                                  if (raw === '') delete next[scenario.rank];
+                                                  else next[scenario.rank] = Math.max(0, Number(raw));
+                                                  return next;
+                                                });
+                                              }}
+                                              placeholder="직접 입력"
+                                              className="mt-1 h-8 text-sm placeholder:text-destructive/60"
+                                            />
+                                          </div>
+                                          <div>
+                                            <p className="text-muted-foreground">분양매출</p>
+                                            <p className="mt-0.5 text-sm font-semibold tabular-nums text-primary">
+                                              {(presaleRevenue / 10).toLocaleString(undefined, { maximumFractionDigits: 1 })} 억원
+                                            </p>
+                                            <p className="mt-0.5 text-[10px] text-muted-foreground tabular-nums">
+                                              ≈ {currentPyeong.toLocaleString(undefined, { maximumFractionDigits: 1 })} 평
+                                            </p>
+                                          </div>
                                         </div>
                                       </div>
                                     );
