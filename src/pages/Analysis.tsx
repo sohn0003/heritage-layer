@@ -992,36 +992,8 @@ const AnalysisPage = () => {
                             ];
                             const labels = scenarioColumns[0].rows;
 
-                            return (
-                              <div className="mt-4 overflow-x-auto border border-border/20">
-                                <div className="min-w-[680px]">
-                                  <div className="grid grid-cols-[1.15fr_repeat(3,1fr)] border-b border-border/20 bg-muted/40 text-xs font-semibold text-muted-foreground">
-                                    <div className="px-4 py-3">항목</div>
-                                    {scenarioColumns.map((col) => (
-                                      <div key={col.key} className="border-l border-border/20 px-4 py-3 text-right">{col.title}</div>
-                                    ))}
-                                  </div>
-                                  <div className="divide-y divide-border/20">
-                                    {labels.map((row, rowIndex) => (
-                                      <div key={row.label} className="grid grid-cols-[1.15fr_repeat(3,1fr)] items-center">
-                                        <div className="px-4 py-3 text-sm text-muted-foreground leading-snug">{row.label}</div>
-                                        {scenarioColumns.map((col) => {
-                                          const value = col.rows[rowIndex];
-                                          return (
-                                            <div
-                                              key={`${col.key}-${row.label}`}
-                                              className={`border-l border-border/20 px-4 py-3 text-right text-sm tabular-nums ${value.highlight ? 'font-bold text-primary' : 'font-semibold'}`}
-                                            >
-                                              {value.value}
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            );
+                            return <ScenarioTable columns={scenarioColumns} labels={labels} />;
+
                           })()}
                         </div>
                       </TabsContent>
