@@ -608,12 +608,13 @@ const AnalysisPage = () => {
                           </div>
                         </div>
 
+                        <div className="grid gap-6 border-t border-border/25 pt-5 sm:grid-cols-2">
                         {/* 사용 연면적 입력 (탭별 개별) */}
                         {(() => {
                           const maxAllowed = Math.round(scenario.irrResult.base.usableFloorArea ?? 0);
                           const usedVal = usedFloorAreaByRank[scenario.rank] ?? maxAllowed;
                           return (
-                            <div className="border-t border-border/60 pt-5">
+                            <div>
                               <div className="mb-2 flex items-baseline justify-between gap-2">
                                 <div className="flex items-baseline gap-2">
                                   <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
