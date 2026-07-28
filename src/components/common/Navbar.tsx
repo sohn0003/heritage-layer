@@ -108,19 +108,19 @@ const Navbar = () => {
 
           {/* Mobile right side */}
           <div className="flex items-center gap-3 md:hidden">
+            <button
+              onClick={() => setContactOpen(true)}
+              className="bg-white px-3 py-1.5 text-xs font-light tracking-wide text-neutral-900"
+            >
+              문의하기
+            </button>
             {user ? (
-              <Link
-                to="/mypage"
-                className={`text-sm font-light tracking-wide transition-colors ${textMuted}`}
-              >
-                Mypage
+              <Link to="/mypage" aria-label="Mypage" className={`transition-colors ${textMuted}`}>
+                <User className="h-5 w-5" strokeWidth={1.5} />
               </Link>
             ) : (
-              <button
-                onClick={() => setAuthOpen(true)}
-                className={`text-sm font-light tracking-wide transition-colors ${textMuted}`}
-              >
-                Login
+              <button onClick={() => setAuthOpen(true)} aria-label="Login" className={`transition-colors ${textMuted}`}>
+                <User className="h-5 w-5" strokeWidth={1.5} />
               </button>
             )}
             <button
