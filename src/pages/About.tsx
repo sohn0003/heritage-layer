@@ -133,10 +133,11 @@ const KoreaMapChart = () => {
             top: `${p.ly}%`,
           }}
         >
-          <span className="text-xs" style={{ color: LIGHT_SUB }}>{p.label}</span>
-          <span className="ml-2 font-display text-sm tabular-nums" style={{ color: hover === p.label ? 'hsl(210 45% 45%)' : LIGHT_TEXT }}>
+          <span className="text-[10px] sm:text-xs" style={{ color: LIGHT_SUB }}>{p.label}</span>
+          <span className="ml-1 font-display text-[11px] tabular-nums sm:ml-2 sm:text-sm" style={{ color: hover === p.label ? 'hsl(210 45% 45%)' : LIGHT_TEXT }}>
             {p.value.toLocaleString()}개
           </span>
+
         </div>
       ))}
     </div>
