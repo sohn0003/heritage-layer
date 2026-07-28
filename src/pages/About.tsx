@@ -96,7 +96,7 @@ const REGION_PINS = [
 const KoreaMapChart = () => {
   const [hover, setHover] = useState<string | null>(null);
   return (
-    <div className="relative mx-auto aspect-[726/688] w-full max-w-[420px]">
+    <div className="relative mx-auto aspect-[726/688] w-[54%] max-w-[420px] sm:w-full">
       <img
         src={koreaMap.url}
         alt="대한민국 권역별 폐교 분포 지도"
@@ -133,10 +133,11 @@ const KoreaMapChart = () => {
             top: `${p.ly}%`,
           }}
         >
-          <span className="text-xs" style={{ color: LIGHT_SUB }}>{p.label}</span>
-          <span className="ml-2 font-display text-sm tabular-nums" style={{ color: hover === p.label ? 'hsl(210 45% 45%)' : LIGHT_TEXT }}>
+          <span className="text-[10px] sm:text-xs" style={{ color: LIGHT_SUB }}>{p.label}</span>
+          <span className="ml-1 font-display text-[11px] tabular-nums sm:ml-2 sm:text-sm" style={{ color: hover === p.label ? 'hsl(210 45% 45%)' : LIGHT_TEXT }}>
             {p.value.toLocaleString()}개
           </span>
+
         </div>
       ))}
     </div>
@@ -270,11 +271,11 @@ const StepCircles = ({ tone = 'dark' as Tone }: { tone?: Tone }) => {
   const activeBg = tone === 'dark' ? 'hsl(0 0% 100% / 0.08)' : 'hsl(0 0% 100%)';
   return (
     <div>
-      <div className="relative mx-auto flex max-w-4xl flex-wrap items-start justify-center gap-x-4 gap-y-8 sm:flex-nowrap">
+      <div className="relative mx-auto flex max-w-4xl flex-col items-stretch justify-center gap-y-6 sm:flex-row sm:flex-nowrap sm:items-start sm:gap-x-4 sm:gap-y-8">
         {steps.map((s, i) => (
           <Reveal key={s.step} delay={i * 120} className="flex-1">
-            <div className="flex flex-col items-center">
-              <div className="flex w-full items-center">
+            <div className="flex flex-row items-center gap-4 text-left sm:flex-col sm:items-center sm:gap-0 sm:text-center">
+              <div className="flex w-auto items-center sm:w-full">
                 <div className="hidden h-px flex-1 sm:block" style={{ background: i === 0 ? 'transparent' : line }} />
                 <button
                   type="button"
@@ -283,7 +284,7 @@ const StepCircles = ({ tone = 'dark' as Tone }: { tone?: Tone }) => {
                   onFocus={() => setActive(i)}
                   onBlur={() => setActive(null)}
                   onClick={() => setActive(active === i ? null : i)}
-                  className="flex h-24 w-24 shrink-0 flex-col items-center justify-center rounded-full transition-all duration-300 sm:h-28 sm:w-28"
+                  className="flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full transition-all duration-300 sm:h-28 sm:w-28"
                   style={{
                     border: `1px solid ${active === i ? 'hsl(210 45% 55%)' : line}`,
                     background: active === i ? activeBg : 'transparent',
@@ -291,21 +292,23 @@ const StepCircles = ({ tone = 'dark' as Tone }: { tone?: Tone }) => {
                   }}
                 >
                   <span className="font-display text-[9px] tracking-[0.2em]" style={{ color: sub }}>{s.step}</span>
-                  <span className="mt-1.5 text-sm font-light">{s.title}</span>
+                  <span className="mt-1.5 text-[13px] font-light sm:text-sm">{s.title}</span>
                 </button>
                 <div className="hidden h-px flex-1 sm:block" style={{ background: i === steps.length - 1 ? 'transparent' : line }} />
               </div>
               <p
-                className="mt-3 min-h-[3.5rem] px-1 text-center text-[11px] leading-[1.7] transition-opacity duration-300 sm:min-h-[4.5rem]"
-                style={{ color: sub, opacity: active === i ? 1 : 0 }}
+                className="flex-1 text-[11px] leading-[1.7] transition-opacity duration-300 sm:mt-3 sm:min-h-[4.5rem] sm:px-1 sm:text-center"
+                style={{ color: sub }}
               >
-                {s.desc}
+                <span className="sm:hidden">{s.desc}</span>
+                <span className="hidden sm:inline" style={{ opacity: active === i ? 1 : 0 }}>{s.desc}</span>
               </p>
             </div>
           </Reveal>
         ))}
       </div>
-      <p className="mt-2 text-xs" style={{ color: sub }}>각 단계를 마우스로 올려보세요</p>
+
+      <p className="mt-2 hidden text-xs sm:block" style={{ color: sub }}>각 단계를 마우스로 올려보세요</p>
     </div>
   );
 };
@@ -342,9 +345,11 @@ const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => {
   }, []);
 
   return (
-    <div ref={ref} className="relative mx-auto aspect-square w-full max-w-[520px] sm:max-w-[600px]">
-      <div className="absolute inset-0 rounded-full" style={{ border: `1px solid ${LINE_LIGHT}` }} />
-      <div className="absolute inset-[10%] rounded-full" style={{ border: `1px dashed ${LINE_LIGHT}` }} />
+    <div ref={ref} className="relative mx-auto aspect-square w-[84%] max-w-[520px] sm:w-full sm:max-w-[600px]">
+      <div className="absolute inset-[13%] rounded-full" style={{ border: `1px solid ${LINE_LIGHT}` }} />
+      <div className="absolute inset-[24%] rounded-full" style={{ border: `1px dashed ${LINE_LIGHT}` }} />
+
+
 
       <div
         className="absolute left-1/2 top-1/2 flex h-36 w-36 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full text-center sm:h-44 sm:w-44"
@@ -369,15 +374,17 @@ const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => {
 
       {features.map((f, i) => {
         const angle = (i / features.length) * 2 * Math.PI - Math.PI / 2;
-        const left = 50 + 50 * Math.cos(angle);
-        const top = 50 + 50 * Math.sin(angle);
+        const radius = 37;
+        const left = 50 + radius * Math.cos(angle);
+        const top = 50 + radius * Math.sin(angle);
         const Icon = f.icon;
         const isHover = hover === i;
         return (
           <div
             key={f.title}
             className="absolute -translate-x-1/2 -translate-y-1/2"
-            style={{ left: `${left}%`, top: `${top}%`, width: 'min(28%, 128px)' }}
+            style={{ left: `${left}%`, top: `${top}%`, width: 'min(26%, 120px)' }}
+
           >
             <div
               className="flex flex-col items-center"
