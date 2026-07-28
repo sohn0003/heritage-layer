@@ -400,7 +400,7 @@ const AnalysisPage = () => {
       />
       {/* 자산 핵심 정보 헤더 */}
       <div className="section-navy border-b border-primary-foreground/10 bg-primary text-primary-foreground">
-        <div className="mx-auto max-w-5xl px-6 sm:px-8 py-12 sm:py-16">
+        <div className="mx-auto max-w-5xl px-5 sm:px-8 py-12 sm:py-16">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <div className="mb-3 flex items-center gap-2">
