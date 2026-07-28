@@ -13,7 +13,10 @@ interface RatioBarProps {
 // 사용률(%)에 따라 색상이 변합니다.
 const RatioBar = ({ label, current, legalMax, unit = '%', className, tone = 'default' }: RatioBarProps) => {
   const hasData = current != null && legalMax != null && legalMax > 0;
-  const usage = hasData ? Math.min((current / legalMax) * 100, 100) : 0;
+  let usage = 0;
+  if (current != null && legalMax != null && legalMax > 0) {
+    usage = Math.min((current / legalMax) * 100, 100);
+  }
 
   const barColor = tone === 'dark'
     ? 'bg-primary-foreground/80'
