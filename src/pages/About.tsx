@@ -51,9 +51,9 @@ const Reveal = ({ children, delay = 0, className = '' }: { children: React.React
 };
 
 const Section = ({
-  tone, eyebrow, title, lead, children,
+  tone, title, lead, children,
 }: {
-  tone: Tone; eyebrow: string; title: React.ReactNode; lead?: React.ReactNode; children?: React.ReactNode;
+  tone: Tone; eyebrow?: string; title: React.ReactNode; lead?: React.ReactNode; children?: React.ReactNode;
 }) => (
   <section
     className="px-6 py-20 text-center sm:px-10 md:px-16 md:py-28"
@@ -64,13 +64,7 @@ const Section = ({
   >
     <div className="mx-auto max-w-5xl">
       <Reveal>
-        <p
-          className="font-display text-[11px] font-normal uppercase tracking-[0.35em]"
-          style={{ color: tone === 'dark' ? DARK_SUB : LIGHT_SUB }}
-        >
-          {eyebrow}
-        </p>
-        <h2 className="mx-auto mt-6 max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
+        <h2 className="mx-auto max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
           {title}
         </h2>
         {lead && (
@@ -86,6 +80,7 @@ const Section = ({
     </div>
   </section>
 );
+
 
 // ── 정적 가로 막대 그래프 ──
 const BarChart = ({ items, max, unit }: { items: { label: string; value: number }[]; max: number; unit: string }) => (
