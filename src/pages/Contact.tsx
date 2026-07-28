@@ -72,7 +72,7 @@ const ContactPage = () => {
         description="유휴자산 등록 의뢰, Bridge Solution 의뢰 등 Heritage Layer에 문의하세요."
         path="/contact"
       />
-      <div className="mx-auto max-w-4xl px-3 sm:px-4 py-14 md:py-20">
+      <div className="mx-auto max-w-4xl px-5 sm:px-4 py-14 md:py-20">
         <div className="mb-12 text-center">
           <h1 className="text-2xl font-light tracking-tight md:text-3xl">문의하기</h1>
           <p className="mt-4 text-sm leading-[1.9] text-muted-foreground">

@@ -82,6 +82,83 @@ const formatPercent = (n: number | null | undefined) =>
 const formatNumber = (n: number | null | undefined) =>
   n == null || !Number.isFinite(n) ? '--' : Math.round(n).toLocaleString();
 
+/**
+ * 재무 시나리오 표.
+ * 데스크톱: 3열 비교표 / 모바일: 시나리오 선택 버튼 + 단일 열
+ */
+type ScenarioRow = { label: string; value: string; highlight?: boolean };
+type ScenarioColumn = { key: string; title: string; rows: ScenarioRow[] };
+
+const ScenarioTable = ({ columns, labels }: { columns: ScenarioColumn[]; labels: ScenarioRow[] }) => {
+  const [active, setActive] = useState(1);
+  const activeCol = columns[active] ?? columns[0];
+
+  return (
+    <div className="mt-4">
+      {/* 모바일 — 시나리오 선택 */}
+      <div className="md:hidden">
+        <div className="grid grid-cols-3 border border-border/20">
+          {columns.map((col, i) => (
+            <button
+              key={col.key}
+              type="button"
+              onClick={() => setActive(i)}
+              className={`px-2 py-2.5 text-xs font-medium transition-colors ${i > 0 ? 'border-l border-border/20' : ''} ${
+                i === active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+              }`}
+            >
+              {col.title}
+            </button>
+          ))}
+        </div>
+        <div className="divide-y divide-border/20 border border-t-0 border-border/20">
+          {labels.map((row, rowIndex) => {
+            const value = activeCol.rows[rowIndex];
+            return (
+              <div key={row.label} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                <span className="text-xs leading-snug text-muted-foreground">{row.label}</span>
+                <span className={`text-sm tabular-nums ${value.highlight ? 'font-bold text-primary' : 'font-semibold'}`}>
+                  {value.value}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 데스크톱 — 3열 비교 */}
+      <div className="hidden overflow-x-auto border border-border/20 md:block">
+        <div className="min-w-[680px]">
+          <div className="grid grid-cols-[1.15fr_repeat(3,1fr)] border-b border-border/20 bg-muted/40 text-xs font-semibold text-muted-foreground">
+            <div className="px-4 py-3">항목</div>
+            {columns.map((col) => (
+              <div key={col.key} className="border-l border-border/20 px-4 py-3 text-right">{col.title}</div>
+            ))}
+          </div>
+          <div className="divide-y divide-border/20">
+            {labels.map((row, rowIndex) => (
+              <div key={row.label} className="grid grid-cols-[1.15fr_repeat(3,1fr)] items-center">
+                <div className="px-4 py-3 text-sm leading-snug text-muted-foreground">{row.label}</div>
+                {columns.map((col) => {
+                  const value = col.rows[rowIndex];
+                  return (
+                    <div
+                      key={`${col.key}-${row.label}`}
+                      className={`border-l border-border/20 px-4 py-3 text-right text-sm tabular-nums ${value.highlight ? 'font-bold text-primary' : 'font-semibold'}`}
+                    >
+                      {value.value}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AnalysisPage = () => {
   const [searchParams] = useSearchParams();
   const assetId = searchParams.get('id');
@@ -323,7 +400,7 @@ const AnalysisPage = () => {
       />
       {/* 자산 핵심 정보 헤더 */}
       <div className="section-navy border-b border-primary-foreground/10 bg-primary text-primary-foreground">
-        <div className="mx-auto max-w-5xl px-6 sm:px-8 py-12 sm:py-16">
+        <div className="mx-auto max-w-5xl px-5 sm:px-8 py-12 sm:py-16">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <div className="mb-3 flex items-center gap-2">
@@ -335,7 +412,7 @@ const AnalysisPage = () => {
                   <Badge variant="outline" className="border-primary-foreground/25 bg-primary-foreground/10 text-primary-foreground">정부협력</Badge>
                 )}
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold leading-snug">{asset.address}</h1>
+              <h1 className="text-base sm:text-3xl font-bold leading-snug">{asset.address}</h1>
               <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-primary-foreground/70 leading-relaxed">
                 <span>방치 기간: {asset.idle_years ?? '-'}년</span>
                 <span className="opacity-40">·</span>
@@ -375,7 +452,7 @@ const AnalysisPage = () => {
       {/* 블록별 평가(좌) + 등급 계기판(우) */}
       {scoringResult && (
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
-          <div>
+          <div className="order-2 md:order-1">
             <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-primary-foreground/60">COSMO-P 블록별 평가</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-6">
               {(() => {
@@ -400,9 +477,10 @@ const AnalysisPage = () => {
             </div>
           </div>
           <TooltipProvider>
+            {/* 모바일에서는 계기판이 블록별 평가보다 위 */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex cursor-help flex-col items-center justify-center">
+                <div className="order-1 flex cursor-help flex-col items-center justify-center md:order-2">
                   <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={210} />
                   <span className="mt-3 border border-primary-foreground/20 px-3 py-1 text-xs text-primary-foreground/70">분석 가정</span>
                 </div>
@@ -519,7 +597,7 @@ const AnalysisPage = () => {
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
         <section>
-          <h2 className="mb-5 flex items-center gap-2 text-2xl font-semibold">
+          <h2 className="mb-5 flex items-center gap-2 text-base sm:text-2xl font-semibold">
             <TrendingUp className="h-5 w-5 text-primary" /> 개발 시나리오 추천
           </h2>
           <div>
@@ -550,7 +628,7 @@ const AnalysisPage = () => {
                       <TabsContent key={scenario.rank} value={String(scenario.rank)} className="mt-6 space-y-6">
                         {/* 시나리오 헤더 */}
                         <div>
-                          <h3 className="text-xl font-bold leading-tight">
+                          <h3 className="text-xs sm:text-xl font-bold leading-tight">
                             {scenario.rank}순위 · {scenario.concept.replace(/^\d+순위:\s*/, '')}
                           </h3>
                           <div className="mt-2 flex flex-wrap gap-2">
@@ -601,7 +679,7 @@ const AnalysisPage = () => {
 
                         {/* 금융 구조 추천 */}
                         <div className="border-t border-border/20 pt-5">
-                          <p className="mb-4 text-xl font-semibold">금융 구조 추천</p>
+                          <p className="mb-4 text-xs sm:text-xl font-semibold">금융 구조 추천</p>
                           <div className="grid gap-4 sm:grid-cols-3">
                             <div>
                               <p className="text-xs text-muted-foreground">추천 자기자본 비율</p>
@@ -915,7 +993,7 @@ const AnalysisPage = () => {
                         <div>
                           <div className="mb-3 flex items-center gap-2">
                             <BarChart3 className="h-5 w-5 text-primary" />
-                            <h4 className="text-xl font-semibold">재무 시나리오</h4>
+                            <h4 className="text-xs sm:text-xl font-semibold">재무 시나리오</h4>
                             <Badge variant="outline" className={`ml-auto ${feasibilityClass}`}>
                               투자 타당성: {feasibility}
                             </Badge>
@@ -992,36 +1070,8 @@ const AnalysisPage = () => {
                             ];
                             const labels = scenarioColumns[0].rows;
 
-                            return (
-                              <div className="mt-4 overflow-x-auto border border-border/20">
-                                <div className="min-w-[680px]">
-                                  <div className="grid grid-cols-[1.15fr_repeat(3,1fr)] border-b border-border/20 bg-muted/40 text-xs font-semibold text-muted-foreground">
-                                    <div className="px-4 py-3">항목</div>
-                                    {scenarioColumns.map((col) => (
-                                      <div key={col.key} className="border-l border-border/20 px-4 py-3 text-right">{col.title}</div>
-                                    ))}
-                                  </div>
-                                  <div className="divide-y divide-border/20">
-                                    {labels.map((row, rowIndex) => (
-                                      <div key={row.label} className="grid grid-cols-[1.15fr_repeat(3,1fr)] items-center">
-                                        <div className="px-4 py-3 text-sm text-muted-foreground leading-snug">{row.label}</div>
-                                        {scenarioColumns.map((col) => {
-                                          const value = col.rows[rowIndex];
-                                          return (
-                                            <div
-                                              key={`${col.key}-${row.label}`}
-                                              className={`border-l border-border/20 px-4 py-3 text-right text-sm tabular-nums ${value.highlight ? 'font-bold text-primary' : 'font-semibold'}`}
-                                            >
-                                              {value.value}
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            );
+                            return <ScenarioTable columns={scenarioColumns} labels={labels} />;
+
                           })()}
                         </div>
                       </TabsContent>

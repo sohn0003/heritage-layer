@@ -52,7 +52,7 @@ const Section = ({
   tone: Tone; eyebrow: string; title: React.ReactNode; lead?: React.ReactNode; children?: React.ReactNode;
 }) => (
   <section
-    className="px-6 py-20 text-center sm:px-10 md:px-16 md:py-28"
+    className="px-5 py-20 text-center sm:px-10 md:px-16 md:py-28"
     style={{
       background: tone === 'dark' ? DARK : LIGHT,
       color: tone === 'dark' ? DARK_TEXT : LIGHT_TEXT,
@@ -146,7 +146,7 @@ const Bridge = () => {
       />
 
       {/* HERO */}
-      <section className="px-6 pb-24 pt-32 text-center sm:px-10 md:px-16 md:pb-32 md:pt-40" style={{ background: DARK, color: DARK_TEXT }}>
+      <section className="px-5 pb-24 pt-32 text-center sm:px-10 md:px-16 md:pb-32 md:pt-40" style={{ background: DARK, color: DARK_TEXT }}>
         <div className="mx-auto max-w-3xl">
           <Reveal>
             <p className="font-display text-[11px] uppercase tracking-[0.35em]" style={{ color: DARK_SUB }}>Consulting</p>
@@ -255,7 +255,7 @@ const Bridge = () => {
       </Section>
 
       {/* CTA */}
-      <section className="px-6 py-24 text-center sm:px-10 md:px-16 md:py-32" style={{ background: LIGHT, color: LIGHT_TEXT }}>
+      <section className="px-5 py-24 text-center sm:px-10 md:px-16 md:py-32" style={{ background: LIGHT, color: LIGHT_TEXT }}>
         <div className="mx-auto max-w-3xl">
           <Reveal>
             <h2 className="text-xl font-light leading-[1.5] sm:text-2xl md:text-3xl">프로젝트가 있으신가요?</h2>

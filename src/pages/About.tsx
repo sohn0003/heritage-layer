@@ -58,7 +58,7 @@ const Section = ({
   tone: Tone; eyebrow?: string; title: React.ReactNode; lead?: React.ReactNode; children?: React.ReactNode;
 }) => (
   <section
-    className="px-6 py-20 text-center sm:px-10 md:px-16 md:py-28"
+    className="px-5 py-20 text-center sm:px-10 md:px-16 md:py-28"
     style={{
       background: tone === 'dark' ? DARK : LIGHT,
       color: tone === 'dark' ? DARK_TEXT : LIGHT_TEXT,
@@ -445,7 +445,7 @@ const AboutPage = () => {
 
       {/* 01. PROBLEM — 이미지 배경 */}
       <section
-        className="relative flex min-h-[70vh] items-center px-6 py-32 text-center sm:px-10 md:min-h-[80vh] md:px-16 md:py-44"
+        className="relative flex min-h-[70vh] items-center px-5 py-32 text-center sm:px-10 md:min-h-[80vh] md:px-16 md:py-44"
         style={{ background: DARK, color: DARK_TEXT }}
       >
         <img
@@ -608,7 +608,7 @@ const AboutPage = () => {
       </Section>
 
       {/* 07. 지도 CTA */}
-      <section className="px-6 py-20 text-center sm:px-10 md:px-16 md:py-28" style={{ background: DARK, color: DARK_TEXT }}>
+      <section className="px-5 py-20 text-center sm:px-10 md:px-16 md:py-28" style={{ background: DARK, color: DARK_TEXT }}>
         <div className="mx-auto max-w-5xl">
           <Reveal>
             
