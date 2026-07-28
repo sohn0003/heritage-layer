@@ -395,18 +395,32 @@ const AboutPage = () => {
         path="/about"
       />
 
-      {/* 01. PROBLEM */}
-      <Section
-        tone="dark"
-        eyebrow="Problem"
-        title="방치된 자산이 매년 늘어나고 있습니다"
-        lead="지역은 텅 비어가는데, 활용할 방법은 없습니다. 데이터는 흩어져 있고 절차는 복잡합니다."
-      />
+      {/* 01. PROBLEM — 이미지 배경 */}
+      <section
+        className="relative flex min-h-[70vh] items-center px-6 py-32 text-center sm:px-10 md:min-h-[80vh] md:px-16 md:py-44"
+        style={{ background: DARK, color: DARK_TEXT }}
+      >
+        <img
+          src={abandonedBuilding.url}
+          alt="방치된 유휴 건물"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0" style={{ background: 'hsl(226 35% 8% / 0.72)' }} />
+        <div className="relative mx-auto max-w-5xl">
+          <Reveal>
+            <h2 className="mx-auto max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
+              방치된 자산이 매년 늘어나고 있습니다
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-sm leading-[1.9] md:text-base" style={{ color: 'hsl(0 0% 85%)' }}>
+              지역은 텅 비어가는데, 활용할 방법은 없습니다. 데이터는 흩어져 있고 절차는 복잡합니다.
+            </p>
+          </Reveal>
+        </div>
+      </section>
 
       {/* 02. 전국 부동산 현황 */}
       <Section
         tone="light"
-        eyebrow="Status"
         title="전국 부동산 현황"
         lead="방치된 자원이 매년 늘어나고 있습니다 — 새로운 기회로 전환할 시간입니다."
       >
@@ -424,18 +438,9 @@ const AboutPage = () => {
               <h3 className="text-base font-light md:text-lg">권역별 폐교 분포 (Top 5)</h3>
             </Reveal>
             <div className="mt-8">
-              <BarChart
-                unit="개"
-                max={1000}
-                items={[
-                  { label: '전남', value: 839 },
-                  { label: '경북', value: 745 },
-                  { label: '경남', value: 584 },
-                  { label: '강원', value: 476 },
-                  { label: '전북', value: 329 },
-                ]}
-              />
+              <KoreaMapChart />
             </div>
+
 
             <div className="mx-auto mt-10 max-w-2xl">
               <button
