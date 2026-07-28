@@ -343,9 +343,10 @@ const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => {
   }, []);
 
   return (
-    <div ref={ref} className="relative mx-auto aspect-square w-full max-w-[520px] sm:max-w-[600px]">
-      <div className="absolute inset-0 rounded-full" style={{ border: `1px solid ${LINE_LIGHT}` }} />
-      <div className="absolute inset-[10%] rounded-full" style={{ border: `1px dashed ${LINE_LIGHT}` }} />
+    <div ref={ref} className="relative mx-auto aspect-square w-[84%] max-w-[520px] sm:w-full sm:max-w-[600px]">
+      <div className="absolute inset-[13%] rounded-full sm:inset-[8%]" style={{ border: `1px solid ${LINE_LIGHT}` }} />
+      <div className="absolute inset-[24%] rounded-full sm:inset-[18%]" style={{ border: `1px dashed ${LINE_LIGHT}` }} />
+
 
       <div
         className="absolute left-1/2 top-1/2 flex h-36 w-36 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full text-center sm:h-44 sm:w-44"
