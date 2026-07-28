@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Mail, Phone, MapPin, MessageSquare, CheckCircle2 } from 'lucide-react';
+import LoadingBars from '@/components/common/LoadingBars';
 
 interface SignalRow {
   id: string;
@@ -137,7 +138,7 @@ const AdminDealSignalsPage = () => {
   };
 
   if (authLoading || loading) {
-    return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
+    return <LoadingBars />;
   }
   if (!isAdmin) return null;
 

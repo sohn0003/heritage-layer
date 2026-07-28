@@ -27,6 +27,7 @@ import Seo from '@/components/common/Seo';
 import GradeMeter from '@/components/common/GradeMeter';
 import RatioBar from '@/components/common/RatioBar';
 import AuthModal from '@/components/common/AuthModal';
+import LoadingBars from '@/components/common/LoadingBars';
 
 // 서버 응답 타입 (analyze-asset edge function). 알고리즘 로직은 클라이언트 번들에 포함되지 않습니다.
 type Grade = 'S' | 'A' | 'B' | 'C' | 'D';
@@ -267,7 +268,7 @@ const AnalysisPage = () => {
   };
 
   if (authLoading || loading) {
-    return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
+    return <LoadingBars />;
   }
   if (!user) {
     return (

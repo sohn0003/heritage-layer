@@ -19,6 +19,7 @@ const AdminDealSignals = lazy(() => import("@/pages/admin/AdminDealSignals"));
 import NotFound from "@/pages/NotFound";
 import Terms from "@/pages/legal/Terms";
 import Privacy from "@/pages/legal/Privacy";
+import LoadingBars from '@/components/common/LoadingBars';
 
 const queryClient = new QueryClient();
 
@@ -39,8 +40,8 @@ const App = () => (
             <Route path="/mypage" element={<Mypage />} />
             <Route path="/bridge" element={<Bridge />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin/properties" element={<Suspense fallback={<div className="p-8 text-muted-foreground">로딩 중...</div>}><AdminProperties /></Suspense>} />
-            <Route path="/admin/signals" element={<Suspense fallback={<div className="p-8 text-muted-foreground">로딩 중...</div>}><AdminDealSignals /></Suspense>} />
+            <Route path="/admin/properties" element={<Suspense fallback={<LoadingBars />}><AdminProperties /></Suspense>} />
+            <Route path="/admin/signals" element={<Suspense fallback={<LoadingBars />}><AdminDealSignals /></Suspense>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />
