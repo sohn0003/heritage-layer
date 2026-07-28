@@ -512,7 +512,7 @@ const AnalysisPage = () => {
       </div>
 
       {/* 개발 시나리오 — 흰색 밴드 */}
-      <div className="section-light">
+      <div className="section-light pb-0">
         <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
@@ -909,7 +909,7 @@ const AnalysisPage = () => {
                           );
                         })()}
 
-                        {/* 재무 지표: 보수적 / 기본 / 낙관적 — 탭 방식 */}
+                        {/* 재무 지표: 좌측 항목명 + 3개 시나리오 숫자 그리드 */}
                         <div>
                           <div className="mb-3 flex items-center gap-2">
                             <BarChart3 className="h-5 w-5 text-primary" />
@@ -1032,7 +1032,7 @@ const AnalysisPage = () => {
       </div>
         </div>
       </div>
-
+      <Footer />
     </div>
   );
 };
