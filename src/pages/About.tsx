@@ -4,6 +4,8 @@ import Seo from '@/components/common/Seo';
 import Footer from '@/components/layout/Footer';
 import NaverMap from '@/components/map/NaverMap';
 import { supabase } from '@/integrations/supabase/client';
+import koreaMap from '@/assets/korea-map.png.asset.json';
+import abandonedBuilding from '@/assets/abandoned-building.jpg.asset.json';
 import {
   Search, FileText, Award, Lightbulb, BarChart3, GitCompare,
   Landmark, HandCoins, Bookmark, ChevronDown,
@@ -492,7 +494,6 @@ const AboutPage = () => {
       {/* 03. ROOT CAUSE — 2단 */}
       <Section
         tone="dark"
-        eyebrow="Root Cause"
         title="왜 재생되지 못할까요?"
         lead="방치는 우연이 아닙니다. 구조적 원인이 네 가지 축에서 작동하고 있습니다."
       >
@@ -517,7 +518,6 @@ const AboutPage = () => {
       {/* 04. WHAT WE PROVIDE — 원형 스텝 */}
       <Section
         tone="light"
-        eyebrow="What We Provide"
         title="Heritage Layer가 제공하는 것"
         lead="유휴자산 재생을 다섯 단계로 연결합니다."
       >
@@ -527,7 +527,6 @@ const AboutPage = () => {
       {/* 05. OUR SERVICE */}
       <Section
         tone="dark"
-        eyebrow="Our Service"
         title={<>유휴자산 등록부터 매입까지,<br className="hidden sm:block" /> 매니징해주는 파트너</>}
         lead="Heritage Layer는 단순 분석 도구가 아닙니다. 자산 발굴부터 사업화까지 전 과정을 함께 책임집니다."
       >
@@ -552,7 +551,6 @@ const AboutPage = () => {
       {/* 06. 플랫폼 기능 — 원형 다이어그램 */}
       <Section
         tone="light"
-        eyebrow="Platform"
         title="플랫폼 기능"
         lead="Heritage Layer는 누구나 무료로 이용할 수 있는 데이터 기반 재생 플랫폼입니다."
       >
