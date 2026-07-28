@@ -82,7 +82,7 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
       />
       {/* panel */}
       <aside
-        className="absolute right-0 top-0 h-full w-full overflow-y-auto bg-white text-neutral-900 shadow-2xl transition-all duration-500 ease-out sm:w-[70%] lg:w-[56%]"
+        className="cp-fields absolute right-0 top-0 h-full w-full overflow-y-auto bg-white text-neutral-900 shadow-2xl transition-all duration-500 ease-out sm:w-[62%] lg:w-[42%]"
         style={{
           transform: open ? 'translateX(0)' : 'translateX(40px)',
           opacity: open ? 1 : 0,
