@@ -434,7 +434,7 @@ const AnalysisPage = () => {
             { label: '인구 추이', value: asset.population_trend ?? '-' },
             { label: '건물 상태', value: asset.building_condition ?? '-' },
           ].map((item) => (
-            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-border/40 pb-2">
+            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-border/25 pb-2">
               <dt className="text-xs text-muted-foreground">{item.label}</dt>
               <dd className="text-sm font-semibold text-right">{item.value}</dd>
             </div>
@@ -590,7 +590,7 @@ const AnalysisPage = () => {
                         </div>
 
                         {/* 금융 구조 추천 */}
-                        <div className="border-t border-border/60 pt-5">
+                        <div className="border-t border-border/25 pt-5">
                           <p className="mb-3 text-sm font-semibold">금융 구조 추천</p>
                           <div className="grid gap-4 sm:grid-cols-3">
                             <div>
@@ -731,7 +731,7 @@ const AnalysisPage = () => {
                             : (recommendedRevenue / 100_000_000).toFixed(1);
                           const marginVal = marginByRank[scenario.rank] ?? 40;
                           return (
-                            <div className="space-y-5 border-t border-border/60 pt-5">
+                            <div className="space-y-5 border-t border-border/25 pt-5">
                               {hasPresale && (
                                 <div>
                                   <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -756,7 +756,7 @@ const AnalysisPage = () => {
                                     const presaleRevenue = currentPyeong * pricePerPyeong; // 천만원 단위
                                     return (
                                       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                                        <div className="space-y-3 border border-border/40 p-3 text-xs">
+                                        <div className="space-y-3 border border-border/25 p-3 text-xs">
                                           <div>
                                             <p className="text-muted-foreground">최대 분양가능 면적</p>
                                             <p className="mt-0.5 text-sm font-semibold tabular-nums">
@@ -770,7 +770,7 @@ const AnalysisPage = () => {
                                             </p>
                                           </div>
                                         </div>
-                                        <div className="space-y-3 border border-border/40 p-3 text-xs">
+                                        <div className="space-y-3 border border-border/25 p-3 text-xs">
                                           <div>
                                             <div className="flex items-baseline justify-between gap-2">
                                               <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
@@ -987,7 +987,7 @@ const AnalysisPage = () => {
                             );
 
                             const levelCard = (title: string, rows: ReturnType<typeof buildRows>, tone: string) => (
-                              <div className="border border-border/40 bg-background/60 p-4">
+                              <div className="border border-border/25 bg-background/60 p-4">
                                 <p className={`text-xs font-semibold uppercase tracking-wider ${tone}`}>{title}</p>
                                 {renderList(rows)}
                               </div>
