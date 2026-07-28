@@ -561,7 +561,7 @@ const AboutPage = () => {
       <section className="px-6 py-20 text-center sm:px-10 md:px-16 md:py-28" style={{ background: DARK, color: DARK_TEXT }}>
         <div className="mx-auto max-w-5xl">
           <Reveal>
-            <p className="font-display text-[11px] uppercase tracking-[0.35em]" style={{ color: DARK_SUB }}>Explore</p>
+            
             <h2 className="mx-auto mt-6 max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
               잠든 유휴부지의 가치를 탐색하세요
             </h2>
