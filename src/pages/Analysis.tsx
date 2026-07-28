@@ -322,21 +322,21 @@ const AnalysisPage = () => {
         path="/analysis"
       />
       {/* 자산 핵심 정보 헤더 */}
-      <div className="border-b border-border/25 bg-background">
+      <div className="border-b border-primary-foreground/10 bg-primary text-primary-foreground">
         <div className="mx-auto max-w-5xl px-6 sm:px-8 py-12 sm:py-16">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <div className="mb-3 flex items-center gap-2">
-                <span className="flex h-9 w-9 items-center justify-center bg-muted text-foreground">
+                <span className="flex h-9 w-9 items-center justify-center bg-primary-foreground/10 text-primary-foreground">
                   <AssetIcon className="h-5 w-5" />
                 </span>
                 <Badge variant="secondary">{asset.asset_type}</Badge>
                 {asset.gov_cooperation && (
-                  <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
+                  <Badge variant="outline" className="border-primary-foreground/25 bg-primary-foreground/10 text-primary-foreground">정부협력</Badge>
                 )}
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold leading-snug">{asset.address}</h1>
-              <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground leading-relaxed">
+              <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-primary-foreground/70 leading-relaxed">
                 <span>방치 기간: {asset.idle_years ?? '-'}년</span>
                 <span className="opacity-40">·</span>
                 <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
@@ -346,9 +346,9 @@ const AnalysisPage = () => {
                   {(() => {
                     const s = asset.utilization_status ?? 'unutilized';
                     const map: Record<string, { label: string; cls: string }> = {
-                      unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
-                      in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
-                      utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
+                      unutilized: { label: '미활용', cls: 'border-primary-foreground/25 text-primary-foreground/75' },
+                      in_discussion: { label: '협의 중', cls: 'border-primary-foreground/35 text-primary-foreground' },
+                      utilized: { label: '활용 중', cls: 'border-primary-foreground/35 text-primary-foreground' },
                     };
                     const v = map[s] ?? map.unutilized;
                     return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
@@ -360,65 +360,68 @@ const AnalysisPage = () => {
             {/* 액션 버튼 — 우측 상단 */}
             {user && (
               <div className="flex flex-wrap gap-2 md:shrink-0">
-                <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
-                <Button onClick={handleDealInterest}>관심 상담 신청</Button>
+                <Button variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground hover:text-primary" onClick={handleSaveAsset}>자산 저장</Button>
+                <Button className="bg-primary-foreground text-primary hover:bg-primary-foreground/90" onClick={handleDealInterest}>관심 상담 신청</Button>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* 등급/블록/분석가정 밴드 */}
-      <div className="bg-background">
-        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-14 sm:py-20">
+      {/* 등급/블록/기본 정보 — 블루 밴드 */}
+      <div className="bg-primary text-primary-foreground">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10 sm:py-14">
 
-      {/* 등급 계기판 + 블록별 평가 — 2단 */}
+      {/* 블록별 평가(좌) + 등급 계기판(우) */}
       {scoringResult && (
-        <div className="mb-12 grid grid-cols-1 gap-10 border-b border-border/25 pb-12 sm:grid-cols-2">
-          <div className="flex items-center justify-center">
-            <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={165} />
-          </div>
+        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
           <div>
-            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-muted-foreground">COSMO-P 블록별 평가</p>
+            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-primary-foreground/60">COSMO-P 블록별 평가</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-6">
               {(() => {
                 const labelClass = (v: BlockLabel) =>
-                  v === '우수' ? 'text-[hsl(var(--primary))]'
-                    : v === '양호' ? 'text-[hsl(var(--primary))]'
-                    : v === '보통' ? 'text-foreground'
-                    : v === '미흡' ? 'text-[hsl(var(--accent))]'
-                    : 'text-[hsl(var(--grade-d))]';
+                  v === '우수' ? 'text-primary-foreground'
+                    : v === '양호' ? 'text-primary-foreground'
+                    : v === '보통' ? 'text-primary-foreground/85'
+                    : v === '미흡' ? 'text-primary-foreground/70'
+                    : 'text-primary-foreground/55';
                 return [
                   { label: '입지·규제', value: scoringResult.blockLabels.A },
                   { label: '수요·환경', value: scoringResult.blockLabels.B },
                   { label: '심미적 가치', value: scoringResult.blockLabels.C },
                   { label: '사업성', value: scoringResult.blockLabels.D },
                 ].map((item) => (
-                  <div key={item.label} className="flex flex-col">
-                    <p className="text-sm text-muted-foreground">{item.label}</p>
-                    <p className={`mt-1 text-xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                  <div key={item.label} className="flex flex-col border-t border-primary-foreground/10 pt-4">
+                    <p className="text-base text-primary-foreground/65">{item.label}</p>
+                    <p className={`mt-1 text-2xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
                   </div>
                 ));
               })()}
             </div>
           </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex cursor-help flex-col items-center justify-center">
+                  <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={210} />
+                  <span className="mt-3 border border-primary-foreground/20 px-3 py-1 text-xs text-primary-foreground/70">분석 가정</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="center" className="w-72 rounded-none border-primary-foreground/10 bg-primary text-primary-foreground shadow-xl">
+                <div className="space-y-2 py-1 text-xs leading-relaxed">
+                  {assumptionItems.map((item) => (
+                    <div key={item.label} className="grid grid-cols-[72px_1fr] gap-3">
+                      <span className="text-primary-foreground/55">{item.label}</span>
+                      <span className="font-medium">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
 
-      <p className="text-left text-sm leading-relaxed text-destructive">
-        <strong>분석 가정:</strong>{' '}
-        공시지가 {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
-        {' · '}운영 {algoConfig.projectYears}년 · 잔존가치{' '}
-        {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
-        {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
-      </p>
-
-        </div>
-      </div>
-
-      {/* 기본 정보 + 예상 매도가 — 동일 블루 밴드 */}
-      <div className="bg-background text-foreground">
-        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <section className="mb-8">
         <h2 className="mb-5 text-base font-semibold">기본 정보</h2>
         <div className="mb-6 grid gap-5 sm:grid-cols-2">
@@ -442,8 +445,8 @@ const AnalysisPage = () => {
             { label: '인구 추이', value: asset.population_trend ?? '-' },
             { label: '건물 상태', value: asset.building_condition ?? '-' },
           ].map((item) => (
-            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-border/25 pb-2">
-              <dt className="text-xs text-muted-foreground">{item.label}</dt>
+            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-primary-foreground/10 pb-2">
+              <dt className="text-xs text-primary-foreground/55">{item.label}</dt>
               <dd className="text-sm font-semibold text-right">{item.value}</dd>
             </div>
           ))}
@@ -455,24 +458,22 @@ const AnalysisPage = () => {
         <h2 className="mb-5 text-base font-semibold">예상 자산 매도가</h2>
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <p className="text-xs text-muted-foreground">토지 매도가 (매도자 희망)</p>
+            <p className="text-xs text-primary-foreground/55">토지 매도가 (매도자 희망)</p>
             <p className="mt-1 text-xl font-semibold tabular-nums">
               {((askingLandPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">건물 매도가 (매도자 희망)</p>
+            <p className="text-xs text-primary-foreground/55">건물 매도가 (매도자 희망)</p>
             <p className="mt-1 text-xl font-semibold tabular-nums">
               {((askingBuildingPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
             </p>
           </div>
         </div>
-        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+        <p className="mt-4 text-xs leading-relaxed text-primary-foreground/55">
           * 가격이 없는 경우 매도자 미제시, 공시지가 기준 적용
         </p>
       </section>
-        </div>
-      </div>
 
       {/* 전문가 의견 밴드 */}
       {analysis && (() => {
@@ -484,34 +485,33 @@ const AnalysisPage = () => {
           return `${t}합니다.`;
         };
         return (
-          <div className="bg-background">
-            <div className="mx-auto max-w-5xl px-5 sm:px-10 py-8">
-              <section className="border-l-2 border-primary/60 pl-5">
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
-                <div className="space-y-3 text-sm leading-[1.8] text-foreground">
+              <section className="mt-8 border-l border-primary-foreground/20 pl-5">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-primary-foreground/55">전문가 의견</p>
+                <div className="space-y-3 text-sm leading-[1.8] text-primary-foreground/85">
                   {strengths.length > 0 && (
                     <p>
-                      <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
-                      본 자산은 {strengths.map(sentenceify).join(' 또한 ')}
+                      <span className="font-semibold text-primary-foreground">강점 +</span>{' '}
+                      본 자산은 {strengths.map((s) => normalizeArrowText(sentenceify(s))).join(' 또한 ')}
                     </p>
                   )}
                   {risks.length > 0 && (
                     <p>
-                      <span className="font-semibold text-[hsl(var(--accent))]">리스크:</span>{' '}
-                      다만 {risks.map(sentenceify).join(' 아울러 ')}
+                      <span className="font-semibold text-primary-foreground">리스크 -</span>{' '}
+                      다만 {risks.map((s) => normalizeArrowText(sentenceify(s))).join(' 아울러 ')}
                     </p>
                   )}
                   {strengths.length === 0 && risks.length === 0 && (
-                    <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
+                    <p className="text-primary-foreground/55">특이 사항이 확인되지 않습니다.</p>
                   )}
                 </div>
               </section>
-            </div>
-          </div>
         );
       })()}
 
-      {/* 개발 시나리오 — 회색 밴드 */}
+        </div>
+      </div>
+
+      {/* 개발 시나리오 — 흰색 밴드 */}
       <div className="section-light">
         <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <div className="space-y-6">
