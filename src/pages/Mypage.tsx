@@ -34,10 +34,10 @@ const statusLabel = (s: string) =>
   s === 'pending' ? '검토중' : s === 'in_progress' ? '진행중' : s === 'completed' ? '완료' : s === 'rejected' ? '반려' : s;
 
 const Section = ({ icon: Icon, title, children, action }: { icon: any; title: string; children: React.ReactNode; action?: React.ReactNode }) => (
-  <section className="border-t border-border/60 pt-8">
+  <section className="border-t border-neutral-200 pt-8">
     <div className="mb-5 flex items-center justify-between">
-      <h2 className="flex items-center gap-2 text-base font-semibold">
-        <Icon className="h-4 w-4 text-accent" /> {title}
+      <h2 className="flex items-center gap-2 text-base font-medium text-neutral-900">
+        <Icon className="h-4 w-4 text-neutral-400" /> {title}
       </h2>
       {action}
     </div>
