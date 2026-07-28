@@ -408,8 +408,8 @@ const AnalysisPage = () => {
         </div>
       </div>
 
-      {/* 기본 정보 + 예상 매도가 — 흰색 밴드 */}
-      <div className="bg-card text-card-foreground">
+      {/* 기본 정보 + 예상 매도가 — 동일 블루 밴드 */}
+      <div className="bg-background text-foreground">
         <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <section className="mb-8">
         <h2 className="mb-5 text-base font-semibold">기본 정보</h2>
@@ -1026,15 +1026,6 @@ const AnalysisPage = () => {
             </div>
         </section>
       </div>
-        </div>
-      </div>
-
-      {/* 하단 액션 */}
-      <div className="border-t border-border/25 bg-background">
-        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
-          <Button variant="outline" onClick={() => navigate('/properties')}>
-            목록으로 돌아가기
-          </Button>
         </div>
       </div>
 
