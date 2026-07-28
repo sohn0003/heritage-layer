@@ -154,3 +154,11 @@
   60%  { transform: translateX(400%); }
   100% { transform: translateX(400%); }
 }
+
+@layer components {
+  /* 짙은 네이비 밴드 — bg-primary/text-primary-foreground 조합을 항상 다크로 고정 */
+  .section-navy {
+    --primary: 228 37% 12%;
+    --primary-foreground: 210 25% 96%;
+  }
+}
