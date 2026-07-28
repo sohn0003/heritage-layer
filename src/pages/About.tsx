@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Seo from '@/components/common/Seo';
 import Footer from '@/components/layout/Footer';
+import NaverMap from '@/components/map/NaverMap';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Search, FileText, Award, Lightbulb, BarChart3, GitCompare,
-  Landmark, HandCoins, Bookmark,
+  Landmark, HandCoins, Bookmark, ChevronDown,
 } from 'lucide-react';
 
 // ── 톤: 다크 네이비 / 라이트 블루 2단계 대비만 사용 ──
