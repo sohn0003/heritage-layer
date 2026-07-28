@@ -314,53 +314,65 @@ const AnalysisPage = () => {
         path="/analysis"
       />
       {/* 자산 핵심 정보 헤더 */}
-      <div className="border-b bg-background">
-        <div className="mx-auto max-w-5xl px-6 sm:px-8 py-6">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center bg-muted text-foreground">
-              <AssetIcon className="h-5 w-5" />
-            </span>
-            <Badge variant="secondary">{asset.asset_type}</Badge>
-            {asset.gov_cooperation && (
-              <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
+      <div className="border-b border-border/25 bg-background">
+        <div className="mx-auto max-w-5xl px-6 sm:px-8 py-12 sm:py-16">
+          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex h-9 w-9 items-center justify-center bg-muted text-foreground">
+                  <AssetIcon className="h-5 w-5" />
+                </span>
+                <Badge variant="secondary">{asset.asset_type}</Badge>
+                {asset.gov_cooperation && (
+                  <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
+                )}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold leading-snug">{asset.address}</h1>
+              <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground leading-relaxed">
+                <span>방치 기간: {asset.idle_years ?? '-'}년</span>
+                <span className="opacity-40">·</span>
+                <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
+                <span className="opacity-40">·</span>
+                <span className="inline-flex items-center gap-1">
+                  활용 상태:
+                  {(() => {
+                    const s = asset.utilization_status ?? 'unutilized';
+                    const map: Record<string, { label: string; cls: string }> = {
+                      unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
+                      in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
+                      utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
+                    };
+                    const v = map[s] ?? map.unutilized;
+                    return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
+                  })()}
+                </span>
+              </div>
+            </div>
+
+            {/* 액션 버튼 — 우측 상단 */}
+            {user && (
+              <div className="flex flex-wrap gap-2 md:shrink-0">
+                <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
+                <Button onClick={handleDealInterest}>관심 상담 신청</Button>
+              </div>
             )}
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold leading-snug">{asset.address}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground leading-relaxed">
-            <span>방치 기간: {asset.idle_years ?? '-'}년</span>
-            <span className="opacity-40">·</span>
-            <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
-            <span className="opacity-40">·</span>
-            <span className="inline-flex items-center gap-1">
-              활용 상태:
-              {(() => {
-                const s = asset.utilization_status ?? 'unutilized';
-                const map: Record<string, { label: string; cls: string }> = {
-                  unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
-                  in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
-                  utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
-                };
-                const v = map[s] ?? map.unutilized;
-                return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
-              })()}
-            </span>
           </div>
         </div>
       </div>
 
       {/* 등급/블록/분석가정 밴드 */}
       <div className="bg-background">
-        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-8">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-14 sm:py-20">
 
       {/* 등급 계기판 + 블록별 평가 — 2단 */}
       {scoringResult && (
-        <div className="mb-10 grid grid-cols-2 gap-6 border-b border-border/60 pb-8">
+        <div className="mb-12 grid grid-cols-1 gap-10 border-b border-border/25 pb-12 sm:grid-cols-2">
           <div className="flex items-center justify-center">
-            <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={110} />
+            <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={165} />
           </div>
           <div>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">COSMO-P 블록별 평가</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-muted-foreground">COSMO-P 블록별 평가</p>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-6">
               {(() => {
                 const labelClass = (v: BlockLabel) =>
                   v === '우수' ? 'text-[hsl(var(--primary))]'
@@ -375,8 +387,8 @@ const AnalysisPage = () => {
                   { label: '사업성', value: scoringResult.blockLabels.D },
                 ].map((item) => (
                   <div key={item.label} className="flex flex-col">
-                    <p className="text-[11px] text-muted-foreground">{item.label}</p>
-                    <p className={`mt-0.5 text-base font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                    <p className="text-sm text-muted-foreground">{item.label}</p>
+                    <p className={`mt-1 text-xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
                   </div>
                 ));
               })()}
@@ -385,16 +397,14 @@ const AnalysisPage = () => {
         </div>
       )}
 
-      <div className="border border-destructive/70 bg-destructive/5 p-4 text-xs leading-relaxed text-muted-foreground">
-        <strong className="text-destructive">분석 가정:</strong>{' '}
-        공시지가{' '}
-        <span className="text-foreground">
-          {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
-        </span>{' '}
-        · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
+      <p className="text-left text-sm leading-relaxed text-destructive">
+        <strong>분석 가정:</strong>{' '}
+        공시지가 {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
+        {' · '}운영 {algoConfig.projectYears}년 · 잔존가치{' '}
         {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
         {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
-      </div>
+      </p>
+
         </div>
       </div>
 
