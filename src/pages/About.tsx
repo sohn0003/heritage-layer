@@ -96,7 +96,7 @@ const REGION_PINS = [
 const KoreaMapChart = () => {
   const [hover, setHover] = useState<string | null>(null);
   return (
-    <div className="relative mx-auto aspect-[736/680] w-full max-w-[420px]">
+    <div className="relative mx-auto aspect-[726/688] w-full max-w-[420px]">
       <img
         src={koreaMap.url}
         alt="대한민국 권역별 폐교 분포 지도"
@@ -143,43 +143,56 @@ const KoreaMapChart = () => {
   );
 };
 
-// ── 도넛 차트 (선만 사용) ──
-const Donut = ({ segments }: { segments: { label: string; value: number; shade: string }[] }) => {
-  const r = 58, c = 2 * Math.PI * r;
+// ── 파이 차트 (선만 사용 · 후버 시 항목 표시) ──
+const PieChart = ({ segments }: { segments: { label: string; value: number; shade: string }[] }) => {
   const [hover, setHover] = useState<string | null>(null);
-  let offset = 0;
+  const cx = 85, cy = 85, r = 62;
+  let acc = 0;
+  const wedges = segments.map((s) => {
+    const a0 = (acc / 100) * 2 * Math.PI - Math.PI / 2;
+    acc += s.value;
+    const a1 = (acc / 100) * 2 * Math.PI - Math.PI / 2;
+    const p0 = [cx + r * Math.cos(a0), cy + r * Math.sin(a0)];
+    const p1 = [cx + r * Math.cos(a1), cy + r * Math.sin(a1)];
+    const large = s.value > 50 ? 1 : 0;
+    const mid = (a0 + a1) / 2;
+    return {
+      ...s,
+      d: `M ${cx} ${cy} L ${p0[0].toFixed(2)} ${p0[1].toFixed(2)} A ${r} ${r} 0 ${large} 1 ${p1[0].toFixed(2)} ${p1[1].toFixed(2)} Z`,
+      mid,
+    };
+  });
+  const activeSeg = wedges.find((w) => w.label === hover);
   return (
     <div className="flex flex-col items-center gap-8 sm:flex-row sm:justify-center sm:gap-12">
       <div className="relative shrink-0">
-        <svg width="170" height="170" viewBox="0 0 170 170" className="-rotate-90">
-          <circle cx="85" cy="85" r={r} fill="none" stroke={LINE_LIGHT} strokeWidth="1" />
-          {segments.map((s) => {
-            const len = (s.value / 100) * c;
-            const node = (
-              <circle
-                key={s.label}
-                cx="85" cy="85" r={r} fill="none"
-                stroke={s.shade}
-                strokeWidth={hover === s.label ? 8 : 2}
-                strokeDasharray={`${Math.max(len - 2, 0)} ${c - len + 2}`}
-                strokeDashoffset={-offset}
-                className="transition-all duration-300"
-                onMouseEnter={() => setHover(s.label)}
-                onMouseLeave={() => setHover(null)}
-              />
-            );
-            offset += len;
-            return node;
-          })}
+        <svg width="180" height="180" viewBox="0 0 170 170">
+          {wedges.map((w) => (
+            <path
+              key={w.label}
+              d={w.d}
+              fill="transparent"
+              stroke={w.shade}
+              strokeWidth={hover === w.label ? 2.5 : 1.2}
+              strokeLinejoin="round"
+              className="cursor-default transition-all duration-300"
+              style={{
+                opacity: hover && hover !== w.label ? 0.35 : 1,
+                transform: hover === w.label
+                  ? `translate(${(Math.cos(w.mid) * 4).toFixed(2)}px, ${(Math.sin(w.mid) * 4).toFixed(2)}px)`
+                  : 'none',
+              }}
+              onMouseEnter={() => setHover(w.label)}
+              onMouseLeave={() => setHover(null)}
+            />
+          ))}
         </svg>
         <div
-          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center transition-opacity duration-300"
-          style={{ opacity: hover ? 1 : 0 }}
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 text-center transition-opacity duration-300"
+          style={{ opacity: activeSeg ? 1 : 0, background: LIGHT }}
         >
-          <span className="text-xs" style={{ color: LIGHT_SUB }}>{hover}</span>
-          <span className="font-display text-lg tabular-nums">
-            {segments.find((s) => s.label === hover)?.value}%
-          </span>
+          <span className="block text-xs" style={{ color: LIGHT_SUB }}>{activeSeg?.label}</span>
+          <span className="font-display text-lg tabular-nums">{activeSeg?.value}%</span>
         </div>
       </div>
       <div className="space-y-3 text-left">
@@ -311,60 +324,94 @@ const features = [
   { icon: Bookmark, title: '무제한 자산 저장' },
 ];
 
-const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => (
-  <div className="relative mx-auto aspect-square w-full max-w-[520px] sm:max-w-[600px]">
-    <div className="absolute inset-0 rounded-full" style={{ border: `1px solid ${LINE_LIGHT}` }} />
-    <div className="absolute inset-[10%] rounded-full" style={{ border: `1px dashed ${LINE_LIGHT}` }} />
+const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [shown, setShown] = useState(false);
+  const [hover, setHover] = useState<number | null>(null);
+  const [ctaHover, setCtaHover] = useState(false);
 
-    <div
-      className="absolute left-1/2 top-1/2 flex h-36 w-36 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full text-center sm:h-44 sm:w-44"
-      style={{ background: '#ffffff', border: `1px solid ${LINE_LIGHT}` }}
-    >
-      <span className="font-display text-[10px] uppercase tracking-[0.25em]" style={{ color: LIGHT_SUB }}>The Layer</span>
-      <p className="mt-2 text-base font-light">Heritage<br />Layer</p>
-      <button
-        type="button"
-        onClick={onExplore}
-        className="mt-3 h-7 px-3 text-[10px] transition-colors"
-        style={{ border: `1px solid ${LINE_LIGHT}`, color: LIGHT_TEXT, background: 'transparent' }}
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setShown(true); obs.disconnect(); } },
+      { threshold: 0.2 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="relative mx-auto aspect-square w-full max-w-[520px] sm:max-w-[600px]">
+      <div className="absolute inset-0 rounded-full" style={{ border: `1px solid ${LINE_LIGHT}` }} />
+      <div className="absolute inset-[10%] rounded-full" style={{ border: `1px dashed ${LINE_LIGHT}` }} />
+
+      <div
+        className="absolute left-1/2 top-1/2 flex h-36 w-36 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full text-center sm:h-44 sm:w-44"
+        style={{ background: '#ffffff', border: `1px solid ${LINE_LIGHT}` }}
       >
-        자산 탐색
-      </button>
-
-    </div>
-
-    {features.map((f, i) => {
-      const angle = (i / features.length) * 2 * Math.PI - Math.PI / 2;
-      const left = 50 + 50 * Math.cos(angle);
-      const top = 50 + 50 * Math.sin(angle);
-      const Icon = f.icon;
-      return (
-        <div
-          key={f.title}
-          className="absolute -translate-x-1/2 -translate-y-1/2"
-          style={{ left: `${left}%`, top: `${top}%`, width: 'min(28%, 128px)' }}
+        <p className="text-base font-light">Heritage<br />Layer</p>
+        <button
+          type="button"
+          onClick={onExplore}
+          onMouseEnter={() => setCtaHover(true)}
+          onMouseLeave={() => setCtaHover(false)}
+          className="mt-3 h-7 px-3 text-[10px] transition-colors duration-300"
+          style={{
+            border: `1px solid ${ctaHover ? 'hsl(210 45% 45%)' : LINE_LIGHT}`,
+            color: ctaHover ? '#ffffff' : LIGHT_TEXT,
+            background: ctaHover ? 'hsl(210 45% 45%)' : 'transparent',
+          }}
         >
+          자산 탐색
+        </button>
+      </div>
+
+      {features.map((f, i) => {
+        const angle = (i / features.length) * 2 * Math.PI - Math.PI / 2;
+        const left = 50 + 50 * Math.cos(angle);
+        const top = 50 + 50 * Math.sin(angle);
+        const Icon = f.icon;
+        const isHover = hover === i;
+        return (
           <div
-            className="flex flex-col items-center animate-fade-in"
-            style={{ animationDelay: `${i * 70}ms`, animationFillMode: 'both' }}
+            key={f.title}
+            className="absolute -translate-x-1/2 -translate-y-1/2"
+            style={{ left: `${left}%`, top: `${top}%`, width: 'min(28%, 128px)' }}
           >
             <div
-              className="flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14"
-              style={{ background: LIGHT, border: `1px solid ${LINE_LIGHT}` }}
+              className="flex flex-col items-center"
+              onMouseEnter={() => setHover(i)}
+              onMouseLeave={() => setHover(null)}
+              style={{
+                opacity: shown ? 1 : 0,
+                transform: shown ? 'scale(1)' : 'scale(0.4)',
+                transition: `opacity 450ms ease-out ${i * 110}ms, transform 550ms cubic-bezier(0.22,1,0.36,1) ${i * 110}ms`,
+              }}
             >
-              <Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: 'hsl(210 45% 45%)' }} />
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-300 sm:h-14 sm:w-14"
+                style={{
+                  background: LIGHT,
+                  border: `1px solid ${isHover ? 'hsl(210 45% 45%)' : LINE_LIGHT}`,
+                  transform: isHover ? 'scale(1.5)' : 'scale(1)',
+                }}
+              >
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: 'hsl(210 45% 45%)' }} />
+              </div>
+              <p
+                className="mt-2 text-center text-[10px] leading-tight transition-all duration-300 sm:text-xs"
+                style={{ color: isHover ? LIGHT_TEXT : LIGHT_SUB, marginTop: isHover ? 18 : 8 }}
+              >
+                {f.title}
+              </p>
             </div>
-            <p className="mt-2 text-center text-[10px] leading-tight sm:text-xs" style={{ color: LIGHT_SUB }}>
-              {f.title}
-            </p>
           </div>
-        </div>
-
-
-      );
-    })}
-  </div>
-);
+        );
+      })}
+    </div>
+  );
+};
 
 const AboutPage = () => {
   const navigate = useNavigate();
@@ -413,7 +460,7 @@ const AboutPage = () => {
               방치된 자산이 매년 늘어나고 있습니다
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-sm leading-[1.9] md:text-base" style={{ color: 'hsl(0 0% 85%)' }}>
-              지역은 텅 비어가는데, 활용할 방법은 없습니다. 데이터는 흩어져 있고 절차는 복잡합니다.
+              지역은 텅 비어가는데, 우리는 이를 어떻게 활용할 수 있을까요?
             </p>
           </Reveal>
         </div>
@@ -423,7 +470,12 @@ const AboutPage = () => {
       <Section
         tone="light"
         title="전국 부동산 현황"
-        lead="방치된 자원이 매년 늘어나고 있습니다 — 새로운 기회로 전환할 시간입니다."
+        lead={
+          <span className="block">
+            방치된 자원이 매년 늘어나고 있습니다.
+            <span className="mt-1 block pl-6">새로운 기회로 전환할 시간입니다.</span>
+          </span>
+        }
       >
         <StatRow
           items={[
@@ -441,9 +493,26 @@ const AboutPage = () => {
             <div className="mt-8">
               <KoreaMapChart />
             </div>
+          </div>
 
+          <div>
+            <Reveal>
+              <h3 className="text-base font-light md:text-lg">소유 구분 비율</h3>
+              <p className="mt-3 text-xs" style={{ color: LIGHT_SUB }}>국공유 자산이 절반 이상으로, 민관협력 가능성이 존재합니다</p>
+            </Reveal>
+            <Reveal delay={100}>
+              <div className="mt-8">
+                <PieChart
+                  segments={[
+                    { label: '국·공유', value: 62, shade: 'hsl(210 45% 45%)' },
+                    { label: '사유', value: 28, shade: 'hsl(210 40% 68%)' },
+                    { label: '기타', value: 10, shade: 'hsl(210 25% 84%)' },
+                  ]}
+                />
+              </div>
+            </Reveal>
 
-            <div className="mx-auto mt-10 max-w-2xl">
+            <div className="mt-12">
               <button
                 type="button"
                 onClick={() => setTrendOpen((v) => !v)}
@@ -469,24 +538,6 @@ const AboutPage = () => {
               </div>
             </div>
           </div>
-
-          <div>
-            <Reveal>
-              <h3 className="text-base font-light md:text-lg">소유 구분 비율</h3>
-              <p className="mt-3 text-xs" style={{ color: LIGHT_SUB }}>국·공유 자산이 절반 이상 — 민관협력 기회가 큽니다.</p>
-            </Reveal>
-            <Reveal delay={100}>
-              <div className="mt-8">
-                <Donut
-                  segments={[
-                    { label: '국·공유', value: 62, shade: 'hsl(210 45% 45%)' },
-                    { label: '사유', value: 28, shade: 'hsl(210 40% 68%)' },
-                    { label: '기타', value: 10, shade: 'hsl(210 25% 84%)' },
-                  ]}
-                />
-              </div>
-            </Reveal>
-          </div>
         </div>
       </Section>
 
@@ -494,7 +545,7 @@ const AboutPage = () => {
       <Section
         tone="dark"
         title="왜 재생되지 못할까요?"
-        lead="방치는 우연이 아닙니다. 구조적 원인이 네 가지 축에서 작동하고 있습니다."
+        lead="구조적 원인이 네 가지 축에서 작동하고 있습니다."
       >
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-x-12 sm:grid-cols-2">
           {[

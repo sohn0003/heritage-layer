@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
+import ContactPanel from './ContactPanel';
 import { Menu, X } from 'lucide-react';
 import logo from '@/assets/logo.svg';
 
@@ -10,12 +11,12 @@ const navItems = [
   { label: 'About', href: '/about' },
   { label: 'Properties', href: '/properties' },
   { label: 'Solution', href: '/bridge' },
-  { label: 'Contact', href: '/contact' },
 ];
 
 const Navbar = () => {
   const { user, isAdmin } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -81,7 +82,13 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="hidden items-center gap-5 md:flex">
+            <button
+              onClick={() => setContactOpen(true)}
+              className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
+            >
+              문의하기
+            </button>
             {user ? (
               <Link
                 to="/mypage"
@@ -98,6 +105,7 @@ const Navbar = () => {
               </button>
             )}
           </div>
+
 
           {/* Mobile right side */}
           <div className="flex items-center gap-3 md:hidden">
@@ -145,6 +153,12 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
+            <button
+              className={`text-sm font-light tracking-wide ${textMuted}`}
+              onClick={() => { setMobileOpen(false); setContactOpen(true); }}
+            >
+              문의하기
+            </button>
             {isAdmin && (
               <Link
                 to="/admin/properties"
@@ -159,6 +173,8 @@ const Navbar = () => {
 
       </nav>
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+      <ContactPanel open={contactOpen} onOpenChange={setContactOpen} />
+
     </>
   );
 };
