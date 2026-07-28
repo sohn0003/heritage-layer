@@ -153,6 +153,12 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
+            <button
+              className={`text-sm font-light tracking-wide ${textMuted}`}
+              onClick={() => { setMobileOpen(false); setContactOpen(true); }}
+            >
+              문의하기
+            </button>
             {isAdmin && (
               <Link
                 to="/admin/properties"
@@ -167,6 +173,8 @@ const Navbar = () => {
 
       </nav>
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+      <ContactPanel open={contactOpen} onOpenChange={setContactOpen} />
+
     </>
   );
 };
