@@ -151,7 +151,8 @@ const Navbar = () => {
               className={`text-sm font-light tracking-wide ${textMuted}`}
               onClick={() => { setMobileOpen(false); setContactOpen(true); }}
             >
-              문의하기
+              Contact
+
             </button>
             {isAdmin && (
               <Link
