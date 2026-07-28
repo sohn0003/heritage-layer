@@ -336,55 +336,69 @@ const AboutPage = () => {
           ]}
         />
 
-        <div className="mt-16">
-          <Reveal>
-            <h3 className="text-base font-light md:text-lg">권역별 폐교 분포 (Top 5)</h3>
-          </Reveal>
-          <div className="mt-8">
-            <BarChart
-              unit="개"
-              max={1000}
-              items={[
-                { label: '전남', value: 839 },
-                { label: '경북', value: 745 },
-                { label: '경남', value: 584 },
-                { label: '강원', value: 476 },
-                { label: '전북', value: 329 },
-              ]}
-            />
-          </div>
-        </div>
-
-        <div className="mt-16">
-          <Reveal>
-            <h3 className="text-base font-light md:text-lg">소유 구분 비율</h3>
-            <p className="mt-3 text-xs" style={{ color: LIGHT_SUB }}>국·공유 자산이 절반 이상 — 민관협력 기회가 큽니다.</p>
-          </Reveal>
-          <Reveal delay={100}>
+        <div className="mt-16 grid grid-cols-1 gap-14 md:grid-cols-2 md:gap-10">
+          <div>
+            <Reveal>
+              <h3 className="text-base font-light md:text-lg">권역별 폐교 분포 (Top 5)</h3>
+            </Reveal>
             <div className="mt-8">
-              <Donut
-                segments={[
-                  { label: '국·공유', value: 62, shade: 'hsl(210 45% 45%)' },
-                  { label: '사유', value: 28, shade: 'hsl(210 40% 68%)' },
-                  { label: '기타', value: 10, shade: 'hsl(210 25% 84%)' },
+              <BarChart
+                unit="개"
+                max={1000}
+                items={[
+                  { label: '전남', value: 839 },
+                  { label: '경북', value: 745 },
+                  { label: '경남', value: 584 },
+                  { label: '강원', value: 476 },
+                  { label: '전북', value: 329 },
                 ]}
               />
             </div>
-          </Reveal>
-        </div>
 
-        <div className="mt-16">
-          <Reveal>
-            <h3 className="text-base font-light md:text-lg">연도별 신규 폐교 발생 추이</h3>
-          </Reveal>
-          <Reveal delay={100}>
-            <div className="mt-8">
-              <TrendChart
-                data={[112, 138, 165, 190, 224, 261]}
-                labels={['2019', '2020', '2021', '2022', '2023', '2024']}
-              />
+            <div className="mx-auto mt-10 max-w-2xl">
+              <button
+                type="button"
+                onClick={() => setTrendOpen((v) => !v)}
+                className="flex w-full items-center justify-between py-3 text-left text-sm font-light"
+                style={{ borderTop: `1px solid ${LINE_LIGHT}`, borderBottom: `1px solid ${LINE_LIGHT}`, color: LIGHT_TEXT }}
+              >
+                <span>연도별 신규 폐교 발생 추이</span>
+                <ChevronDown
+                  className="h-4 w-4 transition-transform duration-300"
+                  style={{ color: LIGHT_SUB, transform: trendOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                />
+              </button>
+              <div
+                className="overflow-hidden transition-all duration-500"
+                style={{ maxHeight: trendOpen ? 320 : 0, opacity: trendOpen ? 1 : 0 }}
+              >
+                <div className="pt-8">
+                  <TrendChart
+                    data={[112, 138, 165, 190, 224, 261]}
+                    labels={['2019', '2020', '2021', '2022', '2023', '2024']}
+                  />
+                </div>
+              </div>
             </div>
-          </Reveal>
+          </div>
+
+          <div>
+            <Reveal>
+              <h3 className="text-base font-light md:text-lg">소유 구분 비율</h3>
+              <p className="mt-3 text-xs" style={{ color: LIGHT_SUB }}>국·공유 자산이 절반 이상 — 민관협력 기회가 큽니다.</p>
+            </Reveal>
+            <Reveal delay={100}>
+              <div className="mt-8">
+                <Donut
+                  segments={[
+                    { label: '국·공유', value: 62, shade: 'hsl(210 45% 45%)' },
+                    { label: '사유', value: 28, shade: 'hsl(210 40% 68%)' },
+                    { label: '기타', value: 10, shade: 'hsl(210 25% 84%)' },
+                  ]}
+                />
+              </div>
+            </Reveal>
+          </div>
         </div>
       </Section>
 
