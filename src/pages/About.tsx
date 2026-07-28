@@ -96,7 +96,7 @@ const REGION_PINS = [
 const KoreaMapChart = () => {
   const [hover, setHover] = useState<string | null>(null);
   return (
-    <div className="relative mx-auto aspect-[736/680] w-full max-w-[420px]">
+    <div className="relative mx-auto aspect-[726/688] w-full max-w-[420px]">
       <img
         src={koreaMap.url}
         alt="대한민국 권역별 폐교 분포 지도"
@@ -143,43 +143,56 @@ const KoreaMapChart = () => {
   );
 };
 
-// ── 도넛 차트 (선만 사용) ──
-const Donut = ({ segments }: { segments: { label: string; value: number; shade: string }[] }) => {
-  const r = 58, c = 2 * Math.PI * r;
+// ── 파이 차트 (선만 사용 · 후버 시 항목 표시) ──
+const PieChart = ({ segments }: { segments: { label: string; value: number; shade: string }[] }) => {
   const [hover, setHover] = useState<string | null>(null);
-  let offset = 0;
+  const cx = 85, cy = 85, r = 62;
+  let acc = 0;
+  const wedges = segments.map((s) => {
+    const a0 = (acc / 100) * 2 * Math.PI - Math.PI / 2;
+    acc += s.value;
+    const a1 = (acc / 100) * 2 * Math.PI - Math.PI / 2;
+    const p0 = [cx + r * Math.cos(a0), cy + r * Math.sin(a0)];
+    const p1 = [cx + r * Math.cos(a1), cy + r * Math.sin(a1)];
+    const large = s.value > 50 ? 1 : 0;
+    const mid = (a0 + a1) / 2;
+    return {
+      ...s,
+      d: `M ${cx} ${cy} L ${p0[0].toFixed(2)} ${p0[1].toFixed(2)} A ${r} ${r} 0 ${large} 1 ${p1[0].toFixed(2)} ${p1[1].toFixed(2)} Z`,
+      mid,
+    };
+  });
+  const activeSeg = wedges.find((w) => w.label === hover);
   return (
     <div className="flex flex-col items-center gap-8 sm:flex-row sm:justify-center sm:gap-12">
       <div className="relative shrink-0">
-        <svg width="170" height="170" viewBox="0 0 170 170" className="-rotate-90">
-          <circle cx="85" cy="85" r={r} fill="none" stroke={LINE_LIGHT} strokeWidth="1" />
-          {segments.map((s) => {
-            const len = (s.value / 100) * c;
-            const node = (
-              <circle
-                key={s.label}
-                cx="85" cy="85" r={r} fill="none"
-                stroke={s.shade}
-                strokeWidth={hover === s.label ? 8 : 2}
-                strokeDasharray={`${Math.max(len - 2, 0)} ${c - len + 2}`}
-                strokeDashoffset={-offset}
-                className="transition-all duration-300"
-                onMouseEnter={() => setHover(s.label)}
-                onMouseLeave={() => setHover(null)}
-              />
-            );
-            offset += len;
-            return node;
-          })}
+        <svg width="180" height="180" viewBox="0 0 170 170">
+          {wedges.map((w) => (
+            <path
+              key={w.label}
+              d={w.d}
+              fill="transparent"
+              stroke={w.shade}
+              strokeWidth={hover === w.label ? 2.5 : 1.2}
+              strokeLinejoin="round"
+              className="cursor-default transition-all duration-300"
+              style={{
+                opacity: hover && hover !== w.label ? 0.35 : 1,
+                transform: hover === w.label
+                  ? `translate(${(Math.cos(w.mid) * 4).toFixed(2)}px, ${(Math.sin(w.mid) * 4).toFixed(2)}px)`
+                  : 'none',
+              }}
+              onMouseEnter={() => setHover(w.label)}
+              onMouseLeave={() => setHover(null)}
+            />
+          ))}
         </svg>
         <div
-          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center transition-opacity duration-300"
-          style={{ opacity: hover ? 1 : 0 }}
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 text-center transition-opacity duration-300"
+          style={{ opacity: activeSeg ? 1 : 0, background: LIGHT }}
         >
-          <span className="text-xs" style={{ color: LIGHT_SUB }}>{hover}</span>
-          <span className="font-display text-lg tabular-nums">
-            {segments.find((s) => s.label === hover)?.value}%
-          </span>
+          <span className="block text-xs" style={{ color: LIGHT_SUB }}>{activeSeg?.label}</span>
+          <span className="font-display text-lg tabular-nums">{activeSeg?.value}%</span>
         </div>
       </div>
       <div className="space-y-3 text-left">
