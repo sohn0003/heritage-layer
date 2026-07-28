@@ -28,6 +28,7 @@ import GradeMeter from '@/components/common/GradeMeter';
 import RatioBar from '@/components/common/RatioBar';
 import AuthModal from '@/components/common/AuthModal';
 import LoadingBars from '@/components/common/LoadingBars';
+import Footer from '@/components/layout/Footer';
 
 // 서버 응답 타입 (analyze-asset edge function). 알고리즘 로직은 클라이언트 번들에 포함되지 않습니다.
 type Grade = 'S' | 'A' | 'B' | 'C' | 'D';
@@ -305,6 +306,13 @@ const AnalysisPage = () => {
     '폐교': School, '빈집': Home, '유휴공공시설': Building2, '폐산업시설': Factory, '기타': Building,
   };
   const AssetIcon = ASSET_ICONS[asset.asset_type] ?? Building;
+  const normalizeArrowText = (text: string) => text.replace(/\s+—\s+/g, ' → ');
+  const assumptionItems = [
+    { label: '공시지가', value: `${(asset.land_value_per_sqm ?? algoConfig.landValuePerSqm).toLocaleString()}원/㎡` },
+    { label: '운영기간', value: `${algoConfig.projectYears}년` },
+    { label: '잔존가치', value: `${(algoConfig.residualValueRatio * 100).toFixed(0)}%` },
+    { label: '대출금리', value: `PF ${algoConfig.loanRates.pf}% / 담보 ${algoConfig.loanRates.collateral}%` },
+  ];
 
   return (
     <div className="pt-16">
