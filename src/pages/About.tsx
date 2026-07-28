@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Seo from '@/components/common/Seo';
 import Footer from '@/components/layout/Footer';
-import { Button } from '@/components/ui/button';
 import {
   Search, FileText, Award, Lightbulb, BarChart3, GitCompare,
   Landmark, HandCoins, Bookmark,
