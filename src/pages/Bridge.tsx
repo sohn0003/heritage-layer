@@ -115,7 +115,7 @@ const RoundCTA = ({ onClick, tone = 'dark' as Tone, className = '' }: { onClick:
   <button
     type="button"
     onClick={onClick}
-    className={`group inline-flex h-12 items-center gap-2 rounded-full px-8 text-sm font-light transition-all duration-300 ${className}`}
+    className={`group inline-flex h-12 items-center gap-2 rounded-none px-8 text-sm font-light transition-all duration-300 ${className}`}
     style={{
       border: `1px solid ${tone === 'dark' ? LINE_DARK : LINE_LIGHT}`,
       color: tone === 'dark' ? DARK_TEXT : LIGHT_TEXT,
@@ -243,7 +243,7 @@ const Bridge = () => {
                 <button
                   type="button"
                   onClick={() => openInquiry(lv.key)}
-                  className="mx-auto mt-7 h-10 rounded-full px-6 text-xs font-light transition-colors hover:bg-white/10"
+                  className="mx-auto mt-7 h-10 rounded-none px-6 text-xs font-light transition-colors hover:bg-white/10"
                   style={{ border: `1px solid ${LINE_DARK}`, color: DARK_TEXT }}
                 >
                   {lv.name} 문의하기

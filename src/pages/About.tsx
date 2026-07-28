@@ -4,6 +4,8 @@ import Seo from '@/components/common/Seo';
 import Footer from '@/components/layout/Footer';
 import NaverMap from '@/components/map/NaverMap';
 import { supabase } from '@/integrations/supabase/client';
+import koreaMap from '@/assets/korea-map.png.asset.json';
+import abandonedBuilding from '@/assets/abandoned-building.jpg.asset.json';
 import {
   Search, FileText, Award, Lightbulb, BarChart3, GitCompare,
   Landmark, HandCoins, Bookmark, ChevronDown,
@@ -51,9 +53,9 @@ const Reveal = ({ children, delay = 0, className = '' }: { children: React.React
 };
 
 const Section = ({
-  tone, eyebrow, title, lead, children,
+  tone, title, lead, children,
 }: {
-  tone: Tone; eyebrow: string; title: React.ReactNode; lead?: React.ReactNode; children?: React.ReactNode;
+  tone: Tone; eyebrow?: string; title: React.ReactNode; lead?: React.ReactNode; children?: React.ReactNode;
 }) => (
   <section
     className="px-6 py-20 text-center sm:px-10 md:px-16 md:py-28"
@@ -64,13 +66,7 @@ const Section = ({
   >
     <div className="mx-auto max-w-5xl">
       <Reveal>
-        <p
-          className="font-display text-[11px] font-normal uppercase tracking-[0.35em]"
-          style={{ color: tone === 'dark' ? DARK_SUB : LIGHT_SUB }}
-        >
-          {eyebrow}
-        </p>
-        <h2 className="mx-auto mt-6 max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
+        <h2 className="mx-auto max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
           {title}
         </h2>
         {lead && (
@@ -87,50 +83,115 @@ const Section = ({
   </section>
 );
 
-// ── 정적 가로 막대 그래프 ──
-const BarChart = ({ items, max, unit }: { items: { label: string; value: number }[]; max: number; unit: string }) => (
-  <div className="mx-auto max-w-2xl space-y-5 text-left">
-    {items.map((it, i) => (
-      <Reveal key={it.label} delay={i * 80}>
-        <div className="mb-1.5 flex items-baseline justify-between">
-          <span className="text-sm" style={{ color: LIGHT_SUB }}>{it.label}</span>
-          <span className="font-display text-sm tabular-nums">{it.value.toLocaleString()}{unit}</span>
-        </div>
-        <div className="h-[6px] w-full" style={{ background: 'hsl(226 20% 88%)' }}>
-          <div className="h-full" style={{ width: `${(it.value / max) * 100}%`, background: 'hsl(210 45% 55%)' }} />
-        </div>
-      </Reveal>
-    ))}
-  </div>
-);
 
-// ── 정적 도넛 차트 ──
+// ── 지도 기반 권역별 분포 ──
+const REGION_PINS = [
+  { label: '강원', value: 476, x: 56, y: 45, lx: 88, ly: 34 },
+  { label: '경북', value: 745, x: 58, y: 58, lx: 90, ly: 55 },
+  { label: '경남', value: 584, x: 52, y: 70, lx: 88, ly: 76 },
+  { label: '전북', value: 329, x: 45, y: 63, lx: 12, ly: 55 },
+  { label: '전남', value: 839, x: 43, y: 74, lx: 10, ly: 78 },
+];
+
+const KoreaMapChart = () => {
+  const [hover, setHover] = useState<string | null>(null);
+  return (
+    <div className="relative mx-auto aspect-[736/680] w-full max-w-[420px]">
+      <img
+        src={koreaMap.url}
+        alt="대한민국 권역별 폐교 분포 지도"
+        className="absolute inset-0 h-full w-full object-contain opacity-70"
+        style={{ mixBlendMode: 'multiply' }}
+      />
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+        {REGION_PINS.map((p) => (
+          <line
+            key={p.label}
+            x1={p.x} y1={p.y} x2={p.lx > 50 ? p.lx - 2 : p.lx + 8} y2={p.ly}
+            stroke={hover === p.label ? 'hsl(210 45% 45%)' : LINE_LIGHT}
+            strokeWidth="0.35"
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+      </svg>
+      {REGION_PINS.map((p) => (
+        <span
+          key={`${p.label}-dot`}
+          className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ left: `${p.x}%`, top: `${p.y}%`, background: 'hsl(210 45% 45%)' }}
+        />
+      ))}
+      {REGION_PINS.map((p) => (
+        <div
+          key={`${p.label}-label`}
+          onMouseEnter={() => setHover(p.label)}
+          onMouseLeave={() => setHover(null)}
+          className="absolute -translate-y-1/2 whitespace-nowrap text-left transition-opacity"
+          style={{
+            left: p.lx > 50 ? `${p.lx}%` : undefined,
+            right: p.lx > 50 ? undefined : `${100 - p.lx}%`,
+            top: `${p.ly}%`,
+          }}
+        >
+          <span className="text-xs" style={{ color: LIGHT_SUB }}>{p.label}</span>
+          <span className="ml-2 font-display text-sm tabular-nums" style={{ color: hover === p.label ? 'hsl(210 45% 45%)' : LIGHT_TEXT }}>
+            {p.value.toLocaleString()}개
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ── 도넛 차트 (선만 사용) ──
 const Donut = ({ segments }: { segments: { label: string; value: number; shade: string }[] }) => {
   const r = 58, c = 2 * Math.PI * r;
+  const [hover, setHover] = useState<string | null>(null);
   let offset = 0;
   return (
     <div className="flex flex-col items-center gap-8 sm:flex-row sm:justify-center sm:gap-12">
-      <svg width="170" height="170" viewBox="0 0 170 170" className="-rotate-90 shrink-0">
-        <circle cx="85" cy="85" r={r} fill="none" stroke="hsl(226 20% 88%)" strokeWidth="16" />
-        {segments.map((s) => {
-          const len = (s.value / 100) * c;
-          const node = (
-            <circle
-              key={s.label}
-              cx="85" cy="85" r={r} fill="none"
-              stroke={s.shade} strokeWidth="16"
-              strokeDasharray={`${Math.max(len - 1.5, 0)} ${c - len + 1.5}`}
-              strokeDashoffset={-offset}
-            />
-          );
-          offset += len;
-          return node;
-        })}
-      </svg>
+      <div className="relative shrink-0">
+        <svg width="170" height="170" viewBox="0 0 170 170" className="-rotate-90">
+          <circle cx="85" cy="85" r={r} fill="none" stroke={LINE_LIGHT} strokeWidth="1" />
+          {segments.map((s) => {
+            const len = (s.value / 100) * c;
+            const node = (
+              <circle
+                key={s.label}
+                cx="85" cy="85" r={r} fill="none"
+                stroke={s.shade}
+                strokeWidth={hover === s.label ? 8 : 2}
+                strokeDasharray={`${Math.max(len - 2, 0)} ${c - len + 2}`}
+                strokeDashoffset={-offset}
+                className="transition-all duration-300"
+                onMouseEnter={() => setHover(s.label)}
+                onMouseLeave={() => setHover(null)}
+              />
+            );
+            offset += len;
+            return node;
+          })}
+        </svg>
+        <div
+          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center transition-opacity duration-300"
+          style={{ opacity: hover ? 1 : 0 }}
+        >
+          <span className="text-xs" style={{ color: LIGHT_SUB }}>{hover}</span>
+          <span className="font-display text-lg tabular-nums">
+            {segments.find((s) => s.label === hover)?.value}%
+          </span>
+        </div>
+      </div>
       <div className="space-y-3 text-left">
         {segments.map((s) => (
-          <div key={s.label} className="flex items-center gap-3 text-sm">
-            <span className="h-2.5 w-2.5 shrink-0" style={{ background: s.shade }} />
+          <div
+            key={s.label}
+            className="flex cursor-default items-center gap-3 text-sm transition-opacity"
+            style={{ opacity: hover && hover !== s.label ? 0.45 : 1 }}
+            onMouseEnter={() => setHover(s.label)}
+            onMouseLeave={() => setHover(null)}
+          >
+            <span className="h-2.5 w-2.5 shrink-0" style={{ border: `1px solid ${s.shade}` }} />
             <span style={{ color: LIGHT_SUB }}>{s.label}</span>
             <span className="ml-6 font-display tabular-nums">{s.value}%</span>
           </div>
@@ -139,6 +200,7 @@ const Donut = ({ segments }: { segments: { label: string; value: number; shade: 
     </div>
   );
 };
+
 
 // ── 정적 라인(추이) 차트 ──
 const TrendChart = ({ data, labels }: { data: number[]; labels: string[] }) => {
@@ -334,18 +396,32 @@ const AboutPage = () => {
         path="/about"
       />
 
-      {/* 01. PROBLEM */}
-      <Section
-        tone="dark"
-        eyebrow="Problem"
-        title="방치된 자산이 매년 늘어나고 있습니다"
-        lead="지역은 텅 비어가는데, 활용할 방법은 없습니다. 데이터는 흩어져 있고 절차는 복잡합니다."
-      />
+      {/* 01. PROBLEM — 이미지 배경 */}
+      <section
+        className="relative flex min-h-[70vh] items-center px-6 py-32 text-center sm:px-10 md:min-h-[80vh] md:px-16 md:py-44"
+        style={{ background: DARK, color: DARK_TEXT }}
+      >
+        <img
+          src={abandonedBuilding.url}
+          alt="방치된 유휴 건물"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0" style={{ background: 'hsl(226 35% 8% / 0.72)' }} />
+        <div className="relative mx-auto max-w-5xl">
+          <Reveal>
+            <h2 className="mx-auto max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
+              방치된 자산이 매년 늘어나고 있습니다
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-sm leading-[1.9] md:text-base" style={{ color: 'hsl(0 0% 85%)' }}>
+              지역은 텅 비어가는데, 활용할 방법은 없습니다. 데이터는 흩어져 있고 절차는 복잡합니다.
+            </p>
+          </Reveal>
+        </div>
+      </section>
 
       {/* 02. 전국 부동산 현황 */}
       <Section
         tone="light"
-        eyebrow="Status"
         title="전국 부동산 현황"
         lead="방치된 자원이 매년 늘어나고 있습니다 — 새로운 기회로 전환할 시간입니다."
       >
@@ -363,18 +439,9 @@ const AboutPage = () => {
               <h3 className="text-base font-light md:text-lg">권역별 폐교 분포 (Top 5)</h3>
             </Reveal>
             <div className="mt-8">
-              <BarChart
-                unit="개"
-                max={1000}
-                items={[
-                  { label: '전남', value: 839 },
-                  { label: '경북', value: 745 },
-                  { label: '경남', value: 584 },
-                  { label: '강원', value: 476 },
-                  { label: '전북', value: 329 },
-                ]}
-              />
+              <KoreaMapChart />
             </div>
+
 
             <div className="mx-auto mt-10 max-w-2xl">
               <button
@@ -426,7 +493,6 @@ const AboutPage = () => {
       {/* 03. ROOT CAUSE — 2단 */}
       <Section
         tone="dark"
-        eyebrow="Root Cause"
         title="왜 재생되지 못할까요?"
         lead="방치는 우연이 아닙니다. 구조적 원인이 네 가지 축에서 작동하고 있습니다."
       >
@@ -451,7 +517,6 @@ const AboutPage = () => {
       {/* 04. WHAT WE PROVIDE — 원형 스텝 */}
       <Section
         tone="light"
-        eyebrow="What We Provide"
         title="Heritage Layer가 제공하는 것"
         lead="유휴자산 재생을 다섯 단계로 연결합니다."
       >
@@ -461,7 +526,6 @@ const AboutPage = () => {
       {/* 05. OUR SERVICE */}
       <Section
         tone="dark"
-        eyebrow="Our Service"
         title={<>유휴자산 등록부터 매입까지,<br className="hidden sm:block" /> 매니징해주는 파트너</>}
         lead="Heritage Layer는 단순 분석 도구가 아닙니다. 자산 발굴부터 사업화까지 전 과정을 함께 책임집니다."
       >
@@ -486,7 +550,6 @@ const AboutPage = () => {
       {/* 06. 플랫폼 기능 — 원형 다이어그램 */}
       <Section
         tone="light"
-        eyebrow="Platform"
         title="플랫폼 기능"
         lead="Heritage Layer는 누구나 무료로 이용할 수 있는 데이터 기반 재생 플랫폼입니다."
       >
@@ -497,7 +560,7 @@ const AboutPage = () => {
       <section className="px-6 py-20 text-center sm:px-10 md:px-16 md:py-28" style={{ background: DARK, color: DARK_TEXT }}>
         <div className="mx-auto max-w-5xl">
           <Reveal>
-            <p className="font-display text-[11px] uppercase tracking-[0.35em]" style={{ color: DARK_SUB }}>Explore</p>
+            
             <h2 className="mx-auto mt-6 max-w-3xl text-2xl font-light leading-[1.45] sm:text-3xl md:text-4xl">
               잠든 유휴부지의 가치를 탐색하세요
             </h2>
