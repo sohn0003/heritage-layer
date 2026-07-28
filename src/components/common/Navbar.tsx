@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
+import ContactPanel from './ContactPanel';
 import { Menu, X } from 'lucide-react';
 import logo from '@/assets/logo.svg';
 
@@ -10,12 +11,12 @@ const navItems = [
   { label: 'About', href: '/about' },
   { label: 'Properties', href: '/properties' },
   { label: 'Solution', href: '/bridge' },
-  { label: 'Contact', href: '/contact' },
 ];
 
 const Navbar = () => {
   const { user, isAdmin } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
