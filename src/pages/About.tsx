@@ -410,34 +410,35 @@ const AboutPage = () => {
 
       {/* 04. WHAT WE PROVIDE — 원형 스텝 */}
       <Section
-        tone="dark"
+        tone="light"
         eyebrow="What We Provide"
         title="Heritage Layer가 제공하는 것"
         lead="유휴자산 재생을 다섯 단계로 연결합니다."
       >
-        <StepCircles />
+        <StepCircles tone="light" />
       </Section>
 
       {/* 05. OUR SERVICE */}
       <Section
-        tone="light"
+        tone="dark"
         eyebrow="Our Service"
         title={<>유휴자산 등록부터 매입까지,<br className="hidden sm:block" /> 매니징해주는 파트너</>}
         lead="Heritage Layer는 단순 분석 도구가 아닙니다. 자산 발굴부터 사업화까지 전 과정을 함께 책임집니다."
       >
-        <div className="mx-auto max-w-4xl" style={{ borderTop: `1px solid ${LINE_LIGHT}` }}>
+        <div className="mx-auto max-w-4xl" style={{ borderTop: `1px solid ${LINE_DARK}` }}>
           {[
             { i: 'STEP 01', t: '유휴자산 통합 데이터베이스', d: '전국에 흩어진 폐교·빈집·유휴 공공시설을 한곳에 모아 시각화합니다. 검증된 자산 정보를 즉시 탐색할 수 있습니다.' },
             { i: 'STEP 02', t: '재생 가능성 진단', d: '입지·법규·시장·예산 등 6개 차원을 결합한 알고리즘이 재생 가능성을 점수화하고 사업 시나리오와 수익성 시뮬레이션을 제공합니다.' },
             { i: 'STEP 03', t: '등록부터 매입까지 풀 매니징', d: '자산 등록·인허가 검토·지자체 협력 구조 설계·매입 실행까지 전 과정을 매니징하고 필요한 자본·전문가 리소스를 제공합니다.' },
           ].map((s, idx) => (
             <Reveal key={s.i} delay={idx * 100}>
-              <div className="py-10" style={{ borderBottom: `1px solid ${LINE_LIGHT}` }}>
-                <span className="font-display text-xs tracking-[0.25em]" style={{ color: LIGHT_SUB }}>{s.i}</span>
+              <div className="py-10" style={{ borderBottom: `1px solid ${LINE_DARK}` }}>
+                <span className="font-display text-xs tracking-[0.25em]" style={{ color: DARK_SUB }}>{s.i}</span>
                 <h3 className="mt-3 text-xl font-light md:text-2xl">{s.t}</h3>
-                <p className="mx-auto mt-4 max-w-2xl text-sm leading-[1.9] md:text-base" style={{ color: LIGHT_SUB }}>{s.d}</p>
+                <p className="mx-auto mt-4 max-w-2xl text-sm leading-[1.9] md:text-base" style={{ color: DARK_SUB }}>{s.d}</p>
               </div>
             </Reveal>
+
           ))}
         </div>
       </Section>
