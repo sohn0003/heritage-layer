@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Star, FileText, User, ArrowRight, Handshake, LogOut, Building2, Inbox } from 'lucide-react';
+import { Star, FileText, User, ArrowRight, Handshake, LogOut, Inbox } from 'lucide-react';
 import Seo from '@/components/common/Seo';
 
 interface AssetLite {
