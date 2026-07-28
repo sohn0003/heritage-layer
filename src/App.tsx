@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/common/Navbar";
+import IntroOverlay from "@/components/common/IntroOverlay";
 import Properties from "@/pages/Properties";
 import Analysis from "@/pages/Analysis";
 import About from "@/pages/About";
@@ -28,6 +29,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <IntroOverlay />
           <Navbar />
           <Routes>
             <Route path="/" element={<Properties />} />
