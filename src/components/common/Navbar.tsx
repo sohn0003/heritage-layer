@@ -82,7 +82,13 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="hidden items-center gap-5 md:flex">
+            <button
+              onClick={() => setContactOpen(true)}
+              className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
+            >
+              문의하기
+            </button>
             {user ? (
               <Link
                 to="/mypage"
@@ -99,6 +105,7 @@ const Navbar = () => {
               </button>
             )}
           </div>
+
 
           {/* Mobile right side */}
           <div className="flex items-center gap-3 md:hidden">
