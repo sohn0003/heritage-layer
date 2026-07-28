@@ -155,15 +155,6 @@ const Navbar = () => {
             </button>
           </div>
           <nav className="flex flex-col">
-            {user && (
-              <Link
-                to="/mypage"
-                className="border-b border-white/10 px-5 py-3.5 text-sm font-light text-white/90"
-                onClick={() => setMobileOpen(false)}
-              >
-                My dashboard
-              </Link>
-            )}
             {navItems.map((item) => (
               <Link
                 key={item.href}
