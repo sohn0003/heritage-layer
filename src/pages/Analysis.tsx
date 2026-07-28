@@ -577,7 +577,7 @@ const AnalysisPage = () => {
                               {scenario.reasons.map((r, i) => (
                                 <li key={i} className="flex gap-2">
                                   <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[hsl(var(--primary))]" />
-                                  <span>{r}</span>
+                                  <span>{normalizeArrowText(r)}</span>
                                 </li>
                               ))}
                             </ul>
@@ -590,7 +590,7 @@ const AnalysisPage = () => {
                               {scenario.risks.map((r, i) => (
                                 <li key={i} className="flex gap-2">
                                   <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[hsl(var(--accent))]" />
-                                  <span>{r}</span>
+                                  <span>{normalizeArrowText(r)}</span>
                                 </li>
                               ))}
                             </ul>
@@ -611,7 +611,7 @@ const AnalysisPage = () => {
                             </div>
                             <div className="sm:col-span-3">
                               <p className="text-xs text-muted-foreground">선정 이유</p>
-                              <p className="mt-1 text-sm leading-relaxed">{scenario.loanReason}</p>
+                              <p className="mt-1 text-sm leading-relaxed">{normalizeArrowText(scenario.loanReason)}</p>
                             </div>
                           </div>
                         </div>
