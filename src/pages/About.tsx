@@ -308,7 +308,7 @@ const StepCircles = ({ tone = 'dark' as Tone }: { tone?: Tone }) => {
         ))}
       </div>
 
-      <p className="mt-2 text-xs" style={{ color: sub }}>각 단계를 마우스로 올려보세요</p>
+      <p className="mt-2 hidden text-xs sm:block" style={{ color: sub }}>각 단계를 마우스로 올려보세요</p>
     </div>
   );
 };
