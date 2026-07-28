@@ -82,29 +82,28 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="hidden items-center gap-5 md:flex">
+          <div className="hidden items-center gap-4 md:flex">
             <button
               onClick={() => setContactOpen(true)}
-              className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
+              className="bg-white px-5 py-2 text-sm font-light tracking-wide text-neutral-900 transition-opacity hover:opacity-85"
             >
               문의하기
             </button>
             {user ? (
-              <Link
-                to="/mypage"
-                className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
-              >
-                Mypage
+              <Link to="/mypage" aria-label="Mypage" className={`transition-colors ${textMuted} hover:${textColor}`}>
+                <User className="h-5 w-5" strokeWidth={1.5} />
               </Link>
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
-                className={`text-sm font-light tracking-wide transition-colors ${textMuted} hover:${textColor}`}
+                aria-label="Login"
+                className={`transition-colors ${textMuted} hover:${textColor}`}
               >
-                Login
+                <User className="h-5 w-5" strokeWidth={1.5} />
               </button>
             )}
           </div>
+
 
 
           {/* Mobile right side */}
