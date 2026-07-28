@@ -452,7 +452,7 @@ const AnalysisPage = () => {
       {/* 블록별 평가(좌) + 등급 계기판(우) */}
       {scoringResult && (
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
-          <div>
+          <div className="order-2 md:order-1">
             <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-primary-foreground/60">COSMO-P 블록별 평가</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-6">
               {(() => {
@@ -477,6 +477,7 @@ const AnalysisPage = () => {
             </div>
           </div>
           <TooltipProvider>
+            {/* 모바일에서는 계기판이 블록별 평가보다 위 */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex cursor-help flex-col items-center justify-center">
