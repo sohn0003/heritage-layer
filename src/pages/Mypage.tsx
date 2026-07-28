@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Star, FileText, User, ArrowRight, Handshake, LogOut, Inbox } from 'lucide-react';
 import Seo from '@/components/common/Seo';
+import LoadingBars from '@/components/common/LoadingBars';
 
 interface AssetLite {
   id: string;
@@ -74,7 +75,7 @@ const Mypage = () => {
   }, [user]);
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center pt-16"><p className="text-muted-foreground">로딩 중...</p></div>;
+    return <LoadingBars />;
   }
   if (!user) {
     return (

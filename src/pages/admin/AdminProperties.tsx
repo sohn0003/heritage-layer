@@ -19,6 +19,7 @@ import { Plus, Pencil, Trash2, Download, Upload, MapPin } from 'lucide-react';
 import { exportAssetsToExcel, importAssetsFromExcel } from '@/lib/assetExcel';
 import GradeBadge from '@/components/common/GradeBadge';
 import { isValidKoreaCoordinate } from '@/lib/geo';
+import LoadingBars from '@/components/common/LoadingBars';
 
 const assetTypes = ['폐교', '빈집', '유휴공공시설', '폐산업시설', '기타'];
 const populationTrends = [
@@ -405,7 +406,7 @@ const AdminPropertiesPage = () => {
 
 
 
-  if (authLoading) return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
+  if (authLoading) return <LoadingBars />;
   if (!isAdmin) return null;
 
   const setF = (patch: Partial<AssetForm>) => setForm((f) => ({ ...f, ...patch }));

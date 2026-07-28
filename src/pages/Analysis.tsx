@@ -27,6 +27,7 @@ import Seo from '@/components/common/Seo';
 import GradeMeter from '@/components/common/GradeMeter';
 import RatioBar from '@/components/common/RatioBar';
 import AuthModal from '@/components/common/AuthModal';
+import LoadingBars from '@/components/common/LoadingBars';
 
 // 서버 응답 타입 (analyze-asset edge function). 알고리즘 로직은 클라이언트 번들에 포함되지 않습니다.
 type Grade = 'S' | 'A' | 'B' | 'C' | 'D';
@@ -267,7 +268,7 @@ const AnalysisPage = () => {
   };
 
   if (authLoading || loading) {
-    return <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">로딩 중...</div>;
+    return <LoadingBars />;
   }
   if (!user) {
     return (
@@ -313,53 +314,65 @@ const AnalysisPage = () => {
         path="/analysis"
       />
       {/* 자산 핵심 정보 헤더 */}
-      <div className="border-b bg-background">
-        <div className="mx-auto max-w-5xl px-6 sm:px-8 py-6">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center bg-muted text-foreground">
-              <AssetIcon className="h-5 w-5" />
-            </span>
-            <Badge variant="secondary">{asset.asset_type}</Badge>
-            {asset.gov_cooperation && (
-              <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
+      <div className="border-b border-border/25 bg-background">
+        <div className="mx-auto max-w-5xl px-6 sm:px-8 py-12 sm:py-16">
+          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex h-9 w-9 items-center justify-center bg-muted text-foreground">
+                  <AssetIcon className="h-5 w-5" />
+                </span>
+                <Badge variant="secondary">{asset.asset_type}</Badge>
+                {asset.gov_cooperation && (
+                  <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
+                )}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold leading-snug">{asset.address}</h1>
+              <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground leading-relaxed">
+                <span>방치 기간: {asset.idle_years ?? '-'}년</span>
+                <span className="opacity-40">·</span>
+                <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
+                <span className="opacity-40">·</span>
+                <span className="inline-flex items-center gap-1">
+                  활용 상태:
+                  {(() => {
+                    const s = asset.utilization_status ?? 'unutilized';
+                    const map: Record<string, { label: string; cls: string }> = {
+                      unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
+                      in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
+                      utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
+                    };
+                    const v = map[s] ?? map.unutilized;
+                    return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
+                  })()}
+                </span>
+              </div>
+            </div>
+
+            {/* 액션 버튼 — 우측 상단 */}
+            {user && (
+              <div className="flex flex-wrap gap-2 md:shrink-0">
+                <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
+                <Button onClick={handleDealInterest}>관심 상담 신청</Button>
+              </div>
             )}
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold leading-snug">{asset.address}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground leading-relaxed">
-            <span>방치 기간: {asset.idle_years ?? '-'}년</span>
-            <span className="opacity-40">·</span>
-            <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
-            <span className="opacity-40">·</span>
-            <span className="inline-flex items-center gap-1">
-              활용 상태:
-              {(() => {
-                const s = asset.utilization_status ?? 'unutilized';
-                const map: Record<string, { label: string; cls: string }> = {
-                  unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
-                  in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
-                  utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
-                };
-                const v = map[s] ?? map.unutilized;
-                return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
-              })()}
-            </span>
           </div>
         </div>
       </div>
 
       {/* 등급/블록/분석가정 밴드 */}
       <div className="bg-background">
-        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-8">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-14 sm:py-20">
 
       {/* 등급 계기판 + 블록별 평가 — 2단 */}
       {scoringResult && (
-        <div className="mb-10 grid grid-cols-2 gap-6 border-b border-border/60 pb-8">
+        <div className="mb-12 grid grid-cols-1 gap-10 border-b border-border/25 pb-12 sm:grid-cols-2">
           <div className="flex items-center justify-center">
-            <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={110} />
+            <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={165} />
           </div>
           <div>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">COSMO-P 블록별 평가</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-muted-foreground">COSMO-P 블록별 평가</p>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-6">
               {(() => {
                 const labelClass = (v: BlockLabel) =>
                   v === '우수' ? 'text-[hsl(var(--primary))]'
@@ -374,8 +387,8 @@ const AnalysisPage = () => {
                   { label: '사업성', value: scoringResult.blockLabels.D },
                 ].map((item) => (
                   <div key={item.label} className="flex flex-col">
-                    <p className="text-[11px] text-muted-foreground">{item.label}</p>
-                    <p className={`mt-0.5 text-base font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                    <p className="text-sm text-muted-foreground">{item.label}</p>
+                    <p className={`mt-1 text-xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
                   </div>
                 ));
               })()}
@@ -384,16 +397,14 @@ const AnalysisPage = () => {
         </div>
       )}
 
-      <div className="border border-destructive/70 bg-destructive/5 p-4 text-xs leading-relaxed text-muted-foreground">
-        <strong className="text-destructive">분석 가정:</strong>{' '}
-        공시지가{' '}
-        <span className="text-foreground">
-          {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
-        </span>{' '}
-        · 운영 {algoConfig.projectYears}년 · 잔존가치{' '}
+      <p className="text-left text-sm leading-relaxed text-destructive">
+        <strong>분석 가정:</strong>{' '}
+        공시지가 {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
+        {' · '}운영 {algoConfig.projectYears}년 · 잔존가치{' '}
         {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
         {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
-      </div>
+      </p>
+
         </div>
       </div>
 
@@ -423,7 +434,7 @@ const AnalysisPage = () => {
             { label: '인구 추이', value: asset.population_trend ?? '-' },
             { label: '건물 상태', value: asset.building_condition ?? '-' },
           ].map((item) => (
-            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-border/40 pb-2">
+            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-border/25 pb-2">
               <dt className="text-xs text-muted-foreground">{item.label}</dt>
               <dd className="text-sm font-semibold text-right">{item.value}</dd>
             </div>
@@ -493,7 +504,7 @@ const AnalysisPage = () => {
       })()}
 
       {/* 개발 시나리오 — 회색 밴드 */}
-      <div className="bg-muted/60">
+      <div className="section-light">
         <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
@@ -579,7 +590,7 @@ const AnalysisPage = () => {
                         </div>
 
                         {/* 금융 구조 추천 */}
-                        <div className="border-t border-border/60 pt-5">
+                        <div className="border-t border-border/25 pt-5">
                           <p className="mb-3 text-sm font-semibold">금융 구조 추천</p>
                           <div className="grid gap-4 sm:grid-cols-3">
                             <div>
@@ -597,12 +608,13 @@ const AnalysisPage = () => {
                           </div>
                         </div>
 
+                        <div className="grid gap-6 border-t border-border/25 pt-5 sm:grid-cols-2">
                         {/* 사용 연면적 입력 (탭별 개별) */}
                         {(() => {
                           const maxAllowed = Math.round(scenario.irrResult.base.usableFloorArea ?? 0);
                           const usedVal = usedFloorAreaByRank[scenario.rank] ?? maxAllowed;
                           return (
-                            <div className="border-t border-border/60 pt-5">
+                            <div>
                               <div className="mb-2 flex items-baseline justify-between gap-2">
                                 <div className="flex items-baseline gap-2">
                                   <Label className="text-sm font-semibold">사용 연면적 (㎡)</Label>
@@ -696,6 +708,9 @@ const AnalysisPage = () => {
                               </button>
                             )}
                         </div>
+                        </div>
+
+
 
                         {/* 분양 비율 / 연간 매출 / 영업이익률 — 사용자 입력 */}
                         {(() => {
@@ -716,7 +731,7 @@ const AnalysisPage = () => {
                             : (recommendedRevenue / 100_000_000).toFixed(1);
                           const marginVal = marginByRank[scenario.rank] ?? 40;
                           return (
-                            <div className="space-y-5 border-t border-border/60 pt-5">
+                            <div className="space-y-5 border-t border-border/25 pt-5">
                               {hasPresale && (
                                 <div>
                                   <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -735,58 +750,60 @@ const AnalysisPage = () => {
                                   <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
                                     <span>0%</span><span>50%</span><span>100%</span>
                                   </div>
-                                  <div className="mt-3 grid grid-cols-2 gap-2 rounded-md border border-border/50 bg-background/60 p-3 text-xs">
-                                    <div>
-                                      <p className="text-muted-foreground">최대 분양가능 면적</p>
-                                      <p className="mt-0.5 text-sm font-semibold tabular-nums">
-                                        {maxPresaleArea.toLocaleString()} ㎡
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <p className="text-muted-foreground">현재 분양면적</p>
-                                      <p className="mt-0.5 text-sm font-semibold tabular-nums text-primary">
-                                        {currentPresaleArea.toLocaleString()} ㎡
-                                      </p>
-                                    </div>
-                                  </div>
                                   {(() => {
                                     const currentPyeong = currentPresaleArea / 3.305785;
                                     const pricePerPyeong = presalePriceByRank[scenario.rank] ?? 0; // 천만원
                                     const presaleRevenue = currentPyeong * pricePerPyeong; // 천만원 단위
                                     return (
-                                      <div className="mt-3 grid grid-cols-2 gap-2 rounded-md border border-border/50 bg-background/60 p-3 text-xs">
-                                        <div>
-                                          <div className="flex items-baseline justify-between gap-2">
-                                            <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
-                                            <span className="text-[11px] text-destructive">ex) 5</span>
+                                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                                        <div className="space-y-3 border border-border/25 p-3 text-xs">
+                                          <div>
+                                            <p className="text-muted-foreground">최대 분양가능 면적</p>
+                                            <p className="mt-0.5 text-sm font-semibold tabular-nums">
+                                              {maxPresaleArea.toLocaleString()} ㎡
+                                            </p>
                                           </div>
-                                          <Input
-                                            type="number"
-                                            inputMode="decimal"
-                                            step="0.1"
-                                            min={0}
-                                            value={presalePriceByRank[scenario.rank] ?? ''}
-                                            onChange={(e) => {
-                                              const raw = e.target.value;
-                                              setPresalePriceByRank((prev) => {
-                                                const next = { ...prev };
-                                                if (raw === '') delete next[scenario.rank];
-                                                else next[scenario.rank] = Math.max(0, Number(raw));
-                                                return next;
-                                              });
-                                            }}
-                                            placeholder="직접 입력"
-                                            className="mt-1 h-8 text-sm placeholder:text-destructive/60"
-                                          />
+                                          <div>
+                                            <p className="text-muted-foreground">현재 분양면적</p>
+                                            <p className="mt-0.5 text-sm font-semibold tabular-nums text-primary">
+                                              {currentPresaleArea.toLocaleString()} ㎡
+                                            </p>
+                                          </div>
                                         </div>
-                                        <div>
-                                          <p className="text-muted-foreground">분양매출</p>
-                                          <p className="mt-2 text-sm font-semibold tabular-nums text-primary">
-                                            {(presaleRevenue / 10).toLocaleString(undefined, { maximumFractionDigits: 1 })} 억원
-                                          </p>
-                                          <p className="mt-0.5 text-[10px] text-muted-foreground tabular-nums">
-                                            ≈ {currentPyeong.toLocaleString(undefined, { maximumFractionDigits: 1 })} 평
-                                          </p>
+                                        <div className="space-y-3 border border-border/25 p-3 text-xs">
+                                          <div>
+                                            <div className="flex items-baseline justify-between gap-2">
+                                              <Label className="text-muted-foreground">평당 분양가격 (천만원)</Label>
+                                              <span className="text-[11px] text-destructive">ex) 5</span>
+                                            </div>
+                                            <Input
+                                              type="number"
+                                              inputMode="decimal"
+                                              step="0.1"
+                                              min={0}
+                                              value={presalePriceByRank[scenario.rank] ?? ''}
+                                              onChange={(e) => {
+                                                const raw = e.target.value;
+                                                setPresalePriceByRank((prev) => {
+                                                  const next = { ...prev };
+                                                  if (raw === '') delete next[scenario.rank];
+                                                  else next[scenario.rank] = Math.max(0, Number(raw));
+                                                  return next;
+                                                });
+                                              }}
+                                              placeholder="직접 입력"
+                                              className="mt-1 h-8 text-sm placeholder:text-destructive/60"
+                                            />
+                                          </div>
+                                          <div>
+                                            <p className="text-muted-foreground">분양매출</p>
+                                            <p className="mt-0.5 text-sm font-semibold tabular-nums text-primary">
+                                              {(presaleRevenue / 10).toLocaleString(undefined, { maximumFractionDigits: 1 })} 억원
+                                            </p>
+                                            <p className="mt-0.5 text-[10px] text-muted-foreground tabular-nums">
+                                              ≈ {currentPyeong.toLocaleString(undefined, { maximumFractionDigits: 1 })} 평
+                                            </p>
+                                          </div>
                                         </div>
                                       </div>
                                     );
@@ -970,7 +987,7 @@ const AnalysisPage = () => {
                             );
 
                             const levelCard = (title: string, rows: ReturnType<typeof buildRows>, tone: string) => (
-                              <div className="border border-border/40 bg-background/60 p-4">
+                              <div className="border border-border/25 bg-background/60 p-4">
                                 <p className={`text-xs font-semibold uppercase tracking-wider ${tone}`}>{title}</p>
                                 {renderList(rows)}
                               </div>
@@ -1012,74 +1029,15 @@ const AnalysisPage = () => {
         </div>
       </div>
 
-      {/* 딜 시그널 밴드 — 흰색으로 구분 */}
-      <div className="bg-card text-card-foreground border-t border-border/40">
+      {/* 하단 액션 */}
+      <div className="border-t border-border/25 bg-background">
         <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
-          <section>
-            <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-              <Building2 className="h-5 w-5 text-accent" /> 딜 시그널 현황
-            </h2>
-            <div className="space-y-3 text-sm text-muted-foreground">
-              {signalSummary ? (
-                <>
-                  <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                    <div>
-                      <p className="flex items-center gap-1 text-xs">
-                        종합 신호 점수
-                        <TooltipProvider delayDuration={100}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="max-w-xs">
-                              <p>저장·열람·반복열람·상담 신청 등 사용자 관심 행동을 자산 등급에 따라 가중하여 합산한 점수입니다.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.totalSignalScore}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs">관심 유저 수</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.uniqueUsers}명</p>
-                    </div>
-                    <div>
-                      <p className="text-xs">저장 / 열람 / 반복열람</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">
-                        {signalSummary.savedCount} / {signalSummary.viewCount} / {signalSummary.repeatedViewCount}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs">관심 상담 신청</p>
-                      <p className="mt-1 text-xl font-semibold text-foreground">{signalSummary.dealInterestCount}회</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2 pt-2">
-                    {signalSummary.clusterDetected && (
-                      <Badge variant="default">클러스터 감지</Badge>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <p>신호 데이터를 불러오는 중...</p>
-              )}
-            </div>
-          </section>
-
-          {/* Bottom buttons */}
-          <div className="mt-8 flex flex-wrap gap-3">
-            {user && (
-              <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
-            )}
-            {user && (
-              <Button onClick={handleDealInterest}>관심 상담 신청</Button>
-            )}
-            <Button variant="outline" onClick={() => navigate('/properties')}>
-              목록으로 돌아가기
-            </Button>
-          </div>
+          <Button variant="outline" onClick={() => navigate('/properties')}>
+            목록으로 돌아가기
+          </Button>
         </div>
       </div>
+
     </div>
   );
 };
