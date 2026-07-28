@@ -34,9 +34,6 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
   const [message, setMessage] = useState('');
   const [assetAddress, setAssetAddress] = useState('');
   const [assetType, setAssetType] = useState('');
-  const [landArea, setLandArea] = useState('');
-  const [buildingArea, setBuildingArea] = useState('');
-  const [totalFloorArea, setTotalFloorArea] = useState('');
   const [ownerType, setOwnerType] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -48,7 +45,7 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
 
   const reset = () => {
     setName(''); setOrganization(''); setPhone(''); setEmail(''); setMessage('');
-    setAssetAddress(''); setAssetType(''); setLandArea(''); setBuildingArea(''); setTotalFloorArea(''); setOwnerType('');
+    setAssetAddress(''); setAssetType(''); setOwnerType('');
     setType('asset_report');
   };
 
@@ -57,7 +54,7 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
     setLoading(true);
     const typeLabel = inquiryTypes.find((t) => t.v === type)?.l ?? type;
     const assetBlock = type === 'asset_report'
-      ? `\n[자산정보]\n- 주소: ${assetAddress}\n- 유형: ${assetType}\n- 대지면적: ${landArea}㎡\n- 건축면적: ${buildingArea ? buildingArea + '㎡' : '-'}\n- 연면적: ${totalFloorArea ? totalFloorArea + '㎡' : '-'}\n- 소유자: ${ownerType}\n`
+      ? `\n[자산정보]\n- 주소: ${assetAddress}\n- 유형: ${assetType}\n- 소유자: ${ownerType}\n`
       : '';
     const finalMessage = `[${typeLabel}]${assetBlock}\n${message}`;
     const { error } = await supabase.from('partner_inquiries').insert({
@@ -79,6 +76,8 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
         .cp-fields textarea,
         .cp-fields [role="combobox"] {
           background: transparent !important;
+          color: rgb(23 23 23) !important;
+          -webkit-text-fill-color: rgb(23 23 23) !important;
           border: 0 !important;
           border-bottom: 1px solid rgba(0,0,0,0.14) !important;
           border-radius: 0 !important;
@@ -106,8 +105,7 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
           opacity: open ? 1 : 0,
         }}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-neutral-200 bg-white/95 px-8 py-4 backdrop-blur">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-neutral-500">Contact / 문의하기</p>
+        <div className="sticky top-0 z-10 flex items-center justify-end border-b border-neutral-200 bg-white/95 px-8 py-4 backdrop-blur">
           <button type="button" onClick={() => onOpenChange(false)} aria-label="닫기" className="text-neutral-500 hover:text-neutral-900">
             <X className="h-5 w-5" />
           </button>
@@ -200,20 +198,6 @@ const ContactPanel = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
                               <SelectItem value="개인">개인</SelectItem>
                             </SelectContent>
                           </Select>
-                        </div>
-                      </div>
-                      <div className="grid gap-5 sm:grid-cols-3">
-                        <div className="space-y-2">
-                          <FieldLabel ko="대지면적 (㎡)" en="Land" htmlFor="cp-land" required />
-                          <Input id="cp-land" type="number" min="0" step="0.01" value={landArea} onChange={(e) => setLandArea(e.target.value)} required />
-                        </div>
-                        <div className="space-y-2">
-                          <FieldLabel ko="건축면적 (㎡)" en="Building" htmlFor="cp-bldg" />
-                          <Input id="cp-bldg" type="number" min="0" step="0.01" value={buildingArea} onChange={(e) => setBuildingArea(e.target.value)} placeholder="선택" />
-                        </div>
-                        <div className="space-y-2">
-                          <FieldLabel ko="연면적 (㎡)" en="Floor area" htmlFor="cp-floor" />
-                          <Input id="cp-floor" type="number" min="0" step="0.01" value={totalFloorArea} onChange={(e) => setTotalFloorArea(e.target.value)} placeholder="선택" />
                         </div>
                       </div>
                     </div>

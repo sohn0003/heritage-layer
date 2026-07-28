@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Star, FileText, User, ArrowRight, Handshake, LogOut, Inbox } from 'lucide-react';
 import Seo from '@/components/common/Seo';
 import LoadingBars from '@/components/common/LoadingBars';
+import Footer from '@/components/layout/Footer';
 
 interface AssetLite {
   id: string;
@@ -87,9 +88,9 @@ const Mypage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 pt-24 pb-20">
+    <div className="min-h-screen bg-white text-neutral-900 pt-24">
       <Seo title="마이페이지 — Heritage Layer" description="저장한 매물과 딜 관심 신청 내역을 확인하세요." path="/mypage" />
-      <div className="mx-auto max-w-5xl px-6 sm:px-8 space-y-10">
+      <div className="mx-auto max-w-5xl px-6 sm:px-8 pb-20 space-y-10">
         {/* Header */}
         <div className="flex items-end justify-between gap-4">
           <div>
@@ -99,9 +100,6 @@ const Mypage = () => {
               {profileName ? `${profileName}님, ` : ''}저장한 매물과 관심 신청 현황을 한눈에 확인하세요.
             </p>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut} className="gap-2 text-neutral-500 hover:text-neutral-900">
-            <LogOut className="h-4 w-4" /> 로그아웃
-          </Button>
         </div>
 
         {/* 2단 레이아웃 */}
@@ -199,7 +197,14 @@ const Mypage = () => {
             <p className="py-6 text-sm text-neutral-500">준비 중입니다.</p>
           </Section>
         </div>
+
+        <div className="flex justify-end border-t border-neutral-100 pt-8">
+          <Button variant="ghost" size="sm" onClick={signOut} className="gap-2 text-neutral-500 hover:text-neutral-900">
+            <LogOut className="h-4 w-4" /> 로그아웃
+          </Button>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 };

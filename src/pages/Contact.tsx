@@ -35,16 +35,13 @@ const ContactPage = () => {
   const [message, setMessage] = useState('');
   const [assetAddress, setAssetAddress] = useState('');
   const [assetType, setAssetType] = useState('');
-  const [landArea, setLandArea] = useState('');
-  const [buildingArea, setBuildingArea] = useState('');
-  const [totalFloorArea, setTotalFloorArea] = useState('');
   const [ownerType, setOwnerType] = useState('');
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
 
   const reset = () => {
     setName(''); setOrganization(''); setPhone(''); setEmail(''); setMessage('');
-    setAssetAddress(''); setAssetType(''); setLandArea(''); setBuildingArea(''); setTotalFloorArea(''); setOwnerType('');
+    setAssetAddress(''); setAssetType(''); setOwnerType('');
     setType('asset_report');
   };
 
@@ -53,7 +50,7 @@ const ContactPage = () => {
     setLoading(true);
     const typeLabel = inquiryTypes.find((t) => t.v === type)?.l ?? type;
     const assetBlock = type === 'asset_report'
-      ? `\n[자산정보]\n- 주소: ${assetAddress}\n- 유형: ${assetType}\n- 대지면적: ${landArea}㎡\n- 건축면적: ${buildingArea ? buildingArea + '㎡' : '-'}\n- 연면적: ${totalFloorArea ? totalFloorArea + '㎡' : '-'}\n- 소유자: ${ownerType}\n`
+      ? `\n[자산정보]\n- 주소: ${assetAddress}\n- 유형: ${assetType}\n- 소유자: ${ownerType}\n`
       : '';
     const finalMessage = `[${typeLabel}]${assetBlock}\n${message}`;
     const { error } = await supabase.from('partner_inquiries').insert({
@@ -152,20 +149,6 @@ const ContactPage = () => {
                         <SelectItem value="개인">개인</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                </div>
-                <div className="grid gap-5 sm:grid-cols-3">
-                  <div className="space-y-2">
-                    <FieldLabel ko="대지면적 (㎡)" en="Land" htmlFor="land-area" required />
-                    <Input id="land-area" type="number" className="text-center" min="0" step="0.01" value={landArea} onChange={(e) => setLandArea(e.target.value)} required />
-                  </div>
-                  <div className="space-y-2">
-                    <FieldLabel ko="건축면적 (㎡)" en="Building" htmlFor="building-area" />
-                    <Input id="building-area" type="number" className="text-center" min="0" step="0.01" value={buildingArea} onChange={(e) => setBuildingArea(e.target.value)} placeholder="선택" />
-                  </div>
-                  <div className="space-y-2">
-                    <FieldLabel ko="연면적 (㎡)" en="Floor area" htmlFor="total-floor-area" />
-                    <Input id="total-floor-area" type="number" className="text-center" min="0" step="0.01" value={totalFloorArea} onChange={(e) => setTotalFloorArea(e.target.value)} placeholder="선택" />
                   </div>
                 </div>
               </div>

@@ -28,6 +28,7 @@ import GradeMeter from '@/components/common/GradeMeter';
 import RatioBar from '@/components/common/RatioBar';
 import AuthModal from '@/components/common/AuthModal';
 import LoadingBars from '@/components/common/LoadingBars';
+import Footer from '@/components/layout/Footer';
 
 // 서버 응답 타입 (analyze-asset edge function). 알고리즘 로직은 클라이언트 번들에 포함되지 않습니다.
 type Grade = 'S' | 'A' | 'B' | 'C' | 'D';
@@ -305,6 +306,13 @@ const AnalysisPage = () => {
     '폐교': School, '빈집': Home, '유휴공공시설': Building2, '폐산업시설': Factory, '기타': Building,
   };
   const AssetIcon = ASSET_ICONS[asset.asset_type] ?? Building;
+  const normalizeArrowText = (text: string) => text.replace(/\s+—\s+/g, ' → ');
+  const assumptionItems = [
+    { label: '공시지가', value: `${(asset.land_value_per_sqm ?? algoConfig.landValuePerSqm).toLocaleString()}원/㎡` },
+    { label: '운영기간', value: `${algoConfig.projectYears}년` },
+    { label: '잔존가치', value: `${(algoConfig.residualValueRatio * 100).toFixed(0)}%` },
+    { label: '대출금리', value: `PF ${algoConfig.loanRates.pf}% / 담보 ${algoConfig.loanRates.collateral}%` },
+  ];
 
   return (
     <div className="pt-16">
@@ -314,21 +322,21 @@ const AnalysisPage = () => {
         path="/analysis"
       />
       {/* 자산 핵심 정보 헤더 */}
-      <div className="border-b border-border/25 bg-background">
+      <div className="border-b border-primary-foreground/10 bg-primary text-primary-foreground">
         <div className="mx-auto max-w-5xl px-6 sm:px-8 py-12 sm:py-16">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <div className="mb-3 flex items-center gap-2">
-                <span className="flex h-9 w-9 items-center justify-center bg-muted text-foreground">
+                <span className="flex h-9 w-9 items-center justify-center bg-primary-foreground/10 text-primary-foreground">
                   <AssetIcon className="h-5 w-5" />
                 </span>
                 <Badge variant="secondary">{asset.asset_type}</Badge>
                 {asset.gov_cooperation && (
-                  <Badge variant="outline" className="border-foreground/20 bg-background text-foreground">정부협력</Badge>
+                  <Badge variant="outline" className="border-primary-foreground/25 bg-primary-foreground/10 text-primary-foreground">정부협력</Badge>
                 )}
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold leading-snug">{asset.address}</h1>
-              <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground leading-relaxed">
+              <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-primary-foreground/70 leading-relaxed">
                 <span>방치 기간: {asset.idle_years ?? '-'}년</span>
                 <span className="opacity-40">·</span>
                 <span>소유: {asset.ownership_type === 'public' ? '공유/국유' : asset.ownership_type === 'private' ? '사유' : (asset.ownership_type ?? '-')}</span>
@@ -338,9 +346,9 @@ const AnalysisPage = () => {
                   {(() => {
                     const s = asset.utilization_status ?? 'unutilized';
                     const map: Record<string, { label: string; cls: string }> = {
-                      unutilized: { label: '미활용', cls: 'border-muted-foreground/30 text-muted-foreground' },
-                      in_discussion: { label: '협의 중', cls: 'border-[hsl(var(--accent))] text-[hsl(var(--accent))]' },
-                      utilized: { label: '활용 중', cls: 'border-[hsl(var(--primary))] text-[hsl(var(--primary))]' },
+                      unutilized: { label: '미활용', cls: 'border-primary-foreground/25 text-primary-foreground/75' },
+                      in_discussion: { label: '협의 중', cls: 'border-primary-foreground/35 text-primary-foreground' },
+                      utilized: { label: '활용 중', cls: 'border-primary-foreground/35 text-primary-foreground' },
                     };
                     const v = map[s] ?? map.unutilized;
                     return <Badge variant="outline" className={v.cls}>{v.label}</Badge>;
@@ -352,65 +360,68 @@ const AnalysisPage = () => {
             {/* 액션 버튼 — 우측 상단 */}
             {user && (
               <div className="flex flex-wrap gap-2 md:shrink-0">
-                <Button variant="outline" onClick={handleSaveAsset}>자산 저장</Button>
-                <Button onClick={handleDealInterest}>관심 상담 신청</Button>
+                <Button variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground hover:text-primary" onClick={handleSaveAsset}>자산 저장</Button>
+                <Button className="bg-primary-foreground text-primary hover:bg-primary-foreground/90" onClick={handleDealInterest}>관심 상담 신청</Button>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* 등급/블록/분석가정 밴드 */}
-      <div className="bg-background">
-        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-14 sm:py-20">
+      {/* 등급/블록/기본 정보 — 블루 밴드 */}
+      <div className="bg-primary text-primary-foreground">
+        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10 sm:py-14">
 
-      {/* 등급 계기판 + 블록별 평가 — 2단 */}
+      {/* 블록별 평가(좌) + 등급 계기판(우) */}
       {scoringResult && (
-        <div className="mb-12 grid grid-cols-1 gap-10 border-b border-border/25 pb-12 sm:grid-cols-2">
-          <div className="flex items-center justify-center">
-            <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={165} />
-          </div>
+        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
           <div>
-            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-muted-foreground">COSMO-P 블록별 평가</p>
+            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-primary-foreground/60">COSMO-P 블록별 평가</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-6">
               {(() => {
                 const labelClass = (v: BlockLabel) =>
-                  v === '우수' ? 'text-[hsl(var(--primary))]'
-                    : v === '양호' ? 'text-[hsl(var(--primary))]'
-                    : v === '보통' ? 'text-foreground'
-                    : v === '미흡' ? 'text-[hsl(var(--accent))]'
-                    : 'text-[hsl(var(--grade-d))]';
+                  v === '우수' ? 'text-primary-foreground'
+                    : v === '양호' ? 'text-primary-foreground'
+                    : v === '보통' ? 'text-primary-foreground/85'
+                    : v === '미흡' ? 'text-primary-foreground/70'
+                    : 'text-primary-foreground/55';
                 return [
                   { label: '입지·규제', value: scoringResult.blockLabels.A },
                   { label: '수요·환경', value: scoringResult.blockLabels.B },
                   { label: '심미적 가치', value: scoringResult.blockLabels.C },
                   { label: '사업성', value: scoringResult.blockLabels.D },
                 ].map((item) => (
-                  <div key={item.label} className="flex flex-col">
-                    <p className="text-sm text-muted-foreground">{item.label}</p>
-                    <p className={`mt-1 text-xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
+                  <div key={item.label} className="flex flex-col border-t border-primary-foreground/10 pt-4">
+                    <p className="text-base text-primary-foreground/65">{item.label}</p>
+                    <p className={`mt-1 text-2xl font-bold ${labelClass(item.value)}`}>{item.value}</p>
                   </div>
                 ));
               })()}
             </div>
           </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex cursor-help flex-col items-center justify-center">
+                  <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={210} />
+                  <span className="mt-3 border border-primary-foreground/20 px-3 py-1 text-xs text-primary-foreground/70">분석 가정</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="center" className="w-72 rounded-none border-primary-foreground/10 bg-primary text-primary-foreground shadow-xl">
+                <div className="space-y-2 py-1 text-xs leading-relaxed">
+                  {assumptionItems.map((item) => (
+                    <div key={item.label} className="grid grid-cols-[72px_1fr] gap-3">
+                      <span className="text-primary-foreground/55">{item.label}</span>
+                      <span className="font-medium">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
 
-      <p className="text-left text-sm leading-relaxed text-destructive">
-        <strong>분석 가정:</strong>{' '}
-        공시지가 {(asset.land_value_per_sqm ?? 4_500_000).toLocaleString()}원/㎡
-        {' · '}운영 {algoConfig.projectYears}년 · 잔존가치{' '}
-        {(algoConfig.residualValueRatio * 100).toFixed(0)}% · PF{' '}
-        {algoConfig.loanRates.pf}% / 담보 {algoConfig.loanRates.collateral}%
-      </p>
-
-        </div>
-      </div>
-
-      {/* 기본 정보 + 예상 매도가 — 동일 블루 밴드 */}
-      <div className="bg-background text-foreground">
-        <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <section className="mb-8">
         <h2 className="mb-5 text-base font-semibold">기본 정보</h2>
         <div className="mb-6 grid gap-5 sm:grid-cols-2">
@@ -418,11 +429,13 @@ const AnalysisPage = () => {
             label="건폐율"
             current={asset.current_building_coverage ?? asset.building_coverage}
             legalMax={asset.legal_max_building_coverage}
+            tone="dark"
           />
           <RatioBar
             label="용적률"
             current={asset.current_floor_area_ratio ?? asset.floor_area_ratio}
             legalMax={asset.legal_max_floor_area_ratio}
+            tone="dark"
           />
         </div>
         <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
@@ -434,8 +447,8 @@ const AnalysisPage = () => {
             { label: '인구 추이', value: asset.population_trend ?? '-' },
             { label: '건물 상태', value: asset.building_condition ?? '-' },
           ].map((item) => (
-            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-border/25 pb-2">
-              <dt className="text-xs text-muted-foreground">{item.label}</dt>
+            <div key={item.label} className="flex items-baseline justify-between gap-3 border-b border-primary-foreground/10 pb-2">
+              <dt className="text-xs text-primary-foreground/55">{item.label}</dt>
               <dd className="text-sm font-semibold text-right">{item.value}</dd>
             </div>
           ))}
@@ -447,24 +460,22 @@ const AnalysisPage = () => {
         <h2 className="mb-5 text-base font-semibold">예상 자산 매도가</h2>
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <p className="text-xs text-muted-foreground">토지 매도가 (매도자 희망)</p>
+            <p className="text-xs text-primary-foreground/55">토지 매도가 (매도자 희망)</p>
             <p className="mt-1 text-xl font-semibold tabular-nums">
               {((askingLandPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">건물 매도가 (매도자 희망)</p>
+            <p className="text-xs text-primary-foreground/55">건물 매도가 (매도자 희망)</p>
             <p className="mt-1 text-xl font-semibold tabular-nums">
               {((askingBuildingPrice ?? 0) / 1_0000_0000).toLocaleString(undefined, { maximumFractionDigits: 2 })}억원
             </p>
           </div>
         </div>
-        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+        <p className="mt-4 text-xs leading-relaxed text-primary-foreground/55">
           * 가격이 없는 경우 매도자 미제시, 공시지가 기준 적용
         </p>
       </section>
-        </div>
-      </div>
 
       {/* 전문가 의견 밴드 */}
       {analysis && (() => {
@@ -476,41 +487,40 @@ const AnalysisPage = () => {
           return `${t}합니다.`;
         };
         return (
-          <div className="bg-background">
-            <div className="mx-auto max-w-5xl px-5 sm:px-10 py-8">
-              <section className="border-l-2 border-primary/60 pl-5">
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">전문가 의견</p>
-                <div className="space-y-3 text-sm leading-[1.8] text-foreground">
+              <section className="mt-8 border-l border-primary-foreground/20 pl-5">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-primary-foreground/55">전문가 의견</p>
+                <div className="space-y-3 text-sm leading-[1.8] text-primary-foreground/85">
                   {strengths.length > 0 && (
                     <p>
-                      <span className="font-semibold text-[hsl(var(--primary))]">강점:</span>{' '}
-                      본 자산은 {strengths.map(sentenceify).join(' 또한 ')}
+                      <span className="font-semibold text-primary-foreground">강점 +</span>{' '}
+                      본 자산은 {strengths.map((s) => normalizeArrowText(sentenceify(s))).join(' 또한 ')}
                     </p>
                   )}
                   {risks.length > 0 && (
                     <p>
-                      <span className="font-semibold text-[hsl(var(--accent))]">리스크:</span>{' '}
-                      다만 {risks.map(sentenceify).join(' 아울러 ')}
+                      <span className="font-semibold text-primary-foreground">리스크 -</span>{' '}
+                      다만 {risks.map((s) => normalizeArrowText(sentenceify(s))).join(' 아울러 ')}
                     </p>
                   )}
                   {strengths.length === 0 && risks.length === 0 && (
-                    <p className="text-muted-foreground">특이 사항이 확인되지 않습니다.</p>
+                    <p className="text-primary-foreground/55">특이 사항이 확인되지 않습니다.</p>
                   )}
                 </div>
               </section>
-            </div>
-          </div>
         );
       })()}
 
-      {/* 개발 시나리오 — 회색 밴드 */}
-      <div className="section-light">
+        </div>
+      </div>
+
+      {/* 개발 시나리오 — 흰색 밴드 */}
+      <div className="section-light pb-0">
         <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <div className="space-y-6">
         {/* 시나리오 추천 — 1/2/3순위 탭 */}
         <section>
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-            <TrendingUp className="h-5 w-5 text-accent" /> 개발 시나리오 추천
+          <h2 className="mb-5 flex items-center gap-2 text-2xl font-semibold">
+            <TrendingUp className="h-5 w-5 text-primary" /> 개발 시나리오 추천
           </h2>
           <div>
             {!scenarios ? (
@@ -569,7 +579,7 @@ const AnalysisPage = () => {
                               {scenario.reasons.map((r, i) => (
                                 <li key={i} className="flex gap-2">
                                   <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[hsl(var(--primary))]" />
-                                  <span>{r}</span>
+                                  <span>{normalizeArrowText(r)}</span>
                                 </li>
                               ))}
                             </ul>
@@ -582,7 +592,7 @@ const AnalysisPage = () => {
                               {scenario.risks.map((r, i) => (
                                 <li key={i} className="flex gap-2">
                                   <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[hsl(var(--accent))]" />
-                                  <span>{r}</span>
+                                  <span>{normalizeArrowText(r)}</span>
                                 </li>
                               ))}
                             </ul>
@@ -590,8 +600,8 @@ const AnalysisPage = () => {
                         </div>
 
                         {/* 금융 구조 추천 */}
-                        <div className="border-t border-border/25 pt-5">
-                          <p className="mb-3 text-sm font-semibold">금융 구조 추천</p>
+                        <div className="border-t border-border/20 pt-5">
+                          <p className="mb-4 text-xl font-semibold">금융 구조 추천</p>
                           <div className="grid gap-4 sm:grid-cols-3">
                             <div>
                               <p className="text-xs text-muted-foreground">추천 자기자본 비율</p>
@@ -603,12 +613,12 @@ const AnalysisPage = () => {
                             </div>
                             <div className="sm:col-span-3">
                               <p className="text-xs text-muted-foreground">선정 이유</p>
-                              <p className="mt-1 text-sm leading-relaxed">{scenario.loanReason}</p>
+                              <p className="mt-1 text-sm leading-relaxed">{normalizeArrowText(scenario.loanReason)}</p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="grid gap-6 border-t border-border/25 pt-5 sm:grid-cols-2">
+                        <div className="grid gap-6 border-t border-border/20 pt-5 sm:grid-cols-2">
                         {/* 사용 연면적 입력 (탭별 개별) */}
                         {(() => {
                           const maxAllowed = Math.round(scenario.irrResult.base.usableFloorArea ?? 0);
@@ -731,7 +741,7 @@ const AnalysisPage = () => {
                             : (recommendedRevenue / 100_000_000).toFixed(1);
                           const marginVal = marginByRank[scenario.rank] ?? 40;
                           return (
-                            <div className="space-y-5 border-t border-border/25 pt-5">
+                            <div className="space-y-5 border-t border-border/20 pt-5">
                               {hasPresale && (
                                 <div>
                                   <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -901,11 +911,11 @@ const AnalysisPage = () => {
                           );
                         })()}
 
-                        {/* 재무 지표: 보수적 / 기본 / 낙관적 — 탭 방식 */}
+                        {/* 재무 지표: 좌측 항목명 + 3개 시나리오 숫자 그리드 */}
                         <div>
                           <div className="mb-3 flex items-center gap-2">
-                            <BarChart3 className="h-4 w-4 text-accent" />
-                            <h4 className="text-sm font-semibold">재무 시나리오</h4>
+                            <BarChart3 className="h-5 w-5 text-primary" />
+                            <h4 className="text-xl font-semibold">재무 시나리오</h4>
                             <Badge variant="outline" className={`ml-auto ${feasibilityClass}`}>
                               투자 타당성: {feasibility}
                             </Badge>
@@ -975,46 +985,42 @@ const AnalysisPage = () => {
                                 value: Number.isFinite(lv.paybackYears) && lv.paybackYears > 0 ? `${lv.paybackYears}년` : '--' },
                             ];
 
-                            const renderList = (rows: ReturnType<typeof buildRows>) => (
-                              <dl className="mt-4 divide-y divide-border/20">
-                                {rows.map((r) => (
-                                  <div key={r.label} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 py-2.5">
-                                    <dt className="text-sm text-muted-foreground leading-snug">{r.label}</dt>
-                                    <dd className={`text-sm tabular-nums text-right ${r.highlight ? 'font-bold text-primary' : 'font-semibold'}`}>{r.value}</dd>
-                                  </div>
-                                ))}
-                              </dl>
-                            );
-
-                            const levelCard = (title: string, rows: ReturnType<typeof buildRows>, tone: string) => (
-                              <div className="border border-border/25 bg-background/60 p-4">
-                                <p className={`text-xs font-semibold uppercase tracking-wider ${tone}`}>{title}</p>
-                                {renderList(rows)}
-                              </div>
-                            );
+                            const scenarioColumns = [
+                              { key: 'conservative', title: '보수적', rows: buildRows(levelsData.conservative) },
+                              { key: 'base', title: '기본', rows: buildRows(levelsData.base) },
+                              { key: 'optimistic', title: '낙관적', rows: buildRows(levelsData.optimistic) },
+                            ];
+                            const labels = scenarioColumns[0].rows;
 
                             return (
-                              <>
-                                {/* PC: 3열 나란히 */}
-                                <div className="hidden md:grid md:grid-cols-3 md:gap-4 mt-4">
-                                  {levelCard('보수적', buildRows(levelsData.conservative), 'text-muted-foreground')}
-                                  {levelCard('기본', buildRows(levelsData.base), 'text-primary')}
-                                  {levelCard('낙관적', buildRows(levelsData.optimistic), 'text-[hsl(var(--accent))]')}
+                              <div className="mt-4 overflow-x-auto border border-border/20">
+                                <div className="min-w-[680px]">
+                                  <div className="grid grid-cols-[1.15fr_repeat(3,1fr)] border-b border-border/20 bg-muted/40 text-xs font-semibold text-muted-foreground">
+                                    <div className="px-4 py-3">항목</div>
+                                    {scenarioColumns.map((col) => (
+                                      <div key={col.key} className="border-l border-border/20 px-4 py-3 text-right">{col.title}</div>
+                                    ))}
+                                  </div>
+                                  <div className="divide-y divide-border/20">
+                                    {labels.map((row, rowIndex) => (
+                                      <div key={row.label} className="grid grid-cols-[1.15fr_repeat(3,1fr)] items-center">
+                                        <div className="px-4 py-3 text-sm text-muted-foreground leading-snug">{row.label}</div>
+                                        {scenarioColumns.map((col) => {
+                                          const value = col.rows[rowIndex];
+                                          return (
+                                            <div
+                                              key={`${col.key}-${row.label}`}
+                                              className={`border-l border-border/20 px-4 py-3 text-right text-sm tabular-nums ${value.highlight ? 'font-bold text-primary' : 'font-semibold'}`}
+                                            >
+                                              {value.value}
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                                {/* 모바일: 탭 전환 */}
-                                <div className="md:hidden">
-                                  <Tabs defaultValue="base">
-                                    <TabsList className="grid w-full grid-cols-3">
-                                      <TabsTrigger value="conservative">보수적</TabsTrigger>
-                                      <TabsTrigger value="base">기본</TabsTrigger>
-                                      <TabsTrigger value="optimistic">낙관적</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="conservative">{renderList(buildRows(levelsData.conservative))}</TabsContent>
-                                    <TabsContent value="base">{renderList(buildRows(levelsData.base))}</TabsContent>
-                                    <TabsContent value="optimistic">{renderList(buildRows(levelsData.optimistic))}</TabsContent>
-                                  </Tabs>
-                                </div>
-                              </>
+                              </div>
                             );
                           })()}
                         </div>
@@ -1028,7 +1034,7 @@ const AnalysisPage = () => {
       </div>
         </div>
       </div>
-
+      <Footer />
     </div>
   );
 };

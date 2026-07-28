@@ -59,8 +59,8 @@ const BridgeInquiryForm = ({ defaultLevel = 'L1', onSuccess }: Props) => {
             <label
               key={opt.v}
               htmlFor={`lvl-${opt.v}`}
-              className={`flex cursor-pointer items-start gap-3 rounded-md border p-3 transition-colors ${
-                level === opt.v ? 'border-accent bg-accent/5' : 'hover:bg-muted/50'
+              className={`flex cursor-pointer items-start gap-3 rounded-none border p-3 transition-colors ${
+                level === opt.v ? 'border-primary bg-secondary' : 'hover:bg-muted/50'
               }`}
             >
               <RadioGroupItem id={`lvl-${opt.v}`} value={opt.v} className="mt-0.5" />
