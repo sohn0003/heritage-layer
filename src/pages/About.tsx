@@ -454,9 +454,26 @@ const AboutPage = () => {
             <div className="mt-8">
               <KoreaMapChart />
             </div>
+          </div>
 
+          <div>
+            <Reveal>
+              <h3 className="text-base font-light md:text-lg">소유 구분 비율</h3>
+              <p className="mt-3 text-xs" style={{ color: LIGHT_SUB }}>국공유 자산이 절반 이상으로, 민관협력 가능성이 존재합니다</p>
+            </Reveal>
+            <Reveal delay={100}>
+              <div className="mt-8">
+                <PieChart
+                  segments={[
+                    { label: '국·공유', value: 62, shade: 'hsl(210 45% 45%)' },
+                    { label: '사유', value: 28, shade: 'hsl(210 40% 68%)' },
+                    { label: '기타', value: 10, shade: 'hsl(210 25% 84%)' },
+                  ]}
+                />
+              </div>
+            </Reveal>
 
-            <div className="mx-auto mt-10 max-w-2xl">
+            <div className="mt-12">
               <button
                 type="button"
                 onClick={() => setTrendOpen((v) => !v)}
@@ -482,24 +499,6 @@ const AboutPage = () => {
               </div>
             </div>
           </div>
-
-          <div>
-            <Reveal>
-              <h3 className="text-base font-light md:text-lg">소유 구분 비율</h3>
-              <p className="mt-3 text-xs" style={{ color: LIGHT_SUB }}>국·공유 자산이 절반 이상 — 민관협력 기회가 큽니다.</p>
-            </Reveal>
-            <Reveal delay={100}>
-              <div className="mt-8">
-                <Donut
-                  segments={[
-                    { label: '국·공유', value: 62, shade: 'hsl(210 45% 45%)' },
-                    { label: '사유', value: 28, shade: 'hsl(210 40% 68%)' },
-                    { label: '기타', value: 10, shade: 'hsl(210 25% 84%)' },
-                  ]}
-                />
-              </div>
-            </Reveal>
-          </div>
         </div>
       </Section>
 
@@ -507,7 +506,7 @@ const AboutPage = () => {
       <Section
         tone="dark"
         title="왜 재생되지 못할까요?"
-        lead="방치는 우연이 아닙니다. 구조적 원인이 네 가지 축에서 작동하고 있습니다."
+        lead="구조적 원인이 네 가지 축에서 작동하고 있습니다."
       >
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-x-12 sm:grid-cols-2">
           {[
