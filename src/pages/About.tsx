@@ -306,6 +306,25 @@ const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => (
 
 const AboutPage = () => {
   const navigate = useNavigate();
+  const [trendOpen, setTrendOpen] = useState(false);
+  const [mapMarkers, setMapMarkers] = useState<{ lat: number; lng: number; title?: string; id?: string }[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from('assets_public')
+        .select('id, address, latitude, longitude')
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null)
+        .limit(200);
+      if (data) {
+        setMapMarkers(
+          data.map((a: any) => ({ lat: a.latitude, lng: a.longitude, title: a.address, id: a.id }))
+        );
+      }
+    })();
+  }, []);
+
 
   return (
     <div className="min-h-screen [word-break:keep-all]" style={{ background: DARK }}>
