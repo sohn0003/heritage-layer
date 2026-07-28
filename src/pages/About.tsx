@@ -259,9 +259,15 @@ const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => (
     >
       <span className="font-display text-[10px] uppercase tracking-[0.25em]" style={{ color: LIGHT_SUB }}>The Layer</span>
       <p className="mt-2 text-base font-light">Heritage<br />Layer</p>
-      <Button size="sm" variant="outline" className="mt-3 h-7 px-3 text-[10px]" onClick={onExplore}>
+      <button
+        type="button"
+        onClick={onExplore}
+        className="mt-3 h-7 px-3 text-[10px] transition-colors"
+        style={{ border: `1px solid ${LINE_LIGHT}`, color: LIGHT_TEXT, background: 'transparent' }}
+      >
         자산 탐색
-      </Button>
+      </button>
+
     </div>
 
     {features.map((f, i) => {
