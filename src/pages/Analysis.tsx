@@ -480,7 +480,7 @@ const AnalysisPage = () => {
             {/* 모바일에서는 계기판이 블록별 평가보다 위 */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex cursor-help flex-col items-center justify-center">
+                <div className="order-1 flex cursor-help flex-col items-center justify-center md:order-2">
                   <GradeMeter grade={scoringResult.grade} totalScore={scoringResult.totalScore} size={210} />
                   <span className="mt-3 border border-primary-foreground/20 px-3 py-1 text-xs text-primary-foreground/70">분석 가정</span>
                 </div>
