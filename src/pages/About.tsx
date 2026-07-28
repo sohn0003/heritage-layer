@@ -426,7 +426,7 @@ const AboutPage = () => {
               방치된 자산이 매년 늘어나고 있습니다
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-sm leading-[1.9] md:text-base" style={{ color: 'hsl(0 0% 85%)' }}>
-              지역은 텅 비어가는데, 활용할 방법은 없습니다. 데이터는 흩어져 있고 절차는 복잡합니다.
+              지역은 텅 비어가는데, 우리는 이를 어떻게 활용할 수 있을까요?
             </p>
           </Reveal>
         </div>
@@ -436,7 +436,12 @@ const AboutPage = () => {
       <Section
         tone="light"
         title="전국 부동산 현황"
-        lead="방치된 자원이 매년 늘어나고 있습니다 — 새로운 기회로 전환할 시간입니다."
+        lead={
+          <span className="block">
+            방치된 자원이 매년 늘어나고 있습니다.
+            <span className="mt-1 block pl-6">새로운 기회로 전환할 시간입니다.</span>
+          </span>
+        }
       >
         <StatRow
           items={[
