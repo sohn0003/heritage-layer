@@ -124,59 +124,83 @@ const Navbar = () => {
                 <User className="h-5 w-5" strokeWidth={1.5} />
               </Link>
             ) : (
+          {/* Mobile right side */}
+          <div className="flex items-center gap-3 md:hidden">
+            <button
+              onClick={() => setContactOpen(true)}
+              className="bg-white px-3 py-1.5 text-xs font-light tracking-wide text-neutral-900 transition-opacity hover:opacity-85"
+            >
+              Get started
+            </button>
+            {user ? (
+              <Link to="/mypage" aria-label="Mypage" className={`transition-colors ${textMuted}`}>
+                <User className="h-5 w-5" strokeWidth={1.5} />
+              </Link>
+            ) : (
               <button onClick={() => setAuthOpen(true)} aria-label="Login" className={`transition-colors ${textMuted}`}>
                 <User className="h-5 w-5" strokeWidth={1.5} />
               </button>
             )}
-            <button
-              className={`transition-colors duration-300 ${textColor}`}
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="menu"
-            >
-              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile menu — 애니메이션 슬라이드 다운 */}
+      {/* Mobile drawer — 왼쪽 패널 */}
+      <div className={`fixed inset-0 z-[60] md:hidden ${mobileOpen ? '' : 'pointer-events-none'}`}>
         <div
-          className={`overflow-hidden md:hidden transition-[max-height,opacity] duration-200 ease-out ${
-            mobileOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          } ${isDark ? 'bg-black/70 backdrop-blur-md' : 'bg-background/95 backdrop-blur-md'}`}
+          className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`}
+          onClick={() => setMobileOpen(false)}
+        />
+        <aside
+          className={`absolute left-0 top-0 h-full w-[76%] max-w-xs bg-[#111214] text-white shadow-2xl transition-transform duration-300 ease-out ${
+            mobileOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
         >
-          <div className="flex flex-col items-end gap-4 px-6 pb-6 pt-2">
+          <div className="flex h-16 items-center justify-between border-b border-white/10 px-6">
+            <span className="text-lg font-light">Menu</span>
+            <button onClick={() => setMobileOpen(false)} aria-label="close menu">
+              <X className="h-5 w-5" strokeWidth={1} />
+            </button>
+          </div>
+          <nav className="flex flex-col">
+            {user && (
+              <Link
+                to="/mypage"
+                className="border-b border-white/10 px-6 py-5 text-lg font-light text-white/90"
+                onClick={() => setMobileOpen(false)}
+              >
+                My dashboard
+              </Link>
+            )}
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
-                className={`text-sm font-light tracking-wide ${
-                  location.pathname === item.href ? textColor : textMuted
-                }`}
+                className="border-b border-white/10 px-6 py-5 text-lg font-light text-white/90"
                 onClick={() => setMobileOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
             <button
-              className={`text-sm font-light tracking-wide ${textMuted}`}
+              className="border-b border-white/10 px-6 py-5 text-left text-lg font-light text-white/90"
               onClick={() => { setMobileOpen(false); setContactOpen(true); }}
             >
               Contact
-
             </button>
             {isAdmin && (
               <Link
                 to="/admin/properties"
-                className={`text-sm font-light tracking-wide ${textMuted}`}
+                className="border-b border-white/10 px-6 py-5 text-lg font-light text-white/90"
                 onClick={() => setMobileOpen(false)}
               >
                 Admin
               </Link>
             )}
-          </div>
-        </div>
+          </nav>
+        </aside>
+      </div>
 
-      </nav>
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
       <ContactPanel open={contactOpen} onOpenChange={setContactOpen} />
 
@@ -185,3 +209,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
