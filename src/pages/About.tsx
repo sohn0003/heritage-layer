@@ -96,7 +96,7 @@ const REGION_PINS = [
 const KoreaMapChart = () => {
   const [hover, setHover] = useState<string | null>(null);
   return (
-    <div className="relative mx-auto aspect-[726/688] w-full max-w-[420px]">
+    <div className="relative mx-auto aspect-[726/688] w-[78%] max-w-[420px] sm:w-full">
       <img
         src={koreaMap.url}
         alt="대한민국 권역별 폐교 분포 지도"
