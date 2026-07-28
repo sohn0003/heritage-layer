@@ -271,11 +271,11 @@ const StepCircles = ({ tone = 'dark' as Tone }: { tone?: Tone }) => {
   const activeBg = tone === 'dark' ? 'hsl(0 0% 100% / 0.08)' : 'hsl(0 0% 100%)';
   return (
     <div>
-      <div className="relative mx-auto flex max-w-4xl flex-wrap items-start justify-center gap-x-4 gap-y-8 sm:flex-nowrap">
+      <div className="relative mx-auto flex max-w-4xl flex-col items-stretch justify-center gap-y-6 sm:flex-row sm:flex-nowrap sm:items-start sm:gap-x-4 sm:gap-y-8">
         {steps.map((s, i) => (
           <Reveal key={s.step} delay={i * 120} className="flex-1">
-            <div className="flex flex-col items-center">
-              <div className="flex w-full items-center">
+            <div className="flex flex-row items-center gap-4 text-left sm:flex-col sm:items-center sm:gap-0 sm:text-center">
+              <div className="flex w-auto items-center sm:w-full">
                 <div className="hidden h-px flex-1 sm:block" style={{ background: i === 0 ? 'transparent' : line }} />
                 <button
                   type="button"
@@ -284,7 +284,7 @@ const StepCircles = ({ tone = 'dark' as Tone }: { tone?: Tone }) => {
                   onFocus={() => setActive(i)}
                   onBlur={() => setActive(null)}
                   onClick={() => setActive(active === i ? null : i)}
-                  className="flex h-24 w-24 shrink-0 flex-col items-center justify-center rounded-full transition-all duration-300 sm:h-28 sm:w-28"
+                  className="flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full transition-all duration-300 sm:h-28 sm:w-28"
                   style={{
                     border: `1px solid ${active === i ? 'hsl(210 45% 55%)' : line}`,
                     background: active === i ? activeBg : 'transparent',
@@ -292,20 +292,22 @@ const StepCircles = ({ tone = 'dark' as Tone }: { tone?: Tone }) => {
                   }}
                 >
                   <span className="font-display text-[9px] tracking-[0.2em]" style={{ color: sub }}>{s.step}</span>
-                  <span className="mt-1.5 text-sm font-light">{s.title}</span>
+                  <span className="mt-1.5 text-[13px] font-light sm:text-sm">{s.title}</span>
                 </button>
                 <div className="hidden h-px flex-1 sm:block" style={{ background: i === steps.length - 1 ? 'transparent' : line }} />
               </div>
               <p
-                className="mt-3 min-h-[3.5rem] px-1 text-center text-[11px] leading-[1.7] transition-opacity duration-300 sm:min-h-[4.5rem]"
-                style={{ color: sub, opacity: active === i ? 1 : 0 }}
+                className="flex-1 text-[11px] leading-[1.7] transition-opacity duration-300 sm:mt-3 sm:min-h-[4.5rem] sm:px-1 sm:text-center"
+                style={{ color: sub }}
               >
-                {s.desc}
+                <span className="sm:hidden">{s.desc}</span>
+                <span className="hidden sm:inline" style={{ opacity: active === i ? 1 : 0 }}>{s.desc}</span>
               </p>
             </div>
           </Reveal>
         ))}
       </div>
+
       <p className="mt-2 text-xs" style={{ color: sub }}>각 단계를 마우스로 올려보세요</p>
     </div>
   );
