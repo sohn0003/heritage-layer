@@ -140,25 +140,25 @@ const Navbar = () => {
       {/* Mobile drawer — 왼쪽 패널 */}
       <div className={`fixed inset-0 z-[60] md:hidden ${mobileOpen ? '' : 'pointer-events-none'}`}>
         <div
-          className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 bg-black/30 transition-opacity duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`}
           onClick={() => setMobileOpen(false)}
         />
         <aside
-          className={`absolute left-0 top-0 h-full w-[76%] max-w-xs bg-[#111214] text-white shadow-2xl transition-transform duration-300 ease-out ${
+          className={`absolute left-0 top-0 h-full w-[62%] max-w-[260px] bg-[#111214]/85 text-white shadow-2xl backdrop-blur-md transition-transform duration-300 ease-out ${
             mobileOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="flex h-16 items-center justify-between border-b border-white/10 px-6">
-            <span className="text-lg font-light">Menu</span>
+          <div className="flex h-14 items-center justify-between border-b border-white/10 px-5">
+            <span className="text-sm font-light tracking-wide">Menu</span>
             <button onClick={() => setMobileOpen(false)} aria-label="close menu">
-              <X className="h-5 w-5" strokeWidth={1} />
+              <X className="h-4 w-4" strokeWidth={1} />
             </button>
           </div>
           <nav className="flex flex-col">
             {user && (
               <Link
                 to="/mypage"
-                className="border-b border-white/10 px-6 py-5 text-lg font-light text-white/90"
+                className="border-b border-white/10 px-5 py-3.5 text-sm font-light text-white/90"
                 onClick={() => setMobileOpen(false)}
               >
                 My dashboard
@@ -168,14 +168,14 @@ const Navbar = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className="border-b border-white/10 px-6 py-5 text-lg font-light text-white/90"
+                className="border-b border-white/10 px-5 py-3.5 text-sm font-light text-white/90"
                 onClick={() => setMobileOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
             <button
-              className="border-b border-white/10 px-6 py-5 text-left text-lg font-light text-white/90"
+              className="border-b border-white/10 px-5 py-3.5 text-left text-sm font-light text-white/90"
               onClick={() => { setMobileOpen(false); setContactOpen(true); }}
             >
               Contact
@@ -183,7 +183,7 @@ const Navbar = () => {
             {isAdmin && (
               <Link
                 to="/admin/properties"
-                className="border-b border-white/10 px-6 py-5 text-lg font-light text-white/90"
+                className="border-b border-white/10 px-5 py-3.5 text-sm font-light text-white/90"
                 onClick={() => setMobileOpen(false)}
               >
                 Admin
