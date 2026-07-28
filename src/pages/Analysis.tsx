@@ -429,11 +429,13 @@ const AnalysisPage = () => {
             label="건폐율"
             current={asset.current_building_coverage ?? asset.building_coverage}
             legalMax={asset.legal_max_building_coverage}
+            tone="dark"
           />
           <RatioBar
             label="용적률"
             current={asset.current_floor_area_ratio ?? asset.floor_area_ratio}
             legalMax={asset.legal_max_floor_area_ratio}
+            tone="dark"
           />
         </div>
         <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">

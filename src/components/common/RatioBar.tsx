@@ -6,41 +6,46 @@ interface RatioBarProps {
   legalMax: number | null;// 법정 한도 (%)
   unit?: string;
   className?: string;
+  tone?: 'default' | 'dark';
 }
 
 // 현재 값 vs 법정 한도 시각화 막대
 // 사용률(%)에 따라 색상이 변합니다.
-const RatioBar = ({ label, current, legalMax, unit = '%', className }: RatioBarProps) => {
+const RatioBar = ({ label, current, legalMax, unit = '%', className, tone = 'default' }: RatioBarProps) => {
   const hasData = current != null && legalMax != null && legalMax > 0;
-  const usage = hasData ? Math.min((current! / legalMax!) * 100, 100) : 0;
+  const usage = hasData ? Math.min((current / legalMax) * 100, 100) : 0;
 
-  const barColor =
-    usage < 50 ? 'bg-[hsl(210_45%_72%)]'
-    : usage < 80 ? 'bg-[hsl(25_55%_62%)]'
-    : 'bg-[hsl(15_40%_55%)]';
+  const barColor = tone === 'dark'
+    ? 'bg-primary-foreground/80'
+    : usage < 50 ? 'bg-secondary-foreground/35'
+      : usage < 80 ? 'bg-primary/65'
+      : 'bg-primary';
+  const mutedText = tone === 'dark' ? 'text-primary-foreground/55' : 'text-muted-foreground';
+  const strongText = tone === 'dark' ? 'text-primary-foreground' : 'text-foreground';
+  const trackColor = tone === 'dark' ? 'bg-primary-foreground/10' : 'bg-muted';
 
   return (
     <div className={cn('space-y-1.5', className)}>
       <div className="flex items-baseline justify-between">
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span className={cn('text-xs font-medium', mutedText)}>{label}</span>
         {hasData ? (
           <span className="text-xs tabular-nums">
-            <span className="font-semibold text-foreground">{current}{unit}</span>
-            <span className="mx-1 text-muted-foreground">/</span>
-            <span className="text-muted-foreground">법정 {legalMax}{unit}</span>
+            <span className={cn('font-semibold', strongText)}>{current}{unit}</span>
+            <span className={cn('mx-1', mutedText)}>/</span>
+            <span className={mutedText}>법정 {legalMax}{unit}</span>
           </span>
         ) : (
-          <span className="text-xs text-muted-foreground">정보 없음</span>
+          <span className={cn('text-xs', mutedText)}>정보 없음</span>
         )}
       </div>
-      <div className="relative h-2.5 overflow-hidden rounded-full bg-muted">
+      <div className={cn('relative h-2.5 overflow-hidden rounded-none', trackColor)}>
         <div
-          className={cn('absolute inset-y-0 left-0 rounded-full transition-[width] duration-700 ease-out', barColor)}
+          className={cn('absolute inset-y-0 left-0 rounded-none transition-[width] duration-700 ease-out', barColor)}
           style={{ width: `${usage}%` }}
         />
       </div>
       {hasData && (
-        <div className="text-right text-[10px] text-muted-foreground">사용률 {usage.toFixed(0)}%</div>
+        <div className={cn('text-right text-[10px]', mutedText)}>사용률 {usage.toFixed(0)}%</div>
       )}
     </div>
   );
