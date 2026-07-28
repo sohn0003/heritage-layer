@@ -324,60 +324,94 @@ const features = [
   { icon: Bookmark, title: '무제한 자산 저장' },
 ];
 
-const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => (
-  <div className="relative mx-auto aspect-square w-full max-w-[520px] sm:max-w-[600px]">
-    <div className="absolute inset-0 rounded-full" style={{ border: `1px solid ${LINE_LIGHT}` }} />
-    <div className="absolute inset-[10%] rounded-full" style={{ border: `1px dashed ${LINE_LIGHT}` }} />
+const FeatureWheel = ({ onExplore }: { onExplore: () => void }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [shown, setShown] = useState(false);
+  const [hover, setHover] = useState<number | null>(null);
+  const [ctaHover, setCtaHover] = useState(false);
 
-    <div
-      className="absolute left-1/2 top-1/2 flex h-36 w-36 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full text-center sm:h-44 sm:w-44"
-      style={{ background: '#ffffff', border: `1px solid ${LINE_LIGHT}` }}
-    >
-      <span className="font-display text-[10px] uppercase tracking-[0.25em]" style={{ color: LIGHT_SUB }}>The Layer</span>
-      <p className="mt-2 text-base font-light">Heritage<br />Layer</p>
-      <button
-        type="button"
-        onClick={onExplore}
-        className="mt-3 h-7 px-3 text-[10px] transition-colors"
-        style={{ border: `1px solid ${LINE_LIGHT}`, color: LIGHT_TEXT, background: 'transparent' }}
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setShown(true); obs.disconnect(); } },
+      { threshold: 0.2 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="relative mx-auto aspect-square w-full max-w-[520px] sm:max-w-[600px]">
+      <div className="absolute inset-0 rounded-full" style={{ border: `1px solid ${LINE_LIGHT}` }} />
+      <div className="absolute inset-[10%] rounded-full" style={{ border: `1px dashed ${LINE_LIGHT}` }} />
+
+      <div
+        className="absolute left-1/2 top-1/2 flex h-36 w-36 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full text-center sm:h-44 sm:w-44"
+        style={{ background: '#ffffff', border: `1px solid ${LINE_LIGHT}` }}
       >
-        자산 탐색
-      </button>
-
-    </div>
-
-    {features.map((f, i) => {
-      const angle = (i / features.length) * 2 * Math.PI - Math.PI / 2;
-      const left = 50 + 50 * Math.cos(angle);
-      const top = 50 + 50 * Math.sin(angle);
-      const Icon = f.icon;
-      return (
-        <div
-          key={f.title}
-          className="absolute -translate-x-1/2 -translate-y-1/2"
-          style={{ left: `${left}%`, top: `${top}%`, width: 'min(28%, 128px)' }}
+        <p className="text-base font-light">Heritage<br />Layer</p>
+        <button
+          type="button"
+          onClick={onExplore}
+          onMouseEnter={() => setCtaHover(true)}
+          onMouseLeave={() => setCtaHover(false)}
+          className="mt-3 h-7 px-3 text-[10px] transition-colors duration-300"
+          style={{
+            border: `1px solid ${ctaHover ? 'hsl(210 45% 45%)' : LINE_LIGHT}`,
+            color: ctaHover ? '#ffffff' : LIGHT_TEXT,
+            background: ctaHover ? 'hsl(210 45% 45%)' : 'transparent',
+          }}
         >
+          자산 탐색
+        </button>
+      </div>
+
+      {features.map((f, i) => {
+        const angle = (i / features.length) * 2 * Math.PI - Math.PI / 2;
+        const left = 50 + 50 * Math.cos(angle);
+        const top = 50 + 50 * Math.sin(angle);
+        const Icon = f.icon;
+        const isHover = hover === i;
+        return (
           <div
-            className="flex flex-col items-center animate-fade-in"
-            style={{ animationDelay: `${i * 70}ms`, animationFillMode: 'both' }}
+            key={f.title}
+            className="absolute -translate-x-1/2 -translate-y-1/2"
+            style={{ left: `${left}%`, top: `${top}%`, width: 'min(28%, 128px)' }}
           >
             <div
-              className="flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14"
-              style={{ background: LIGHT, border: `1px solid ${LINE_LIGHT}` }}
+              className="flex flex-col items-center"
+              onMouseEnter={() => setHover(i)}
+              onMouseLeave={() => setHover(null)}
+              style={{
+                opacity: shown ? 1 : 0,
+                transform: shown ? 'scale(1)' : 'scale(0.4)',
+                transition: `opacity 450ms ease-out ${i * 110}ms, transform 550ms cubic-bezier(0.22,1,0.36,1) ${i * 110}ms`,
+              }}
             >
-              <Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: 'hsl(210 45% 45%)' }} />
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-300 sm:h-14 sm:w-14"
+                style={{
+                  background: LIGHT,
+                  border: `1px solid ${isHover ? 'hsl(210 45% 45%)' : LINE_LIGHT}`,
+                  transform: isHover ? 'scale(1.5)' : 'scale(1)',
+                }}
+              >
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: 'hsl(210 45% 45%)' }} />
+              </div>
+              <p
+                className="mt-2 text-center text-[10px] leading-tight transition-all duration-300 sm:text-xs"
+                style={{ color: isHover ? LIGHT_TEXT : LIGHT_SUB, marginTop: isHover ? 18 : 8 }}
+              >
+                {f.title}
+              </p>
             </div>
-            <p className="mt-2 text-center text-[10px] leading-tight sm:text-xs" style={{ color: LIGHT_SUB }}>
-              {f.title}
-            </p>
           </div>
-        </div>
-
-
-      );
-    })}
-  </div>
-);
+        );
+      })}
+    </div>
+  );
+};
 
 const AboutPage = () => {
   const navigate = useNavigate();
