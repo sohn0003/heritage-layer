@@ -591,7 +591,8 @@ const AnalysisPage = () => {
         </div>
       </div>
 
-      {/* 개발 시나리오 — 흰색 밴드 */}
+      {/* 개발 시나리오 — 흰색 밴드 (임시 숨김) */}
+      {false && (
       <div className="section-light pb-0">
         <div className="mx-auto max-w-5xl px-5 sm:px-10 py-10">
       <div className="space-y-6">
@@ -1084,6 +1085,7 @@ const AnalysisPage = () => {
       </div>
         </div>
       </div>
+      )}
       <Footer />
     </div>
   );
